@@ -2,26 +2,66 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+
+using ServicioHydrate.Data;
+using ServicioHydrate.Autenticacion;
+using ServicioHydrate.Utilidades;
 
 namespace ServicioHydrate
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment entorno)
         {
             Configuration = configuration;
+            _env = entorno;
         }
 
         public IConfiguration Configuration { get; }
+        private readonly IWebHostEnvironment _env;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllersWithViews();
+
+            if (_env.IsProduction()) 
+            {
+                services.AddDbContext<ContextoDB>(options => 
+                    options.UseSqlServer(Configuration.GetConnectionString("DbPrincipal")));
+            } else 
+            {
+                services.AddDbContext<ContextoDB>(options => 
+                    options.UseSqlite("Data Source=db_desarrollo.db"));
+            }
+
+            services.AddCors();
+
+            services.Configure<AppConfig>(Configuration.GetSection("AppConfig"));
+
+            services.AddScoped<GeneradorDeToken>();
+
+            services.AddScoped<IServicioUsuarios, RepositorioUsuarios>();
+
+            services.AddControllers();
+
+            services.AddSwaggerGen(c => 
+            {
+                c.SwaggerDoc(
+                    "v1",
+                    new OpenApiInfo
+                    {
+                        Title = "Hydrate - Servicio Web",
+                        Version = "v1",
+                        Description = "API web para el proyecto Hydrate."
+                    }
+                );
+            });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -36,6 +76,10 @@ namespace ServicioHydrate
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                app.UseSwagger();
+
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Hydrate v1"));
             }
             else
             {
@@ -50,11 +94,11 @@ namespace ServicioHydrate
 
             app.UseRouting();
 
+            app.UseMiddleware<MiddlewareJWT>();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
 
             app.UseSpa(spa =>

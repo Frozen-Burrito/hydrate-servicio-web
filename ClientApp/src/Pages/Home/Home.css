@@ -1,0 +1,78 @@
+@import url("../../styles.css");
+
+header {
+  position: relative;
+  background: url("banner-agua-rica.jpg");
+  width: 100%;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 80vh;
+  top: var(-3.75rem);
+}
+
+.banner {
+  position: relative;
+  display: flex;
+  height: 100%;
+  width: 80rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.container-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.text {
+  font-size: 3.5rem;
+  font-weight: 550;
+}
+
+.description {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.btn-container {
+  padding: 2.3rem 0;
+  width: 100%;
+  left: 0;
+}
+
+.button {
+  margin-top: 50px;
+  display: inline-block;
+  padding: 0.8rem 2.8rem;
+  font-size: 0.95rem;
+  border: 2px solid #fff;
+  border-radius: 0.5rem;
+  line-height: 1;
+  margin: 0 0.2rem;
+  transition: 0.3s;
+  text-transform: uppercase;
+  background-color: var(--secundario-claro);
+  color: #fff;
+  font-weight: 600;
+}
+
+.button:hover {
+  background-color: var(--variante-secundario-claro);
+}
+
+section {
+  position: relative;
+  height: 13vh;
+  padding: 1rem;
+  display: flex;
+  width: 76rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.info {
+  font-size: 1.1rem;
+  font-weight: 500;
+}

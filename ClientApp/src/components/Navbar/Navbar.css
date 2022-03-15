@@ -1,0 +1,101 @@
+@import url("../../styles.css");
+
+nav {
+  position: relative;
+  top: 0;
+  width: 100%;
+  background-color: var(--primario-claro);
+  height: 3.75rem;
+}
+
+.container {
+  position: relative;
+  max-width: 90rem;
+  padding: 0 2rem;
+  margin: 0 auto;
+  display: flex;
+  height: 100%;
+}
+
+.logo-container {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.links-container {
+  display: flex;
+  flex: 3;
+}
+
+.nav-links {
+  display: flex;
+  flex: 3;
+  justify-content: center;
+  align-items: center;
+}
+
+.btns-container {
+  display: flex;
+  flex: 2;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-links > ul {
+  display: flex;
+  list-style: none;
+}
+
+.logo {
+  color: var(--contraste-primario-claro);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  line-height: 3rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.3rem;
+  font-size: 0.8rem;
+  border: 2px solid #fff;
+  border-radius: 2rem;
+  line-height: 1;
+  margin: 0 0.2rem;
+  transition: 0.3s;
+  text-transform: uppercase;
+}
+
+.btn.solid,
+.btn.transparent:hover {
+  background-color: #fff;
+  color: var(--variante-primario-claro);
+}
+
+.btn.transparent,
+.btn.solid:hover {
+  background-color: transparent;
+  color: #fff;
+}
+
+.link {
+  position: relative;
+}
+
+.link > .nav-link {
+  line-height: 3rem;
+  color: #fff;
+  padding: 0 0.8rem;
+  letter-spacing: 1px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: 0.5s;
+}
+
+.link:hover > .nav-link {
+  transform: scale(1.1);
+}

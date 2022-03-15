@@ -1,0 +1,25 @@
+@import url("../../styles.css");
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.3rem;
+  font-size: 0.8rem;
+  border: 2px solid #fff;
+  border-radius: 2rem;
+  line-height: 1;
+  margin: 0 0.2rem;
+  transition: 0.3s;
+  text-transform: uppercase;
+}
+
+.btn.solid,
+.btn.transparent:hover {
+  background-color: #fff;
+  color: var(--variante-primario-claro);
+}
+
+.btn.transparent,
+.btn.solid:hover {
+  background-color: transparent;
+  color: #fff;
+}
