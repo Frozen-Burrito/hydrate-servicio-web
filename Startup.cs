@@ -30,15 +30,15 @@ namespace ServicioHydrate
         {
             services.AddControllersWithViews();
 
-            if (_env.IsProduction()) 
-            {
+            // if (_env.IsProduction()) 
+            // {
                 services.AddDbContext<ContextoDB>(options => 
                     options.UseSqlServer(Configuration.GetConnectionString("DbPrincipal")));
-            } else 
-            {
-                services.AddDbContext<ContextoDB>(options => 
-                    options.UseSqlite("Data Source=db_desarrollo.db"));
-            }
+            // } else 
+            // {
+            //     services.AddDbContext<ContextoDB>(options => 
+            //         options.UseSqlite("Data Source=db_desarrollo.db"));
+            // }
 
             services.AddCors();
 

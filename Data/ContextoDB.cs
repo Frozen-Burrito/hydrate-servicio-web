@@ -18,7 +18,13 @@ namespace ServicioHydrate.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.Id)
+                .HasColumnType("uniqueidentifier")
+                .HasDefaultValueSql("newid()");
 
+            modelBuilder.Entity<Usuario>()
+                .HasKey(u => u.Id);
         }
     }
 }

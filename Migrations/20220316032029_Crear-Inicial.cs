@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ServicioHydrate.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class CrearInicial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,10 +11,10 @@ namespace ServicioHydrate.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    NombreUsuario = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Contrasenia = table.Column<string>(type: "TEXT", maxLength: 40, nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newid()"),
+                    NombreUsuario = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false)
                 },
                 constraints: table =>
                 {

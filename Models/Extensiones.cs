@@ -1,4 +1,4 @@
-using System.Linq;
+using System;
 
 using ServicioHydrate.Modelos.DTO;
 
@@ -10,7 +10,7 @@ namespace ServicioHydrate.Modelos
         {
             return new Usuario 
             {
-                Id = usuario.Id,
+                Id = usuario.Id, //.ToString("N")
                 NombreUsuario = usuario.NombreUsuario,
                 Email = usuario.Email,
                 Password = hashContrasenia,
