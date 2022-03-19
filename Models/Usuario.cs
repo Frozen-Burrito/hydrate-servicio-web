@@ -10,14 +10,14 @@ namespace ServicioHydrate.Modelos
         public Guid Id { get; set; }
 
         [Required]
-        [MaxLength(32)]
+        // [MaxLength(32)]
         public string NombreUsuario { get; set; }
 
         [Required]
         public string Email { get; set; }
 
         [Required]
-        [MaxLength(40)]
+        [MaxLength(80)]
         public string Password { get; set; }
     }
 }
