@@ -16,6 +16,8 @@ namespace ServicioHydrate.Data
 
         public DbSet<Usuario> Usuarios { get; set; }
 
+        public DbSet<RecursoInformativo> Recursos { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
 
