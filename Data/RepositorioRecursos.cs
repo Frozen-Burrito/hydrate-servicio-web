@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -17,24 +18,55 @@ namespace ServicioHydrate.Data
             this._contexto = contexto;
         }
 
-        public async Task<DTORecursoInformativo> ActualizarRecursoAsync(int idRecurso, DTORecursoInformativo recursoActualizado)
+        public async Task ActualizarRecursoAsync(DTORecursoInformativo recursoModificado)
         {
-            throw new System.NotImplementedException();
+            RecursoInformativo modeloRecurso = await _contexto.Recursos.FindAsync(recursoModificado.Id);
+
+            if (modeloRecurso is null)
+            {
+                throw new ArgumentException("No existe un recurso informativo con el ID especificado.");
+            }
+
+            modeloRecurso.Actualizar(recursoModificado);
+
+            _contexto.Entry(modeloRecurso).State = EntityState.Modified;
+
+            await _contexto.SaveChangesAsync();
         }
 
         public async Task<DTORecursoInformativo> AgregarNuevoRecursoAsync(DTORecursoInformativo nuevoRecurso)
         {
-            throw new System.NotImplementedException();
+            RecursoInformativo modeloRecurso = nuevoRecurso.ComoModelo();
+            
+            _contexto.Add(modeloRecurso);
+            await _contexto.SaveChangesAsync();
+
+            return modeloRecurso.ComoDTO();
         }
 
         public async Task EliminarRecursoAsync(int idRecurso)
         {
-            throw new System.NotImplementedException();
+            var recurso = await _contexto.Recursos.FindAsync(idRecurso);
+
+            if (recurso is null)
+            {
+                throw new ArgumentException("No existe un recurso informativo con el ID especificado.");
+            }
+
+            _contexto.Remove(recurso);
+            await _contexto.SaveChangesAsync();
         }
 
         public async Task<DTORecursoInformativo> GetRecursoPorIdAsync(int idRecurso)
         {
-            throw new System.NotImplementedException();
+            var recurso = await _contexto.Recursos.FindAsync(idRecurso);
+
+            if (recurso is null)
+            {
+                throw new ArgumentException("No existe un recurso informativo con el ID especificado.");
+            }
+
+            return recurso.ComoDTO();
         }
 
         public Task<List<DTORecursoInformativo>> GetRecursosAsync()

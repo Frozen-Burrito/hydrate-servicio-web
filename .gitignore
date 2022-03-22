@@ -230,3 +230,6 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+# Base de datos de desarrollo
+db_desarrollo.db

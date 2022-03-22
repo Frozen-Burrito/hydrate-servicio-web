@@ -12,7 +12,7 @@ namespace ServicioHydrate.Data
         Task<List<DTORecursoInformativo>> GetRecursosAsync();
         Task<DTORecursoInformativo> GetRecursoPorIdAsync(int idRecurso);
         Task<DTORecursoInformativo> AgregarNuevoRecursoAsync(DTORecursoInformativo nuevoRecurso);
-        Task<DTORecursoInformativo> ActualizarRecursoAsync(int idRecurso, DTORecursoInformativo recursoActualizado);
+        Task ActualizarRecursoAsync(DTORecursoInformativo recursoActualizado);
         Task EliminarRecursoAsync(int idRecurso);
     }
 }

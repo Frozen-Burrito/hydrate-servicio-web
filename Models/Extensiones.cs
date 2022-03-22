@@ -18,7 +18,17 @@ namespace ServicioHydrate.Modelos
             };
         }
 
-        public static DTORespuestaAutenticacion AsRespuestaToken(this Usuario usuario)
+        public static DTOUsuario ComoDTO(this Usuario usuario)
+        {
+            return new DTOUsuario 
+            {
+                Id = usuario.Id,
+                NombreUsuario = usuario.NombreUsuario,
+                Email = usuario.Email
+            };
+        }
+
+        public static DTORespuestaAutenticacion ComoRespuestaToken(this Usuario usuario)
         {
             return new DTORespuestaAutenticacion
             {
@@ -51,6 +61,15 @@ namespace ServicioHydrate.Modelos
                 Descripcion = recurso.Descripcion,
                 FechaPublicacion = recurso.FechaPublicacion.ToString("O"),
             };
+        }
+
+        public static void Actualizar(this RecursoInformativo recurso, DTORecursoInformativo modificaciones)
+        {
+            recurso.Titulo = modificaciones.Titulo;
+            recurso.Url = modificaciones.Url;
+            recurso.Descripcion = modificaciones.Descripcion;
+            recurso.Descripcion = modificaciones.Descripcion;
+            recurso.FechaPublicacion = DateTime.Parse(modificaciones.FechaPublicacion, CultureInfo.InvariantCulture, DateTimeStyles.None);
         }
     }
 }

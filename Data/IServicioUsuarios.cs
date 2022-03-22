@@ -10,10 +10,10 @@ namespace ServicioHydrate.Data
     public interface IServicioUsuarios
     {
         Task<List<DTOUsuario>> GetUsuariosAsync();
-        Task<Usuario> GetUsuarioPorId(Guid id);
+        Task<DTOUsuario> GetUsuarioPorId(Guid id);
         Task<DTORespuestaAutenticacion> AutenticarUsuario(DTOPeticionAutenticacion infoUsuario);
         Task<DTOUsuario> RegistrarAsync(DTOUsuario usuario);
-        Task<DTOUsuario> ActualizarUsuarioAsync(Guid id, DTOUsuario dtoUsuario);
+        Task<DTOUsuario> ActualizarUsuarioAsync(DTOUsuario dtoUsuario);
         Task EliminarUsuarioAsync(Guid id);
     }
 }
