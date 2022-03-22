@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-using ServicioHydrate.Modelos;
+using ServicioHydrate.Modelos.DTO;
 
 namespace ServicioHydrate.Autenticacion
 {
@@ -16,7 +16,7 @@ namespace ServicioHydrate.Autenticacion
             var permitirUsuarioAnonimo = context.ActionDescriptor.EndpointMetadata.OfType<PermitirAnonimo>().Any();
             if (permitirUsuarioAnonimo) return;
 
-            var usuario = (Usuario) context.HttpContext.Items["Usuario"];
+            var usuario = (DTOUsuario) context.HttpContext.Items["Usuario"];
             if (usuario == null)
                 context.Result = new JsonResult(new { message = "Unauthorized" }) 
                 { 
