@@ -22,7 +22,7 @@ namespace ServicioHydrate.Data
             this._generadorToken = generadorToken;
         }
 
-        public Task<DTOUsuario> ActualizarUsuarioAsync(Guid id, DTOUsuario dtoUsuario)
+        public Task<DTOUsuario> ActualizarUsuarioAsync(DTOUsuario dtoUsuario)
         {
             throw new NotImplementedException();
         }
@@ -70,7 +70,7 @@ namespace ServicioHydrate.Data
                 throw e;  
             }
 
-            var datosUsuario = usuario.AsRespuestaToken();
+            var datosUsuario = usuario.ComoRespuestaToken();
             datosUsuario.Token = _generadorToken.Generar(usuario);
             return datosUsuario;
         }
@@ -80,12 +80,19 @@ namespace ServicioHydrate.Data
             throw new NotImplementedException();
         }
 
-        public Task<Usuario> GetUsuarioPorId(Guid id)
+        public async Task<DTOUsuario> GetUsuarioPorId(Guid id)
         {
-            throw new NotImplementedException();
+            var usuario = await _contexto.Usuarios.FindAsync(id);
+
+            if (usuario is null)
+            {
+                throw new ArgumentException("No existe un usuario con el ID especificado.");
+            }
+
+            return usuario.ComoDTO();
         }
 
-        public Task<List<DTOUsuario>> GetUsuariosAsync()
+        public async Task<List<DTOUsuario>> GetUsuariosAsync()
         {
             throw new NotImplementedException();
         }

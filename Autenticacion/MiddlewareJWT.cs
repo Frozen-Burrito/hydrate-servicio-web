@@ -25,7 +25,7 @@ namespace ServicioHydrate.Autenticacion
 
         public async Task Invoke(HttpContext contexto, IServicioUsuarios servicioUsuarios)
         {
-            var token = contexto.Request.Headers["Autorizacion"].FirstOrDefault()?.Split(" ").Last();
+            var token = contexto.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             if (token != null)
             {
