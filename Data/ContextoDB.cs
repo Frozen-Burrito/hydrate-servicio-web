@@ -7,6 +7,7 @@ using ServicioHydrate.Modelos;
 
 namespace ServicioHydrate.Data 
 {
+    /// Permite la interacción con la base de datos y las entidades de EF core. 
     public class ContextoDB : DbContext 
     {
         public ContextoDB(DbContextOptions<ContextoDB> opciones)
@@ -14,10 +15,13 @@ namespace ServicioHydrate.Data
         {
         }
 
+        /// Colección de entidades de Usuario.
         public DbSet<Usuario> Usuarios { get; set; }
 
+        /// Colección de entidades de RecursoInformativo.
         public DbSet<RecursoInformativo> Recursos { get; set; }
 
+        /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
             modelBuilder.Entity<Usuario>()

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ServicioHydrate.Modelos
 {
+    // Representa un Usuario en la base de datos.
     public class Usuario
     {
         [Key]

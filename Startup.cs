@@ -24,32 +24,41 @@ namespace ServicioHydrate
         public IConfiguration Configuration { get; }
         private readonly IWebHostEnvironment _env;
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // Este método es llamado por el runtime. Utiliza este método para agregar servicios al contenedor.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
 
-            // if (_env.IsProduction()) 
-            // {
+            // Configurar el contexto de base de datos.
+            if (_env.IsProduction()) 
+            {
+                // En entrono de producción (ya desplegado en Azure) usar SQL Server.
                 services.AddDbContext<ContextoDB>(options => 
                     options.UseSqlServer(Configuration.GetConnectionString("DbPrincipal")));
-            // } else 
-            // {
-            //     services.AddDbContext<ContextoDB>(options => 
-            //         options.UseSqlite("Data Source=db_desarrollo.db"));
-            // }
+            } else 
+            {
+                // En entrono de desarrollo (local) usar SQLite.
+                services.AddDbContext<ContextoDB>(options => 
+                    options.UseSqlite("Data Source=db_desarrollo.db"));
+            }
 
+            // Configura Cross-Origin Resource Sharing.
             services.AddCors();
 
+            // Obtiene la configuración del secreto para JWT.
             services.Configure<AppConfig>(Configuration.GetSection("AppConfig"));
 
+            // Incluye el servicio de generación de JWT.
             services.AddScoped<GeneradorDeToken>();
 
+            // Incluye los servicios de acceso a datos.
             services.AddScoped<IServicioUsuarios, RepositorioUsuarios>();
             services.AddScoped<IServicioRecursos, RepositorioRecursos>();
 
+            // Agrega los controladores puros (de la API).
             services.AddControllers();
 
+            // Agregar la generación automática de documentación de API con Swagger.
             services.AddSwaggerGen(c => 
             {
                 c.SwaggerDoc(
@@ -63,20 +72,23 @@ namespace ServicioHydrate
                 );
             });
 
-            // In production, the React files will be served from this directory
+            // En producción, los archivos de React serán servidos desde este directorio.
+            // "build/" es donde está la versión "compilada" de la app de React.
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/build";
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        // Este método es llamado por el runtime. Usa este método para configurar el pipeline de peticiones HTTP.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
+                // Utilizar página de error detallada.
                 app.UseDeveloperExceptionPage();
 
+                // Utilizar Swagger y su UI.
                 app.UseSwagger();
 
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Hydrate v1"));
@@ -84,29 +96,40 @@ namespace ServicioHydrate
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                // El valor por defecto de Hsts es de 30 días. 
+                // Es posible que cambiemos esto para entornos de producción, ver https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
+            // Redirige peticiones HTTP a HTTPS.
             app.UseHttpsRedirection();
+
+            // Usa archivos estáticos (css, js, etc.) de la app de React.
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
+            // Configura el enrutamiento para las url.
             app.UseRouting();
 
+            // Incluir middleware propio para verificar autenticación y autorización
+            // con JWT.
             app.UseMiddleware<MiddlewareJWT>();
 
+            // Utilizar endpoints de los controladores de la API.
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
 
+            // Utilizar Aplicación de Página Única (app de React).
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
 
                 if (env.IsDevelopment())
                 {
+                    // Usar React en versión de desarrollo, si el entorno 
+                    // de ASP.NET es desarrollo.
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });

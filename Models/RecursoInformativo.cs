@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServicioHydrate.Modelos
 {
+    // Representa un Recurso Informativo en la base de datos.
     public class RecursoInformativo 
     {
         public int Id { get; set; }
@@ -19,7 +20,8 @@ namespace ServicioHydrate.Modelos
         [MaxLength(300)]
         public string Descripcion { get; set; }
 
-        [MaxLength(24)]
-        public DateTime FechaPublicacion { get; set; }
+        [MaxLength(32)]
+        [DataType("char")]
+        public string FechaPublicacion { get; set; }
     }
 }

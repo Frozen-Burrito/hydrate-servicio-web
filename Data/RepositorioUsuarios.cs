@@ -11,9 +11,12 @@ using ServicioHydrate.Autenticacion;
 
 namespace ServicioHydrate.Data
 {
+    // Implementa todas las operaciones con Usuarios en la base de datos.
     public class RepositorioUsuarios : IServicioUsuarios
     {
+        // El contexto de EF para la base de datos.
         private readonly ContextoDB _contexto;
+        // Generador de JWT, utilizado por la autenticación. 
         private readonly GeneradorDeToken _generadorToken;
 
         public RepositorioUsuarios(ContextoDB contexto, GeneradorDeToken generadorToken)
@@ -21,7 +24,7 @@ namespace ServicioHydrate.Data
             this._contexto = contexto;
             this._generadorToken = generadorToken;
         }
-
+        
         public Task<DTOUsuario> ActualizarUsuarioAsync(DTOUsuario dtoUsuario)
         {
             throw new NotImplementedException();
@@ -29,6 +32,8 @@ namespace ServicioHydrate.Data
 
         public async Task<DTORespuestaAutenticacion> AutenticarUsuario(DTOPeticionAutenticacion infoUsuario)
         {
+            // Verificar que la petición tenga al menos un tipo de credencial de inicio
+            // de sesión (hace falta el nombre de usuario O el email).
             if (string.IsNullOrEmpty(infoUsuario.Email) && string.IsNullOrEmpty(infoUsuario.NombreUsuario))
             {
                 var e = new ArgumentException("Authentication Error");
@@ -41,6 +46,7 @@ namespace ServicioHydrate.Data
                 throw e;
             }
 
+            // Buscar un usuario en la base de datos con el username o email recibidos.
             var usuario = await _contexto.Usuarios.SingleOrDefaultAsync(
                 u => (u.NombreUsuario == infoUsuario.NombreUsuario || 
                         u.Email == infoUsuario.Email)
@@ -48,6 +54,10 @@ namespace ServicioHydrate.Data
 
             if (usuario is null) 
             {
+                // Si el resultado de buscar un usuario en la base de datos es igual a null,
+                // significa que no existe ninguna cuenta de usuario con el username o email
+                // recibidos en el login. 
+                // En este caso, lanzar una excepcion con tipo "USUARIO_NO_EXISTE".
                 var e = new ArgumentException("Authentication Error");
                 e.Data["ErrorAutenticacion"] = new MensajeErrorAutenticacion
                 {
@@ -58,8 +68,11 @@ namespace ServicioHydrate.Data
                 throw e;
             }
 
+            // Verificar que los hashes de las contraseñas sean idénticos.
             if (!BCryptNet.Verify(infoUsuario.Password, usuario.Password))
             {
+                // El hash de la contraseña recibida en la petición no es idéntico al
+                // de la cuenta de usuario. Lanzar un error de "PASSWORD_INCORRECTO".
                 var e = new ArgumentException("Authentication Error");
                 e.Data["ErrorAutenticacion"] = new MensajeErrorAutenticacion
                 {
@@ -70,7 +83,13 @@ namespace ServicioHydrate.Data
                 throw e;  
             }
 
+            // Para este punto, la cuenta de usuario existe y las contraseñas coinciden.
+            
+            // Obtener un DTO de RespuestaDeAutenticación.
             var datosUsuario = usuario.ComoRespuestaToken();
+
+            // Utilizando GeneradorDeToken.Generar, generar el JWT de autenticación para 
+            // el usuario. Luego, retornar la RespuestaDeAutenticación.
             datosUsuario.Token = _generadorToken.Generar(usuario);
             return datosUsuario;
         }
@@ -82,13 +101,17 @@ namespace ServicioHydrate.Data
 
         public async Task<DTOUsuario> GetUsuarioPorId(Guid id)
         {
+            // Buscar un usuario en la base de datos con el id recibido.
             var usuario = await _contexto.Usuarios.FindAsync(id);
 
             if (usuario is null)
             {
+                // No se encontró un usuario con el [id] solicitado. Lanzar un 
+                // error de argumento.
                 throw new ArgumentException("No existe un usuario con el ID especificado.");
             }
 
+            // Retornar un DTO del usuario encontrado.
             return usuario.ComoDTO();
         }
 
@@ -97,14 +120,16 @@ namespace ServicioHydrate.Data
             throw new NotImplementedException();
         }
 
-        public async Task<DTOUsuario> RegistrarAsync(DTOUsuario usuario)
+        public async Task<DTOUsuario> RegistrarAsync(DTOPeticionAutenticacion datosUsuario)
         {
-            usuario.Id = new Guid();
-
+            // Verificar que no exista un usuario en la base de datos con 
+            // el username o email recibidos en la petición de registro.
             if (await _contexto.Usuarios.AnyAsync(u => 
-                u.NombreUsuario == usuario.NombreUsuario ||
-                u.Email == usuario.Email ))
+                u.NombreUsuario == datosUsuario.NombreUsuario ||
+                u.Email == datosUsuario.Email ))
             {
+                // Existe un usuario en BD con una de las credenciales 
+                // recibidas. Lanzar un error de autenticación de "USUARIO_EXISTE".
                 var e = new ArgumentException("Authentication Error");
                 e.Data["ErrorAutenticacion"] = new MensajeErrorAutenticacion
                 {
@@ -115,13 +140,21 @@ namespace ServicioHydrate.Data
                 throw e; 
             }
 
-            string hashContrasenia = BCryptNet.HashPassword(usuario.Password);
-            var modeloUsuario = usuario.ComoModelo(hashContrasenia);
+            // Encriptar la contraseña encontrada en la petición de registro.
+            string hashContrasenia = BCryptNet.HashPassword(datosUsuario.Password);
 
+            // Crear un nuevo objeto Usuario, utilizando la contraseña encriptada.
+            var modeloUsuario = datosUsuario.ComoModelo(hashContrasenia);
+
+            // Generar un nuevo GUID para el usuario.
+            modeloUsuario.Id = new Guid();
+
+            // Agregar el nuevo objeto Usuario al contexto de la base de
+            // datos. Luego, guardar los cambios al contexto.
             _contexto.Usuarios.Add(modeloUsuario);
             await _contexto.SaveChangesAsync();
 
-            return usuario;
+            return modeloUsuario.ComoDTO();
         }
     }
 }

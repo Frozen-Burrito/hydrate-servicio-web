@@ -11,8 +11,8 @@ namespace ServicioHydrate.Data
     {
         Task<List<DTOUsuario>> GetUsuariosAsync();
         Task<DTOUsuario> GetUsuarioPorId(Guid id);
-        Task<DTORespuestaAutenticacion> AutenticarUsuario(DTOPeticionAutenticacion infoUsuario);
-        Task<DTOUsuario> RegistrarAsync(DTOUsuario usuario);
+        Task<DTORespuestaAutenticacion> AutenticarUsuario(DTOPeticionAutenticacion datosUsuario);
+        Task<DTOUsuario> RegistrarAsync(DTOPeticionAutenticacion datosUsuario);
         Task<DTOUsuario> ActualizarUsuarioAsync(DTOUsuario dtoUsuario);
         Task EliminarUsuarioAsync(Guid id);
     }

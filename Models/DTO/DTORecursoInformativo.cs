@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServicioHydrate.Modelos.DTO
 {
+    /// Un objeto de transferencia de datos para un Recurso Informativo.
     public class DTORecursoInformativo
     {
         public int Id { get; set; }

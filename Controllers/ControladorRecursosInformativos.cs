@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -21,15 +22,18 @@ namespace ServicioHydrate.Controllers
     [Consumes("application/json")]
     public class ControladorRecursosInformativos : ControllerBase
     {
+        /// El repositorio de acceso a los Recursos Informativos.
         private readonly IServicioRecursos _repoRecursos;
+
+        // Permite generar Logs desde las acciones del controlador.
         private readonly ILogger<ControladorRecursosInformativos> _logger;
-        private readonly AppConfig _appConfig;
 
         public ControladorRecursosInformativos(
             IServicioRecursos servicioRecursos,
-            ILogger<ControladorRecursosInformativos> logger,
-            IOptions<AppConfig> appConfig )
+            ILogger<ControladorRecursosInformativos> logger
+        )
         {
+            // Asegurar que el controlador tiene una instancia del repositorio.
             if (servicioRecursos is null) 
             {
                 throw new ArgumentNullException(nameof(servicioRecursos));
@@ -37,12 +41,12 @@ namespace ServicioHydrate.Controllers
 
             this._repoRecursos = servicioRecursos;
             this._logger = logger;
-            this._appConfig = appConfig.Value;
         }
 
+        /// Regresa todos los Recursos Informativos disponibles.
         [PermitirAnonimo]
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTORecursoInformativo))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTORecursoInformativo>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetRecursosInformativos()
@@ -67,6 +71,7 @@ namespace ServicioHydrate.Controllers
             }
         }
 
+        /// Busca y retorna el Recurso Informativo con el idRecurso deseado.
         [PermitirAnonimo]
         [HttpGet("{idRecurso}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTORecursoInformativo))]
@@ -100,6 +105,7 @@ namespace ServicioHydrate.Controllers
             }
         }
 
+        /// Agrega un nuevo Recurso Informativo a la colección de recursos.
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -111,7 +117,7 @@ namespace ServicioHydrate.Controllers
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
             string ruta = Request.Path.Value;
-            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}: {nuevoRecurso.Id}, {nuevoRecurso.Titulo}");
 
             try 
             {
@@ -142,6 +148,7 @@ namespace ServicioHydrate.Controllers
             }
         }
 
+        /// Actualiza el registro del Recurso Informativo con idRecurso.
         [HttpPut("{idRecurso}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -181,6 +188,7 @@ namespace ServicioHydrate.Controllers
             }
         }
 
+        /// Elimina un RecursoInformativo con el idRecurso especificado.
         [HttpDelete("{idRecurso}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

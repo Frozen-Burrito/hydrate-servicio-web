@@ -23,45 +23,30 @@ namespace ServicioHydrate.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(300)");
 
-                    b.Property<DateTime>("FechaPublicacion")
-                        .HasMaxLength(24)
-                        .HasColumnType("TEXT");
+                    b.Property<string>("FechaPublicacion")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Recursos");
-                });
-
-            modelBuilder.Entity("ServicioHydrate.Modelos.RolDeUsuario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("NombreRol")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("roles");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Usuario", b =>
@@ -84,23 +69,9 @@ namespace ServicioHydrate.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
-                    b.Property<int?>("RolId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("RolId");
-
                     b.ToTable("Usuarios");
-                });
-
-            modelBuilder.Entity("ServicioHydrate.Modelos.Usuario", b =>
-                {
-                    b.HasOne("ServicioHydrate.Modelos.RolDeUsuario", "Rol")
-                        .WithMany()
-                        .HasForeignKey("RolId");
-
-                    b.Navigation("Rol");
                 });
 #pragma warning restore 612, 618
         }
