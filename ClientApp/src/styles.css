@@ -2,6 +2,7 @@
   /*TEMA CLARO*/
   --fondo-claro: #fff;
   --contraste-fondo-claro: #0f0f0f;
+  --contraste-fondo-claro-ocho-siete: rgba(15, 15, 15, 0.87);
   --superficie-claro: #f8f8f8;
   --contraste-superficie-claro: rgba(0, 0, 0, 0.6);
   --error-claro: #b00020;

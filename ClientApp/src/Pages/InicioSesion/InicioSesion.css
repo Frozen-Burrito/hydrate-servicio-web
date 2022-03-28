@@ -1,0 +1,156 @@
+@import url("../../styles.css");
+
+main {
+  width: 100%;
+  height: calc(100vh - 3.75rem);
+  overflow: hidden;
+  background-color: var(--fondo-claro);
+}
+
+.box-form {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.form-container-signup {
+  position: relative;
+  padding: 0 1.4rem;
+}
+
+.title {
+  font-weight: 500;
+  font-size: 1.75rem;
+}
+
+form {
+  padding: 2.3rem 1.2rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.img-container-signup {
+  grid-column-start: 2;
+  grid-column-end: 4;
+}
+
+.form {
+  padding: 5.5rem 0;
+  position: relative;
+}
+
+.form-title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.2rem 0;
+}
+
+.form-title {
+  font-weight: 400;
+  font-size: 2rem;
+}
+
+.input-container {
+  position: relative;
+  margin: 2.5rem 0;
+}
+
+.input {
+  width: 100%;
+  outline: none;
+  border: 2px solid var(--contraste-superficie-claro);
+  background: var(--superficie-claro);
+  padding: 1.2rem 1.2rem;
+  color: var(--contraste-superficie-claro);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: 0.5px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+.input-container label {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  padding: 0 0.4rem;
+  color: var(--contraste-superficie-claro);
+  font-size: 1.2rem;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1000;
+  transition: 0.5s;
+}
+
+.input-container span {
+  position: absolute;
+  top: 0;
+  left: 25px;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  padding: 0 0.4rem;
+  color: transparent;
+  pointer-events: none;
+  z-index: 500;
+}
+
+.input-container span::before,
+.input-container span::after {
+  content: "";
+  position: absolute;
+  width: 50%;
+  height: 5px;
+  opacity: 0;
+  transition: 0.3s;
+  background-color: #ff8c6b;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.input-container span::before {
+  left: 50%;
+}
+
+.input-container span::after {
+  right: 50%;
+}
+
+.input-container.focus label {
+  top: 0;
+  transform: translateY(-50%);
+  left: 25px;
+  font-size: 0.8rem;
+}
+
+.input-container.focus span::before,
+.input-container.focus span::after {
+  width: 50%;
+  opacity: 1;
+}
+
+.text-acount {
+  font-size: 1.1rem;
+  margin: 1rem 0;
+}
+
+.account-link {
+  color: var(--primario-claro);
+  transition: 0.4s ease;
+  font-size: 1.1rem;
+}
+
+.account-link:hover {
+  color: var(--variante-primario-claro);
+}
+
+.btn-form-container {
+  position: relative;
+  padding: 2rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
