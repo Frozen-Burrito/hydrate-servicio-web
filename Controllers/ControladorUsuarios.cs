@@ -20,8 +20,13 @@ namespace ServicioHydrate.Controladores
     [Consumes("application/json")]
     public class ControladorUsuarios : ControllerBase
     {
+        /// El repositorio de acceso a los Usuarios.
         private readonly IServicioUsuarios _repoUsuarios;
+
+        // Permite generar Logs desde las acciones del controlador.
         private readonly ILogger<ControladorUsuarios> _logger;
+
+        // Utilizado para obtener el secreto de los JWT.
         private readonly AppConfig _appConfig;
 
         public ControladorUsuarios(
@@ -29,6 +34,7 @@ namespace ServicioHydrate.Controladores
             ILogger<ControladorUsuarios> logger,
             IOptions<AppConfig> appConfig )
         {
+            // Asegurar que el controlador tenga una instancia del repositorio.
             if (servicioUsuarios is null) 
             {
                 throw new ArgumentNullException(nameof(servicioUsuarios));
@@ -39,6 +45,7 @@ namespace ServicioHydrate.Controladores
             this._appConfig = appConfig.Value;
         }
 
+        /// Autentica un usuario utilizando sus credenciales de acceso. Produce un JWT.
         [PermitirAnonimo]
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTORespuestaAutenticacion))]
@@ -47,8 +54,10 @@ namespace ServicioHydrate.Controladores
         [ProducesErrorResponseType(typeof(MensajeErrorAutenticacion))]
         public async Task<IActionResult> LoginUsuario(DTOPeticionAutenticacion infoUsuario)
         {
-            string logMsg = $"[{DateTime.UtcNow.ToLongTimeString()}] POST - /api/v1/usuarios/login";
-            _logger.LogInformation(logMsg);
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             if (!ModelState.IsValid)
             {
@@ -57,38 +66,54 @@ namespace ServicioHydrate.Controladores
 
             try 
             {
+                // Intentar autenticar el usuario con las credenciales recibidas.
                 var resultado = await _repoUsuarios.AutenticarUsuario(infoUsuario);
                 return Ok(resultado);
             }
             catch (ArgumentException e)
             {
+                // Hay un error de autenticacion. Enviar una respuesta con 
+                // código 401 (No autorizado).
                 MensajeErrorAutenticacion error = e.Data["ErrorAutenticacion"] as MensajeErrorAutenticacion; 
 
                 return Unauthorized(error);
             }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
         }
 
+        /// Recibe las credenciales de una nueva cuenta de usuario y la autentica.
+        /// Produce un JWT. 
         [PermitirAnonimo]
         [HttpPost("registro")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTORespuestaAutenticacion))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesErrorResponseType(typeof(MensajeErrorAutenticacion))]
-        public async Task<IActionResult> RegistroUsuario(DTOUsuario infoUsuario)
+        public async Task<IActionResult> RegistroUsuario(DTOPeticionAutenticacion datosUsuario)
         {
-            string logMsg = $"[{DateTime.UtcNow.ToLongTimeString()}] POST - /api/v1/usuarios/registro";
-            _logger.LogInformation(logMsg);
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
-                var usuario = await _repoUsuarios.RegistrarAsync(infoUsuario);
+                // Intentar registrar una nueva cuenta de usuario con los datos.
+                var usuario = await _repoUsuarios.RegistrarAsync(datosUsuario);
 
+                // Intentar autenticar al usuario usando los datos de la nueva cuenta.
                 var resultado = await _repoUsuarios.AutenticarUsuario(
                     new DTOPeticionAutenticacion
                     {
-                        NombreUsuario = infoUsuario.NombreUsuario,
-                        Email = infoUsuario.Email,
-                        Password = infoUsuario.Password
+                        NombreUsuario = datosUsuario.NombreUsuario,
+                        Email = datosUsuario.Email,
+                        Password = datosUsuario.Password
                     }
                 );
 
@@ -96,9 +121,18 @@ namespace ServicioHydrate.Controladores
             }
             catch (ArgumentException e) 
             {
+                // Hay un error de autenticacion. Enviar una respuesta con 
+                // código 401 (No autorizado). 
                 MensajeErrorAutenticacion error = e.Data["ErrorAutenticacion"] as MensajeErrorAutenticacion; 
 
                 return Unauthorized(error);
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
             }
         }
     }

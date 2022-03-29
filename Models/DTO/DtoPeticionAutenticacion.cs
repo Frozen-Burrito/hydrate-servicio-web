@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServicioHydrate.Modelos.DTO
 {
+    /// Proporciona las credenciales de autenticación de un usuario.
+    /// Utilizado por el inicio de sesión y el registro de usuarios.
     public class DTOPeticionAutenticacion
     {
         [MaxLength(32)]

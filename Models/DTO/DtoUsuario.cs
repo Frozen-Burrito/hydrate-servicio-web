@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServicioHydrate.Modelos.DTO
 {
+    // Un objeto de transferencia de datos (DTO) para un Usuario.
+    // NO contiene la contraseña (para no mostrarla a todo mundo).
     public class DTOUsuario
     {
         public Guid Id { get; set; }
@@ -16,10 +18,5 @@ namespace ServicioHydrate.Modelos.DTO
         [MaxLength(64)]
         [EmailAddress(ErrorMessage = "El correo electrónico no tiene un formato válido.")]
         public string Email { get; set; }
-
-        [Required]
-        [MaxLength(40)]
-        [RegularExpression("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,40}$", ErrorMessage = "La contraseña no tiene un formato válido.")]
-        public string Password { get; set; }
     }
 }
