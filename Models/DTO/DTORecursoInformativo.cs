@@ -19,7 +19,7 @@ namespace ServicioHydrate.Modelos.DTO
         [MaxLength(300)]
         public string Descripcion { get; set; }
 
-        [MaxLength(24)]
+        [MaxLength(33)]
         public string FechaPublicacion { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace ServicioHydrate.Modelos
         [MaxLength(300)]
         public string Descripcion { get; set; }
 
-        [MaxLength(32)]
+        [MaxLength(33)]
         [DataType("char")]
         public string FechaPublicacion { get; set; }
     }
