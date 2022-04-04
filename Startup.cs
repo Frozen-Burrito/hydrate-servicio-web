@@ -38,7 +38,7 @@ namespace ServicioHydrate
             } else 
             {
                 // En entrono de desarrollo (local) usar SQLite.
-                services.AddDbContext<ContextoDB>(options => 
+                services.AddDbContext<ContextoDBSqlite>(options => 
                     options.UseSqlite("Data Source=db_desarrollo.db"));
             }
 
@@ -54,6 +54,8 @@ namespace ServicioHydrate
             // Incluye los servicios de acceso a datos.
             services.AddScoped<IServicioUsuarios, RepositorioUsuarios>();
             services.AddScoped<IServicioRecursos, RepositorioRecursos>();
+
+            services.AddScoped<IServicioComentarios, RepositorioComentarios>();
 
             // Agrega los controladores puros (de la API).
             services.AddControllers();
