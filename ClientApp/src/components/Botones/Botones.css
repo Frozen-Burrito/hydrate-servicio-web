@@ -12,14 +12,14 @@
   text-transform: uppercase;
 }
 
-.btn.solid,
-.btn.transparent:hover {
+.solid,
+.transparent:hover {
   background-color: #fff;
   color: var(--variante-primario-claro);
 }
 
-.btn.transparent,
-.btn.solid:hover {
+.transparent,
+.solid:hover {
   background-color: transparent;
   color: #fff;
 }

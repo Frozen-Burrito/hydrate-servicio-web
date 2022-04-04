@@ -1,0 +1,21 @@
+@import url("../../styles.css");
+
+.buttons {
+  display: inline-block;
+  padding: 1.2rem 2rem;
+  font-size: 1.5rem;
+  font-style: normal;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  line-height: 1;
+  margin: 0 0.2rem;
+  transition: 0.3s;
+  background-color: var(--primario-claro);
+  color: #fff;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.buttons:hover {
+  background-color: var(--variante-primario-claro);
+}

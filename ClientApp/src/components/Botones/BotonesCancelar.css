@@ -1,0 +1,21 @@
+@import url("../../styles.css");
+
+.buttons-cancel {
+  margin-top: 50px;
+  display: inline-block;
+  padding: 0.8rem 2.8rem;
+  font-size: 0.95rem;
+  border: 2px solid #fff;
+  border-radius: 0.5rem;
+  line-height: 1;
+  margin: 0 0.2rem;
+  transition: 0.3s;
+  text-transform: uppercase;
+  background-color: var(--contraste-superficie-claro);
+  color: #fff;
+  font-weight: 600;
+}
+
+.buttons-cancel:hover {
+  background-color: var(--variante-primario-claro);
+}

@@ -1,10 +1,11 @@
 import React from 'react'
+import Layout from '../../Components/Layout/Layout';
 
 const DatosAbiertos = () => {
   return (
-    <div>
+    <Layout>
         <h1>Datos Abiertos</h1>
-    </div>
+    </Layout>
   )
 }
 

@@ -1,11 +1,11 @@
+import './Botones.css';
 import React from 'react'
 import { Link } from 'react-router-dom';
 
-export default function Botones() {
+const Botones = ({ property, texto, link }) => {
   return (
-    <div>
-        <Link className='btn transparent' to='/' style={{ textDecoration: 'none' }}>Log in</Link>
-        <Link className='btn solid' to='/' style={{ textDecoration: 'none' }}>Sign up</Link>
-    </div>
-  )
+    <Link className={`btn ${property}`} to={link} style={{ textDecoration: 'none' }}>{texto}</Link>
+  );
 }
+
+export default Botones;
