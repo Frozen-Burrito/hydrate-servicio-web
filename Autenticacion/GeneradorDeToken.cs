@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Utilidades;
+using System.Collections.Generic;
 
 namespace ServicioHydrate.Autenticacion
 {
@@ -21,17 +22,26 @@ namespace ServicioHydrate.Autenticacion
 
         public string Generar(Usuario usuario)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appConfig.SecretoJWT);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            List<Claim> claims = new List<Claim>
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", usuario.Id.ToString())}),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new SigningCredentials( new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                new Claim("id", usuario.Id.ToString()),
+                new Claim(ClaimTypes.Role, usuario.RolDeUsuario.ToString()),
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appConfig.SecretoJWT));
+
+            var credenciales = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+
+            var token = new JwtSecurityToken
+            (
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(1),
+                signingCredentials: credenciales
+            );
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
         }
     }
 }

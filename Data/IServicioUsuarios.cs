@@ -9,11 +9,12 @@ namespace ServicioHydrate.Data
 {
     public interface IServicioUsuarios
     {
-        Task<List<DTOUsuario>> GetUsuariosAsync();
+        Task<List<DTOUsuario>> GetUsuarios();
         Task<DTOUsuario> GetUsuarioPorId(Guid id);
         Task<DTORespuestaAutenticacion> AutenticarUsuario(DTOPeticionAutenticacion datosUsuario);
-        Task<DTOUsuario> RegistrarAsync(DTOPeticionAutenticacion datosUsuario);
-        Task<DTOUsuario> ActualizarUsuarioAsync(DTOUsuario dtoUsuario);
-        Task EliminarUsuarioAsync(Guid id);
+        Task<DTOUsuario> RegistrarNuevoUsuario(DTOPeticionAutenticacion datosUsuario);
+        Task<DTOUsuario> ActualizarUsuario(DTOUsuario dtoUsuario);
+        Task ModificarRolDeUsuario(Guid idUsuario, RolDeUsuario nuevoRol);
+        Task EliminarUsuario(Guid id);
     }
 }

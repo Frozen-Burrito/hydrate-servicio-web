@@ -25,9 +25,25 @@ namespace ServicioHydrate.Data
             this._generadorToken = generadorToken;
         }
         
-        public Task<DTOUsuario> ActualizarUsuarioAsync(DTOUsuario dtoUsuario)
+        public async Task<DTOUsuario> ActualizarUsuario(DTOUsuario dtoUsuario)
         {
-            throw new NotImplementedException();
+            // Buscar un usuario en la base de datos con el id recibido.
+            var usuario = await _contexto.Usuarios.FindAsync(dtoUsuario.Id);
+
+            if (usuario is null)
+            {
+                // No se encontró un usuario con el [id] solicitado.
+                throw new ArgumentException("No existe un usuario con el ID especificado.");
+            }
+
+            usuario.NombreUsuario = dtoUsuario.NombreUsuario;
+            usuario.Email = dtoUsuario.Email;
+
+            _contexto.Entry(usuario).State = EntityState.Modified;
+
+            await _contexto.SaveChangesAsync();
+
+            return usuario.ComoDTO();
         }
 
         public async Task<DTORespuestaAutenticacion> AutenticarUsuario(DTOPeticionAutenticacion infoUsuario)
@@ -49,7 +65,7 @@ namespace ServicioHydrate.Data
             // Buscar un usuario en la base de datos con el username o email recibidos.
             var usuario = await _contexto.Usuarios.SingleOrDefaultAsync(
                 u => (u.NombreUsuario == infoUsuario.NombreUsuario || 
-                        u.Email == infoUsuario.Email)
+                      u.Email == infoUsuario.Email)
             );
 
             if (usuario is null) 
@@ -83,20 +99,50 @@ namespace ServicioHydrate.Data
                 throw e;  
             }
 
-            // Para este punto, la cuenta de usuario existe y las contraseñas coinciden.
-            
-            // Obtener un DTO de RespuestaDeAutenticación.
-            var datosUsuario = usuario.ComoRespuestaToken();
+            // En este punto, la cuenta de usuario existe y las contraseñas coinciden.
 
             // Utilizando GeneradorDeToken.Generar, generar el JWT de autenticación para 
             // el usuario. Luego, retornar la RespuestaDeAutenticación.
-            datosUsuario.Token = _generadorToken.Generar(usuario);
+            string jwt = _generadorToken.Generar(usuario);
+            
+            // Obtener un DTO de RespuestaDeAutenticación.
+            var datosUsuario = new DTORespuestaAutenticacion{ Token = jwt };
+
             return datosUsuario;
         }
 
-        public Task EliminarUsuarioAsync(Guid id)
+        public async Task EliminarUsuario(Guid id)
         {
-            throw new NotImplementedException();
+            // Buscar un usuario en la base de datos con el id recibido.
+            var usuario = await _contexto.Usuarios.FindAsync(id);
+
+            if (usuario is null)
+            {
+                // No se encontró un usuario con el [id] solicitado. Lanzar un 
+                // error de argumento.
+                throw new ArgumentException("No existe un usuario con el ID especificado.");
+            }
+
+            _contexto.Remove(usuario);
+            await _contexto.SaveChangesAsync();
+        }
+
+        public async Task ModificarRolDeUsuario(Guid idUsuario, RolDeUsuario nuevoRol)
+        {
+            // Buscar un usuario en la base de datos con el id recibido.
+            var usuario = await _contexto.Usuarios.FindAsync(idUsuario);
+
+            if (usuario is null)
+            {
+                // No se encontró un usuario con el [id] solicitado.
+                throw new ArgumentException("No existe un usuario con el ID especificado.");
+            }
+
+            usuario.RolDeUsuario = nuevoRol;
+
+            _contexto.Entry(usuario).State = EntityState.Modified;
+
+            await _contexto.SaveChangesAsync();
         }
 
         public async Task<DTOUsuario> GetUsuarioPorId(Guid id)
@@ -115,12 +161,21 @@ namespace ServicioHydrate.Data
             return usuario.ComoDTO();
         }
 
-        public async Task<List<DTOUsuario>> GetUsuariosAsync()
+        public async Task<List<DTOUsuario>> GetUsuarios()
         {
-            throw new NotImplementedException();
+            if (_contexto.Usuarios.Count() == 0)
+            {
+                return new List<DTOUsuario>();
+            }
+
+            List<DTOUsuario> usuarios = await _contexto.Usuarios
+                .Select(u => u.ComoDTO())
+                .ToListAsync();
+
+            return usuarios;
         }
 
-        public async Task<DTOUsuario> RegistrarAsync(DTOPeticionAutenticacion datosUsuario)
+        public async Task<DTOUsuario> RegistrarNuevoUsuario(DTOPeticionAutenticacion datosUsuario)
         {
             // Verificar que no exista un usuario en la base de datos con 
             // el username o email recibidos en la petición de registro.

@@ -1,3 +1,5 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -5,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 using ServicioHydrate.Data;
 using ServicioHydrate.Autenticacion;
@@ -57,13 +61,26 @@ namespace ServicioHydrate
 
             services.AddScoped<IServicioComentarios, RepositorioComentarios>();
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(Configuration.GetSection("AppConfig:SecretoJWT").Value)
+                        ),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                    };
+                });
+
             // Agrega los controladores puros (de la API).
             services.AddControllers();
 
             // Agregar la generación automática de documentación de API con Swagger.
-            services.AddSwaggerGen(c => 
+            services.AddSwaggerGen(options => 
             {
-                c.SwaggerDoc(
+                options.SwaggerDoc(
                     "v1",
                     new OpenApiInfo
                     {
@@ -72,6 +89,16 @@ namespace ServicioHydrate
                         Description = "API web para el proyecto Hydrate."
                     }
                 );
+
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Description = "Encabezado estándar de autenticación con formato 'Bearer' (\"bearer {token}\").",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
             // En producción, los archivos de React serán servidos desde este directorio.
@@ -115,7 +142,8 @@ namespace ServicioHydrate
 
             // Incluir middleware propio para verificar autenticación y autorización
             // con JWT.
-            app.UseMiddleware<MiddlewareJWT>();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             // Utilizar endpoints de los controladores de la API.
             app.UseEndpoints(endpoints =>
