@@ -6,9 +6,6 @@ namespace ServicioHydrate.Modelos.DTO
     /// otorgado por el servicio para el usuario.
     public class DTORespuestaAutenticacion
     {
-        public Guid Id { get; set; }
-        public string NombreUsuario { get; set; }
-        public string Email { get; set; }
         public string Token { get; set; }
     }
 }

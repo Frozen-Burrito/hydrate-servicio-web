@@ -18,5 +18,7 @@ namespace ServicioHydrate.Modelos.DTO
         [MaxLength(64)]
         [EmailAddress(ErrorMessage = "El correo electrónico no tiene un formato válido.")]
         public string Email { get; set; }
+
+        public RolDeUsuario RolDeUsuario { get; set; }
     }
 }

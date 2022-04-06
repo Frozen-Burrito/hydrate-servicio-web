@@ -48,7 +48,8 @@ namespace ServicioHydrate.Modelos
             {
                 Id = usuario.Id,
                 NombreUsuario = usuario.NombreUsuario,
-                Email = usuario.Email
+                Email = usuario.Email,
+                RolDeUsuario = usuario.RolDeUsuario
             };
         }
 
@@ -59,17 +60,6 @@ namespace ServicioHydrate.Modelos
                 Id = dtoUsuario.Id,
                 Email = dtoUsuario.Email,
                 NombreUsuario = dtoUsuario.NombreUsuario,
-            };
-        }
-
-        public static DTORespuestaAutenticacion ComoRespuestaToken(this Usuario usuario)
-        {
-            return new DTORespuestaAutenticacion
-            {
-                Id = usuario.Id,
-                NombreUsuario = usuario.NombreUsuario,
-                Email = usuario.Email,
-                Token = "Token default"
             };
         }
 

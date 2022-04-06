@@ -22,6 +22,8 @@ namespace ServicioHydrate.Modelos
         [MaxLength(80)]
         public string Password { get; set; }
 
+        public RolDeUsuario RolDeUsuario { get; set; }
+
         public virtual ICollection<Comentario> Comentarios { get; set; }
         public virtual ICollection<Respuesta> Respuestas { get; set; }
         
