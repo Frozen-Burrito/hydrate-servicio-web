@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicioHydrate.Data;
 
 namespace ServicioHydrate.Migrations.SQLite
 {
     [DbContext(typeof(ContextoDBSqlite))]
-    partial class ContextoDBSqliteModelSnapshot : ModelSnapshot
+    [Migration("20220405235000_RolesDeUsuario")]
+    partial class RolesDeUsuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
