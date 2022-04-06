@@ -11,10 +11,10 @@ using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ServicioHydrate.Controllers
 {
-    [Autorizacion]
     [ApiController]
     [Route("api/v1/comentarios")]
     [Produces("application/json")]
@@ -46,7 +46,6 @@ namespace ServicioHydrate.Controllers
         /// Retorna todos los comentarios publicados en el foro.
         /// </summary>
         /// <returns>Resultado HTTP</returns>
-        [PermitirAnonimo]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -81,7 +80,6 @@ namespace ServicioHydrate.Controllers
         /// </summary>
         /// <param name="idComentario">El ID del comentario buscado.</param>
         /// <returns>Resultado HTTP</returns>
-        [PermitirAnonimo]
         [HttpGet("{idComentario}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOComentario))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -117,7 +115,6 @@ namespace ServicioHydrate.Controllers
             }
         }
 
-        [PermitirAnonimo]
         [HttpGet("autor/{idAutor}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -161,8 +158,8 @@ namespace ServicioHydrate.Controllers
         /// </remarks>
         /// <param name="nuevoComentario">El comentario a publicar</param>
         /// <returns></returns>
-        [PermitirAnonimo]
         [HttpPost]
+        [Authorize(Roles = "NINGUNO")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -212,6 +209,7 @@ namespace ServicioHydrate.Controllers
 
         /// Actualiza el Comentario con idComentario.
         [HttpPut("{idComentario}")]
+        [Authorize(Roles = "NINGUNO,MODERADOR_COMENTARIOS")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -258,6 +256,7 @@ namespace ServicioHydrate.Controllers
 
         /// Elimina un Comentario con el idComentario especificado.
         [HttpDelete("{idComentario}")]
+        [Authorize(Roles = "NINGUNO,MODERADOR_COMENTARIOS")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -308,8 +307,8 @@ namespace ServicioHydrate.Controllers
         /// </remarks>
         /// <param name="idComentario">El ID del comentario marcado.</param>
         /// <returns>Resultado HTTP</returns>
-        [PermitirAnonimo]
         [HttpPatch("{idComentario}/util")]
+        [Authorize(Roles = "NINGUNO")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -364,8 +363,8 @@ namespace ServicioHydrate.Controllers
         /// </remarks>
         /// <param name="idComentario">El ID del comentario reportado.</param>
         /// <returns>Resultado HTTP</returns>
-        [PermitirAnonimo]
         [HttpPatch("{idComentario}/reportar")]
+        [Authorize(Roles = "NINGUNO")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -414,7 +413,6 @@ namespace ServicioHydrate.Controllers
         /// </summary>
         /// <param name="idComentario">El ID del comentario</param>
         /// <returns>Resultado HTTP</returns>
-        [PermitirAnonimo]
         [HttpGet("{idComentario}/respuestas")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTORespuesta>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -459,7 +457,6 @@ namespace ServicioHydrate.Controllers
         /// <param name="idComentario">El ID del comentario</param>
         /// <param name="idRespuesta">El ID de la respuesta</param>
         /// <returns>Resultado HTTP</returns>
-        [PermitirAnonimo]
         [HttpGet("{idComentario}/respuestas/{idRespuesta}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTORespuesta))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -503,6 +500,7 @@ namespace ServicioHydrate.Controllers
         /// <param name="nuevaRespuesta">EL contenido de la respuesta a agregar.</param>
         /// <returns>Resultado HTTP</returns>
         [HttpPost("{idComentario}/respuestas")]
+        [Authorize(Roles = "NINGUNO,MODERADOR_COMENTARIOS")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -564,8 +562,8 @@ namespace ServicioHydrate.Controllers
         /// <param name="idComentario">El ID del comentario en el que esta la respuesta.</param>
         /// <param name="idRespuesta">El ID de la respuesta a marcar.</param>
         /// <returns>Resultado HTTP</returns>
-        [PermitirAnonimo]
         [HttpPatch("{idComentario}/respuestas/{idRespuesta}/util")]
+        [Authorize(Roles = "NINGUNO")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -620,8 +618,8 @@ namespace ServicioHydrate.Controllers
         /// <param name="idComentario">El ID del comentario al que pertenece la respuesta.</param>
         /// <param name="idRespuesta">El ID de la respuesta a reportar.</param>
         /// <returns>Resultado HTTP</returns>
-        [PermitirAnonimo]
         [HttpPatch("{idComentario}/respuestas/{idRespuesta}/reportar")]
+        [Authorize(Roles = "NINGUNO")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -672,6 +670,7 @@ namespace ServicioHydrate.Controllers
         /// <param name="idRespuesta">La respuesta a eliminar</param>
         /// <returns>Resultado de Accion HTTP</returns>
         [HttpDelete("{idComentario}/respuestas/{idRespuesta}")]
+        [Authorize(Roles = "NINGUNO,MODERADOR_COMENTARIOS")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

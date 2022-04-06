@@ -1,23 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 using ServicioHydrate.Data;
-using ServicioHydrate.Autenticacion;
-using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
-using ServicioHydrate.Utilidades;
-using Microsoft.EntityFrameworkCore;
 
 namespace ServicioHydrate.Controllers
 {
-    [Autorizacion]
     [ApiController]
     [Route("api/v1/recursos")]
+    [Authorize(Roles = "ADMIN_RECURSOS_INF")]
     [Produces("application/json")]
     [Consumes("application/json")]
     public class ControladorRecursosInformativos : ControllerBase
@@ -44,8 +41,8 @@ namespace ServicioHydrate.Controllers
         }
 
         /// Regresa todos los Recursos Informativos disponibles.
-        [PermitirAnonimo]
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTORecursoInformativo>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -72,8 +69,8 @@ namespace ServicioHydrate.Controllers
         }
 
         /// Busca y retorna el Recurso Informativo con el idRecurso deseado.
-        [PermitirAnonimo]
         [HttpGet("{idRecurso}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTORecursoInformativo))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -105,7 +102,11 @@ namespace ServicioHydrate.Controllers
             }
         }
 
-        /// Agrega un nuevo Recurso Informativo a la colección de recursos.
+        /// <summary>
+        /// Agrega un nuevo Recurso Informativo a la colección.
+        /// </summary>
+        /// <param name="nuevoRecurso">El recurso para agregar.</param>
+        /// <returns>Resultado de accion HTTP</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -129,6 +130,11 @@ namespace ServicioHydrate.Controllers
                     recursoAgregado
                 );
             }
+            catch (ArgumentException e)
+            {
+                // No existe un recurso informativo con el ID solicitado. Retorna 404.
+                return NotFound(e.Message);
+            }
             catch (DbUpdateException e)
             {
                 // Hubo un error de base de datos. Enviarlo a los logs y retornar 503.
@@ -148,7 +154,12 @@ namespace ServicioHydrate.Controllers
             }
         }
 
-        /// Actualiza el registro del Recurso Informativo con idRecurso.
+        /// <summary>
+        /// Actualiza el registro del Recurso Informativo con [idRecurso].
+        /// </summary>
+        /// <param name="idRecurso">El identificador del recurso.</param>
+        /// <param name="recursoModificado">Las modificaciones realizadas al recurso.</param>
+        /// <returns>Resultado de accion HTTP</returns>
         [HttpPut("{idRecurso}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -188,7 +199,11 @@ namespace ServicioHydrate.Controllers
             }
         }
 
-        /// Elimina un RecursoInformativo con el idRecurso especificado.
+        /// <summary>
+        /// Elimina el Recurso Informativo con [idRecurso].
+        /// </summary>
+        /// <param name="idRecurso">El identificador del recurso.</param>
+        /// <returns>Resultado de accion HTTP</returns>
         [HttpDelete("{idRecurso}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
