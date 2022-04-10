@@ -1,78 +1,160 @@
 @import url("../../styles.css");
 
-header {
-  position: relative;
-  background: url("banner-agua-rica.jpg");
-  width: 100%;
-  background-size: cover;
-  background-attachment: fixed;
-  height: 80vh;
-  top: var(-3.75rem);
-}
-
 .banner {
   position: relative;
-  display: flex;
+  width: 100%;
+  height: 80vh;
+  background: url("luca-bravo-qCA6EULMskk-unsplash.jpg");
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.color-contrast {
+  position: relative;
+  width: 100%;
   height: 100%;
-  width: 80rem;
+  background-color: var(--contraste-superficie-claro);
+  display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 .container-text {
+  position: relative;
+  width: 80vw;
+  height: 100%;
+  padding: 0 2rem;
   display: flex;
   justify-content: center;
-  align-items: center;
   flex-direction: column;
 }
 
+.text-flex {
+  margin: 1.5rem 0;
+}
+
 .text {
-  font-size: 3.5rem;
-  font-weight: 550;
+  font-size: 4rem;
+  font-weight: 500;
+  color: var(--contraste-primario-claro);
+}
+
+.together {
+  position: relative;
+  display: flex;
+  margin-bottom: 3.5rem;
+}
+
+.edition {
+  margin-right: 0.8rem;
 }
 
 .description {
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 2.25rem;
+  font-weight: 400;
+  color: var(--contraste-primario-claro);
 }
 
 .btn-container {
-  padding: 2.3rem 0;
-  width: 100%;
-  left: 0;
+  margin-top: 2rem;
 }
 
-.button {
-  margin-top: 50px;
-  display: inline-block;
-  padding: 0.8rem 2.8rem;
-  font-size: 0.95rem;
-  border: 2px solid #fff;
-  border-radius: 0.5rem;
-  line-height: 1;
-  margin: 0 0.2rem;
-  transition: 0.3s;
-  text-transform: uppercase;
-  background-color: var(--secundario-claro);
-  color: #fff;
-  font-weight: 600;
-}
-
-.button:hover {
-  background-color: var(--variante-secundario-claro);
-}
-
-section {
+.info-container {
   position: relative;
+  padding: 4.5rem 0;
+  width: 100%;
   height: 13vh;
-  padding: 1rem;
   display: flex;
-  width: 76rem;
   justify-content: center;
+}
+
+.box-info {
+  position: relative;
+  width: 80vw;
+  height: 100%;
+  padding: 0 2rem;
+  display: flex;
   align-items: center;
 }
 
 .info {
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+.home-second-part {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+}
+
+.bottle-definition-box {
+  position: relative;
+  width: 57.29vw;
+  height: 100%;
+}
+
+.img-definition-box {
+  position: relative;
+  width: 42.71vw;
+  height: 100%;
+  background: url("svitlana-arFB7nh1aQE-unsplash.jpg");
+  background-size: contain;
+}
+
+.bottle-definition-container-up {
+  position: relative;
+  width: 100%;
+  height: 62.96vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--fondo-claro);
+}
+
+.bottle-definition-container-down {
+  position: relative;
+  width: 100%;
+  height: 37.04vh;
+  background: var(--primario-claro);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bottle-definition-container-up-text-container {
+  position: relative;
+  width: 66.36%;
+  height: 63.24%;
+}
+
+.tittle-definion-up {
+  font-size: 2.85rem;
+  font-weight: 400;
+}
+
+.text-description-container-up {
+  position: relative;
+  width: 100%;
+  height: auto;
+  margin: 3.25rem 0;
+}
+
+.text-description-up {
+  font-size: 1.15rem;
+}
+
+.bottle-definition-container {
+  position: relative;
+  width: 81.27%;
+  height: 62.5%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

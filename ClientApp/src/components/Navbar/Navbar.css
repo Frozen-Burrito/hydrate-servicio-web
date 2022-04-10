@@ -5,12 +5,12 @@ nav {
   top: 0;
   width: 100%;
   background-color: var(--primario-claro);
-  height: 3.75rem;
+  height: 7.41vh;
 }
 
 .container {
   position: relative;
-  max-width: 90rem;
+  max-width: 80vw;
   padding: 0 2rem;
   margin: 0 auto;
   display: flex;
@@ -44,38 +44,24 @@ nav {
 
 .nav-links > ul {
   display: flex;
-  list-style: none;
 }
 
 .logo {
   color: var(--contraste-primario-claro);
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 500;
   letter-spacing: 2.5px;
-  text-transform: uppercase;
   line-height: 3rem;
 }
 
-.btn {
-  display: inline-block;
-  padding: 0.5rem 1.3rem;
-  font-size: 0.8rem;
-  border: 2px solid #fff;
-  border-radius: 2rem;
-  line-height: 1;
-  margin: 0 0.2rem;
-  transition: 0.3s;
-  text-transform: uppercase;
-}
-
-.btn.solid,
-.btn.transparent:hover {
+.solid,
+.transparent:hover {
   background-color: #fff;
   color: var(--variante-primario-claro);
 }
 
-.btn.transparent,
-.btn.solid:hover {
+.transparent,
+.solid:hover {
   background-color: transparent;
   color: #fff;
 }
@@ -89,7 +75,7 @@ nav {
   color: #fff;
   padding: 0 0.8rem;
   letter-spacing: 1px;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
