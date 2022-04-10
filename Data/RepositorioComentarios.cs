@@ -86,13 +86,24 @@ namespace ServicioHydrate.Data
             return modeloComentario.ComoDTO(idAutor);
         }
 
-        public async Task EliminarComentario(int idComentario)
+        public async Task EliminarComentario(int idComentario, Guid? idUsuario, string rolDeUsuario)
         {
             var comentario = await _contexto.Comentarios.FindAsync(idComentario);
 
             if (comentario is null)
             {
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
+            }
+
+            comentario = await _contexto.Comentarios
+                .Where(c => c.Id == idComentario)
+                .Include(c => c.Autor)
+                .FirstAsync();
+
+            if (!idUsuario.Equals(comentario.Autor.Id) && !rolDeUsuario.Equals(RolDeUsuario.MODERADOR_COMENTARIOS.ToString()))
+            {
+                // El usuario intentando eliminar el comentario no es el autor ni un moderador.
+                throw new InvalidOperationException("No es posible eliminar el comentario con las credenciales utilizadas.");
             }
 
             _contexto.Remove(comentario);
@@ -137,16 +148,23 @@ namespace ServicioHydrate.Data
             return comentario.ComoDTO(idUsuarioActual);
         }
 
-        public Task<List<DTOComentario>> GetComentarios(Guid? idUsuarioActual, bool publicados = true)
+        public async Task<List<DTOComentario>> GetComentarios(Guid? idUsuarioActual, bool publicados = true)
         {
+            if (_contexto.Comentarios.Count() <= 0)
+            {
+                // Si no existe ningun comentario, retornar una lista vacia desde el principio.
+                return new List<DTOComentario>();
+            }
+
             var comentarios = _contexto.Comentarios
                 .Where(c => c.Publicado == publicados)
                 .OrderByDescending(c => c.Fecha)
+                .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
                 .Include(c => c.ReportesDeUsuarios)
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
-            return comentarios.ToListAsync();
+            return await comentarios.ToListAsync();
         }
 
         public async Task<List<DTOComentario>> GetComentariosPorUsuario(Guid idUsuario, Guid? idUsuarioActual)

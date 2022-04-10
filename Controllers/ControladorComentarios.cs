@@ -12,6 +12,8 @@ using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Security.Claims;
 
 namespace ServicioHydrate.Controllers
 {
@@ -45,12 +47,13 @@ namespace ServicioHydrate.Controllers
         /// <summary>
         /// Retorna todos los comentarios publicados en el foro.
         /// </summary>
+        /// /// <param name="idUsuarioActual">El identificador del usuario actual.</param>
         /// <returns>Resultado HTTP</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetComentariosPublicados()
+        public async Task<IActionResult> GetComentariosPublicados(Guid? idUsuarioActual)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -59,10 +62,10 @@ namespace ServicioHydrate.Controllers
 
             try 
             {
+                _logger.LogInformation($"Id usuario: {idUsuarioActual.ToString()}");
+                 
                 // Obtener todos los comentarios publicados disponibles.
-                // TODO: Obtener el ID real del usuario autenticado, desde el JWT,
-                // para obtener DTOs de comentarios relativos al usuario.
-                var comentariosPublicados = await _repoComentarios.GetComentarios(null, publicados: true);
+                var comentariosPublicados = await _repoComentarios.GetComentarios(idUsuarioActual, publicados: true);
 
                 return Ok(comentariosPublicados);
             }
@@ -78,14 +81,20 @@ namespace ServicioHydrate.Controllers
         /// <summary>
         /// Busca un comentario con un Id especifico y lo retorna.
         /// </summary>
+        /// <remarks>
+        /// Opcionalmente, puede recibir el identificador del usuario actual. Esto
+        /// permite determinar si el usuario que hace la petición ha marcado o reportado
+        /// el comentario obtenido.
+        /// </remarks>
         /// <param name="idComentario">El ID del comentario buscado.</param>
+        /// <param name="idUsuario">El identificador del usuario actual.</param>
         /// <returns>Resultado HTTP</returns>
         [HttpGet("{idComentario}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOComentario))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetComentarioPorId(int idComentario)
+        public async Task<IActionResult> GetComentarioPorId(int idComentario, Guid? idUsuario)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -94,9 +103,7 @@ namespace ServicioHydrate.Controllers
 
             try
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid usuarioTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
-                var comentario = await _repoComentarios.GetComentarioPorId(idComentario, usuarioTemporal);
+                var comentario = await _repoComentarios.GetComentarioPorId(idComentario, idUsuario);
 
                 return Ok(comentario);
             }
@@ -120,7 +127,7 @@ namespace ServicioHydrate.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetComentariosDeAutor(Guid idAutor)
+        public async Task<IActionResult> GetComentariosDeAutor(Guid idAutor, Guid? idUsuario)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
@@ -130,7 +137,7 @@ namespace ServicioHydrate.Controllers
 
             try
             {
-                var comentarios = await _repoComentarios.GetComentariosPorUsuario(idAutor, null);
+                var comentarios = await _repoComentarios.GetComentariosPorUsuario(idAutor, idUsuario);
 
                 return Ok(comentarios);
             }
@@ -173,9 +180,13 @@ namespace ServicioHydrate.Controllers
 
             try 
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid autorTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
-                var comentarioCreado = await _repoComentarios.AgregarNuevoComentario(nuevoComentario, autorTemporal);
+                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+
+                if (idUsuario is null) throw new ArgumentException("El ID del autor no debe ser null.");
+
+                _logger.LogInformation($"Id usuario: {idUsuario.ToString()}");
+
+                var comentarioCreado = await _repoComentarios.AgregarNuevoComentario(nuevoComentario, idUsuario);
 
                 return CreatedAtAction(
                     nameof(GetComentarioPorId),
@@ -270,7 +281,13 @@ namespace ServicioHydrate.Controllers
 
             try
             {
-                await _repoComentarios.EliminarComentario(idComentario);
+                Guid idUsuario = new Guid(this.User.Claims.First(i => i.Type == "id").Value);
+
+                string rol = this.User.Claims.First(i => i.Type == ClaimTypes.Role).Value;
+
+                _logger.LogInformation($"Id usuario: {idUsuario.ToString()}, Rol: {rol}");
+
+                await _repoComentarios.EliminarComentario(idComentario, idUsuario, rol);
 
                 return NoContent();
             }
@@ -278,6 +295,10 @@ namespace ServicioHydrate.Controllers
             {
                 // No existe un comentario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                return Unauthorized(e.Message);
             }
             catch (DbUpdateException e)
             {
@@ -312,7 +333,6 @@ namespace ServicioHydrate.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        // [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> MarcarComentarioComoUtil(int idComentario)
         {
@@ -322,10 +342,14 @@ namespace ServicioHydrate.Controllers
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
-            {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid usuarioTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
-                await _repoComentarios.MarcarComentarioComoUtil(idComentario, usuarioTemporal);
+            { 
+                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+
+                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+
+                _logger.LogInformation($"Id usuario: {idUsuario.ToString()}");
+                
+                await _repoComentarios.MarcarComentarioComoUtil(idComentario, (Guid) idUsuario);
 
                 return NoContent();
             }
@@ -378,9 +402,13 @@ namespace ServicioHydrate.Controllers
 
             try
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid usuarioTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
-                await _repoComentarios.ReportarComentario(idComentario, usuarioTemporal);
+                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+
+                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+
+                _logger.LogInformation($"Id usuario: {idUsuario.ToString()}");
+
+                await _repoComentarios.ReportarComentario(idComentario, (Guid) idUsuario);
 
                 return NoContent();
             }
@@ -412,12 +440,13 @@ namespace ServicioHydrate.Controllers
         /// Retorna todas las respuestas a un comentario especifico.
         /// </summary>
         /// <param name="idComentario">El ID del comentario</param>
+        /// <param name="idUsuario">El identificador del usuario actual.</param>
         /// <returns>Resultado HTTP</returns>
         [HttpGet("{idComentario}/respuestas")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTORespuesta>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetRespuestasComentario(int idComentario)
+        public async Task<IActionResult> GetRespuestasComentario(int idComentario, Guid? idUsuario)
         {
             // Buscar comentario requerido.
             // Si se encuentra, retornar todas las respuestas publicadas asociadas con el.
@@ -428,10 +457,8 @@ namespace ServicioHydrate.Controllers
 
             try 
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid usuarioTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
-                // Obtener todos los comentarios publicados disponibles.
-                var respuestas = await _repoComentarios.GetRespuestasDeComentario(idComentario, usuarioTemporal);
+                // Obtener todas las respuestas de un comentario.
+                var respuestas = await _repoComentarios.GetRespuestasDeComentario(idComentario, idUsuario);
 
                 return Ok(respuestas);
             }

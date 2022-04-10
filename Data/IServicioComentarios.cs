@@ -19,7 +19,7 @@ namespace ServicioHydrate.Data
 
         Task<DTOComentario> ActualizarComentario(DTOComentario comentarioModificado, Guid? idUsuarioActual);
 
-        Task EliminarComentario(int idComentario);
+        Task EliminarComentario(int idComentario, Guid? idUsuario, string rolDeUsuario);
 
         Task MarcarComentarioComoUtil(int idComentario, Guid idUsuarioActual);
 
