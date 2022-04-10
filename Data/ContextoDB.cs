@@ -37,6 +37,45 @@ namespace ServicioHydrate.Data
 
             modelBuilder.Entity<Usuario>()
                 .HasKey(u => u.Id);
+
+            // Relacion uno a muchos entre Usuario y Comentarios.
+            modelBuilder.Entity<Usuario>()
+                .HasMany(u => u.Comentarios)
+                .WithOne(c => c.Autor);
+
+            // Relacion uno a muchos entre Usuario y Respuestas.
+            modelBuilder.Entity<Usuario>()
+                .HasMany(u => u.Respuestas)
+                .WithOne(r => r.Autor);
+
+            // Configurar relacion muchos a muchos entre usuarios y comentarios 
+            // para los comentarios reportados.
+            modelBuilder.Entity<Comentario>()
+                .HasMany(c => c.ReportesDeUsuarios)
+                .WithMany(u => u.ComentariosReportados)
+                .UsingEntity(j => j.ToTable("ComentariosReportados"));
+
+            // Configurar relacion muchos a muchos entre usuarios y comentarios 
+            // para los comentarios marcados como utiles.
+            modelBuilder.Entity<Comentario>()
+                .HasMany(c => c.UtilParaUsuarios)
+                .WithMany(u => u.ComentariosUtiles)
+                .UsingEntity(j => j.ToTable("ComentariosUtiles"));
+
+            modelBuilder.Entity<Respuesta>()
+                .HasOne(r => r.Comentario)
+                .WithMany(c => c.Respuestas)
+                .HasForeignKey(r => r.IdComentario);
+
+            modelBuilder.Entity<Respuesta>()
+                .HasMany(r => r.UtilParaUsuarios)
+                .WithMany(u => u.RespuestasUtiles)
+                .UsingEntity(j => j.ToTable("RespuestasUtiles"));
+
+            modelBuilder.Entity<Respuesta>()
+                .HasMany(r => r.ReportesDeUsuarios)
+                .WithMany(u => u.RespuestasReportadas)
+                .UsingEntity(j => j.ToTable("RespuestasReportadas"));
         }
     }
 }
