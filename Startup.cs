@@ -133,10 +133,6 @@ namespace ServicioHydrate
             // Redirige peticiones HTTP a HTTPS.
             app.UseHttpsRedirection();
 
-            // Usa archivos estáticos (css, js, etc.) de la app de React.
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
-
             // Configura el enrutamiento para las url.
             app.UseRouting();
 
@@ -150,6 +146,10 @@ namespace ServicioHydrate
             {
                 endpoints.MapControllers();
             });
+
+            // Usa archivos estáticos (css, js, etc.) de la app de React.
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
 
             // Utilizar Aplicación de Página Única (app de React).
             app.UseSpa(spa =>

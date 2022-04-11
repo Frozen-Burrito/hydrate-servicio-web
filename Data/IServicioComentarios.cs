@@ -29,9 +29,9 @@ namespace ServicioHydrate.Data
 
         Task<DTORespuesta> GetRespuestaPorId(int idComentario, int idRespuesta, Guid? idUsuarioActual);
 
-        Task<DTORespuesta> AgregarNuevaRespuesta(int idComentario, DTONuevaRespuesta respuesta, Guid? idAutor);
+    Task<DTORespuesta> AgregarNuevaRespuesta(int idComentario, DTONuevaRespuesta respuesta, Guid idAutor);
 
-        Task EliminarRespuesta(int idComentario, int idRespuesta);
+        Task EliminarRespuesta(int idComentario, int idRespuesta, Guid idUsuario, string rolUsuario);
 
         Task MarcarRespuestaComoUtil(int idComentario, int idRespuesta, Guid idUsuarioActual);
 

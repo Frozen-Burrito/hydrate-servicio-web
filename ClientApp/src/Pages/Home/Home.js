@@ -1,7 +1,7 @@
 import React from 'react'
 import './Home.css';
 import Typewriter  from 'typewriter-effect';
-import BotonesCompra from '../../Components/Botones/BotonesCompra';
+import BotonesCompra from '../../components/Botones/BotonesCompra';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tarjeta from '../../Components/Botones/Tarjeta';
 import Layout from '../../Components/Layout/Layout';

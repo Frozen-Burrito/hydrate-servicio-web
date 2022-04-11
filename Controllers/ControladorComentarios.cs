@@ -110,7 +110,6 @@ namespace ServicioHydrate.Controllers
             catch (ArgumentException e)
             {
                 // No existe un recurso informativo con el ID solicitado. Retorna 404.
-                _logger.LogError(e, $"Error en {metodo} - {ruta}");
                 return NotFound(e.Message);
             }
             catch (Exception e)
@@ -285,8 +284,6 @@ namespace ServicioHydrate.Controllers
 
                 string rol = this.User.Claims.First(i => i.Type == ClaimTypes.Role).Value;
 
-                _logger.LogInformation($"Id usuario: {idUsuario.ToString()}, Rol: {rol}");
-
                 await _repoComentarios.EliminarComentario(idComentario, idUsuario, rol);
 
                 return NoContent();
@@ -346,8 +343,6 @@ namespace ServicioHydrate.Controllers
                 Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
 
                 if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
-
-                _logger.LogInformation($"Id usuario: {idUsuario.ToString()}");
                 
                 await _repoComentarios.MarcarComentarioComoUtil(idComentario, (Guid) idUsuario);
 
@@ -403,8 +398,6 @@ namespace ServicioHydrate.Controllers
             try
             {
                 Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
-
-                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
 
                 _logger.LogInformation($"Id usuario: {idUsuario.ToString()}");
 
@@ -464,8 +457,6 @@ namespace ServicioHydrate.Controllers
             }
             catch (ArgumentException e)
             {
-                _logger.LogError(e, $"Error en {metodo} - {ruta}: {e}");
-
                 // No existe un comentario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
             }
@@ -499,10 +490,12 @@ namespace ServicioHydrate.Controllers
 
             try 
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid usuarioTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
+                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+
+                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+
                 // Obtener todos los comentarios publicados disponibles.
-                var respuesta = await _repoComentarios.GetRespuestaPorId(idComentario, idRespuesta, usuarioTemporal);
+                var respuesta = await _repoComentarios.GetRespuestaPorId(idComentario, idRespuesta, (Guid) idUsuario);
 
                 return Ok(respuesta);
             }
@@ -542,12 +535,14 @@ namespace ServicioHydrate.Controllers
 
             try 
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid usuarioTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
+                Guid? idAutor = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+
+                if (idAutor is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+
                 //TODO: Verificar el contenido de la respuesta.
                 // Si el comentario no es apto, crear el comentario y marcar "Publicado" como false.
                 // Si el contenido es apto, crear el comentario y marcar "Publicado" como true.
-                var respuestaCreada = await _repoComentarios.AgregarNuevaRespuesta(idComentario, nuevaRespuesta, usuarioTemporal);
+                var respuestaCreada = await _repoComentarios.AgregarNuevaRespuesta(idComentario, nuevaRespuesta, (Guid) idAutor);
 
                 return CreatedAtAction(
                     nameof(GetRespuestaPorId),
@@ -604,9 +599,11 @@ namespace ServicioHydrate.Controllers
 
             try
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid usuarioTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
-                await _repoComentarios.MarcarRespuestaComoUtil(idComentario, idRespuesta, usuarioTemporal);
+                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+
+                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+
+                await _repoComentarios.MarcarRespuestaComoUtil(idComentario, idRespuesta, (Guid) idUsuario);
 
                 return NoContent();
             }
@@ -660,9 +657,11 @@ namespace ServicioHydrate.Controllers
 
             try
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid usuarioTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
-                await _repoComentarios.ReportarRespuesta(idComentario, idRespuesta, usuarioTemporal);
+                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+
+                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+
+                await _repoComentarios.ReportarRespuesta(idComentario, idRespuesta, (Guid) idUsuario);
 
                 return NoContent();
             }
@@ -711,9 +710,18 @@ namespace ServicioHydrate.Controllers
 
             try
             {
-                await _repoComentarios.EliminarRespuesta(idComentario, idRespuesta);
+                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                string rol = this.User.Claims.First(i => i.Type == ClaimTypes.Role).Value;
+
+                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+
+                await _repoComentarios.EliminarRespuesta(idComentario, idRespuesta, (Guid) idUsuario, rol);
 
                 return NoContent();
+            }
+            catch (InvalidOperationException e)
+            {
+                return Unauthorized(e.Message);
             }
             catch (ArgumentException e)
             {

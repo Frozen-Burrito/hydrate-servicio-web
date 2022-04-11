@@ -11,21 +11,21 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioComentarios : IServicioComentarios
     {
-        private readonly ContextoDBSqlite _contexto;
+        private readonly ContextoDB _contexto;
 
-        public RepositorioComentarios(ContextoDBSqlite contexto)
+        public RepositorioComentarios(ContextoDB contexto)
         {
             this._contexto = contexto;
         }
 
         public async Task<DTOComentario> ActualizarComentario(DTOComentario comentarioModificado, Guid? idUsuarioActual)
         {
-            //FIXME: Queries lentas, producen advertencia (Microsoft.EntityFrameworkCore.Query[20504])
-            // Mas info: https://go.microsoft.com/fwlink/?linkid=2134277 
             var comentario = await _contexto.Comentarios
                 .Where(c => c.Id == comentarioModificado.Id)
+                .Include(c => c.Autor)
                 .Include(c => c.ReportesDeUsuarios)
                 .Include(c => c.UtilParaUsuarios)
+                .AsSplitQuery()
                 .FirstAsync();
 
             if (comentario is null)
@@ -42,7 +42,7 @@ namespace ServicioHydrate.Data
             return comentario.ComoDTO(idUsuarioActual);
         }
 
-        public async Task<DTORespuesta> AgregarNuevaRespuesta(int idComentario, DTONuevaRespuesta respuesta, Guid? idAutor)
+        public async Task<DTORespuesta> AgregarNuevaRespuesta(int idComentario, DTONuevaRespuesta respuesta, Guid idAutor)
         {
             Comentario comentario = await _contexto.Comentarios
                 .Where(c => c.Publicado && c.Id == idComentario)
@@ -110,7 +110,7 @@ namespace ServicioHydrate.Data
             await _contexto.SaveChangesAsync();
         }
 
-        public async Task EliminarRespuesta(int idComentario, int idRespuesta)
+        public async Task EliminarRespuesta(int idComentario, int idRespuesta, Guid idUsuario, string rolDeUsuario)
         {
             var comentario = await _contexto.Comentarios.FindAsync(idComentario);
 
@@ -124,6 +124,19 @@ namespace ServicioHydrate.Data
             if (respuesta is null)
             {
                 throw new ArgumentException("No existe una respuesta con el ID especificado.");
+            }
+
+            respuesta = await _contexto.Respuestas
+                .Where(r => r.Id == idRespuesta)
+                .Include(r => r.Autor)
+                .FirstAsync();
+
+            bool rolesCoinciden = respuesta.Autor.RolDeUsuario.ToString().Equals(rolDeUsuario);
+            bool usuarioEsModerador = rolDeUsuario.Equals(RolDeUsuario.MODERADOR_COMENTARIOS.ToString());
+
+            if (!rolesCoinciden || (!idUsuario.Equals(respuesta.Autor.Id) && !usuarioEsModerador))
+            {
+                throw new InvalidOperationException("Solo el mismo autor o un moderador puede borrar una respuesta.");
             }
 
             _contexto.Remove(respuesta);
@@ -141,6 +154,7 @@ namespace ServicioHydrate.Data
 
             comentario = await _contexto.Comentarios
                 .Where(c => c.Id == idComentario)
+                .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
                 .Include(c => c.ReportesDeUsuarios)
                 .FirstAsync();
@@ -162,6 +176,7 @@ namespace ServicioHydrate.Data
                 .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
                 .Include(c => c.ReportesDeUsuarios)
+                .AsSplitQuery()
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
             return await comentarios.ToListAsync();
@@ -185,8 +200,10 @@ namespace ServicioHydrate.Data
             var comentariosDelAutor = _contexto.Comentarios
                 .Where(c => c.Autor == usuarioAutor)
                 .OrderByDescending(c => c.Fecha)
+                .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
                 .Include(c => c.ReportesDeUsuarios)
+                .AsSplitQuery()
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
             return await comentariosDelAutor.ToListAsync();
@@ -203,6 +220,7 @@ namespace ServicioHydrate.Data
 
             respuesta = await _contexto.Respuestas
                 .Where(r => (r.IdComentario == idComentario && r.Id == idRespuesta))
+                .Include(r => r.Autor)
                 .Include(r => r.ReportesDeUsuarios)
                 .Include(r => r.UtilParaUsuarios)
                 .FirstAsync();
@@ -229,8 +247,10 @@ namespace ServicioHydrate.Data
 
             List<DTORespuesta> dtosRespuestas = await _contexto.Respuestas
                 .Where(r => r.IdComentario == idComentario)
+                .Include(r => r.Autor)
                 .Include(r => r.UtilParaUsuarios)
                 .Include(r => r.ReportesDeUsuarios)
+                .AsSplitQuery()
                 .OrderBy(r => r.Fecha)
                 .Select(r => r.ComoDTO(idUsuarioActual))
                 .ToListAsync();
@@ -247,8 +267,6 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
-            //FIXME: Mejorar estos Queries, producen advertencia (Microsoft.EntityFrameworkCore.Query[20504])
-            // Mas info: https://go.microsoft.com/fwlink/?linkid=2134277
             comentario = await _contexto.Comentarios
                 .Where(c => c.Id == idComentario)
                 .Include(c => c.UtilParaUsuarios)
