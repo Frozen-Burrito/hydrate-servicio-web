@@ -27,6 +27,12 @@ namespace ServicioHydrate.Data
         // Colección de entidades de Respuesta.
         public DbSet<Respuesta> Respuestas { get; set; }
 
+        // Colección de entidades de Orden.
+        public DbSet<Orden> Ordenes { get; set; }
+
+        // Colección de entidades de Producto.
+        public DbSet<Producto> Productos { get; set; }
+
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
@@ -76,6 +82,30 @@ namespace ServicioHydrate.Data
                 .HasMany(r => r.ReportesDeUsuarios)
                 .WithMany(u => u.RespuestasReportadas)
                 .UsingEntity(j => j.ToTable("RespuestasReportadas"));
+
+            modelBuilder.Entity<Orden>()
+                .Property(o => o.Id)
+                .HasColumnType("uniqueidentifier")
+                .HasDefaultValueSql("newid()");
+
+            // Relación uno a muchos entre Usuario y Orden
+            modelBuilder.Entity<Usuario>()
+                .HasMany(u => u.Ordenes)
+                .WithOne(o => o.Cliente);
+
+            modelBuilder.Entity<ProductosOrdenados>()
+                .HasKey(po => new { po.IdOrden, po.IdProducto });
+
+            // Relación muchos a muchos entre Orden y Producto.
+            modelBuilder.Entity<Orden>()
+                .HasMany(o => o.Productos)
+                .WithOne(po => po.Orden)
+                .HasForeignKey(po => po.IdOrden);
+
+            modelBuilder.Entity<Producto>()
+                .HasMany(p => p.OrdenesDelProducto)
+                .WithOne(po => po.Producto)
+                .HasForeignKey(po => po.IdProducto);
         }
     }
 }
