@@ -1,7 +1,7 @@
 import './CreacionCuenta.css';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import BotonesGenerales from '../../Components/Botones/BotonesGenerales';
+import BotonesGenerales from '../../components/Botones/BotonesGenerales';
 
 const texto = 'Crear cuenta';
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import './AboutUs.css';
-import Layout from '../../Components/Layout/Layout';
-import Footer from '../../Components/Footer/Footer';
+import Layout from '../../components/Layout/Layout';
+import Footer from '../../components/Footer/Footer';
 
 const AboutUs = () => {
   return (

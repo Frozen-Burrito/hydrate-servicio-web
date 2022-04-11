@@ -3,9 +3,9 @@ import './Home.css';
 import Typewriter  from 'typewriter-effect';
 import BotonesCompra from '../../components/Botones/BotonesCompra';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Tarjeta from '../../Components/Botones/Tarjeta';
-import Layout from '../../Components/Layout/Layout';
-import Footer from '../../Components/Footer/Footer';
+import Tarjeta from '../../components/Botones/Tarjeta';
+import Layout from '../../components/Layout/Layout';
+import Footer from '../../components/Footer/Footer';
 
 const escribirAuto = () => {
    return <Typewriter

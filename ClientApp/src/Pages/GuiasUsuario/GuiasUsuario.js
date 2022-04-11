@@ -1,5 +1,5 @@
 import React from 'react'
-import Layout from '../../Components/Layout/Layout';
+import Layout from '../../components/Layout/Layout';
 
 const GuiasUsuario = () => {
   return (
