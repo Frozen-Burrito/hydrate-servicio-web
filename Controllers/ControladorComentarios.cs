@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Security.Claims;
 
-namespace ServicioHydrate.Controllers
+namespace ServicioHydrate.Controladores
 {
     [ApiController]
     [Route("api/v1/comentarios")]

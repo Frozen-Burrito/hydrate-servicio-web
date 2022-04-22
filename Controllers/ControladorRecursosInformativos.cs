@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using ServicioHydrate.Data;
 using ServicioHydrate.Modelos.DTO;
 
-namespace ServicioHydrate.Controllers
+namespace ServicioHydrate.Controladores
 {
     [ApiController]
     [Route("api/v1/recursos")]
