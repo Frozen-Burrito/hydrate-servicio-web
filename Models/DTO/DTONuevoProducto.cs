@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ServicioHydrate.Modelos.DTO
 {
-    public class DTOProducto
+    public class DTONuevoProducto
     {
-        public int Id { get; set; }
-
         [MaxLength(32)]
         public string Nombre { get; set; }
 
