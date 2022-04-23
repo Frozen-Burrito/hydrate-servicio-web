@@ -49,8 +49,15 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> GetRecursosInformativos()
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string metodo = "";
+            string ruta = "";
+
+            if (Request is not null)
+            {
+                metodo = Request.Method.ToString();
+                ruta = Request.Path.Value;
+            }
+
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -78,8 +85,15 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> GetRecursoPorId(int idRecurso)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string metodo = "";
+            string ruta = "";
+
+            if (Request is not null)
+            {
+                metodo = Request.Method.ToString();
+                ruta = Request.Path.Value;
+            }
+            
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -116,9 +130,16 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> AgregarRecurso(DTORecursoInformativo nuevoRecurso)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
-            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}: {nuevoRecurso.Id}, {nuevoRecurso.Titulo}");
+            string metodo = "";
+            string ruta = "";
+
+            if (Request is not null)
+            {
+                metodo = Request.Method.ToString();
+                ruta = Request.Path.Value;
+            }
+            
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
@@ -169,8 +190,15 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> ModificarRecurso(int idRecurso, DTORecursoInformativo recursoModificado)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string metodo = "";
+            string ruta = "";
+
+            if (Request is not null)
+            {
+                metodo = Request.Method.ToString();
+                ruta = Request.Path.Value;
+            }
+            
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -212,8 +240,15 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> EliminarRecurso(int idRecurso)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string metodo = "";
+            string ruta = "";
+
+            if (Request is not null)
+            {
+                metodo = Request.Method.ToString();
+                ruta = Request.Path.Value;
+            }
+            
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try

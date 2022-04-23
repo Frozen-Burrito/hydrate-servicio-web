@@ -61,6 +61,9 @@ namespace ServicioHydrate
 
             services.AddScoped<IServicioComentarios, RepositorioComentarios>();
 
+            services.AddScoped<IServicioOrdenes, RepositorioOrdenes>();
+            services.AddScoped<IServicioProductos, RepositorioProductos>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new TokenValidationParameters
