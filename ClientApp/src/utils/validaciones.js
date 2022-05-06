@@ -35,6 +35,10 @@ export class ErrorDeAutenticacion {
     this.error = error;
   }
 
+  valores() {
+    return Object.keys(this);
+  }
+
   toString() {
     return `ErrorDeAutenticacion.${this.error}`;
   }

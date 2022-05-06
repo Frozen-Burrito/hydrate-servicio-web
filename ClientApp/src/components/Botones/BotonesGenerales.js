@@ -1,10 +1,9 @@
-import './BotonesGenerales.css';
 import React from 'react'
 import { Link } from 'react-router-dom';
 
 const BotonesGenerales = ( {texto} ) => {
   return (
-    <Link className='buttons' to='/' style={{ textDecoration: 'none' }}>{ texto }</Link>
+    <Link className='btn btn-primario' to='/' style={{ textDecoration: 'none' }}>{ texto }</Link>
   );
 }
 

@@ -2,19 +2,67 @@
 
 .btn {
   display: inline-block;
-  padding: 0.5rem 1.3rem;
-  font-size: 0.8rem;
-  border: 2px solid #fff;
-  border-radius: 2rem;
+  padding: 1rem 2.2rem;
+  font-size: 1.5rem;
+  font-style: normal;
   line-height: 1;
   margin: 0 0.2rem;
-  transition: 0.3s;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: -0.015%;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+  border: none;
+
+  transition: background-color .3s ease;
+}
+
+.btn.btn-primario {
+  background-color: var(--primario-claro);
+  color: var(--contraste-primario-claro);
+}
+
+.btn.btn-primario:hover {
+  background-color: var(--variante-primario-claro);
+}
+
+.btn.btn-primario.btn-desactivado {
+  background-color: rgba(var(--primario-claro-rgb), 0.7);
+  cursor: no-drop;
+}
+
+.btn.btn-secundario {
+  background-color: var(--secundario-claro);
+  color: var(--contraste-secundario-claro);
+}
+
+.btn.btn-secundario:hover {
+  background-color: var(--variante-secundario-claro);
+}
+
+.btn.btn-contraste-relleno {
+  background-color: var(--contraste-primario-claro);
+  color: var(--primario-claro);
+}
+
+.btn.btn-contraste-transparente {
+  background-color: transparent;
+  color: var(--contraste-primario-claro);
+  border: 2px solid var(--contraste-primario-claro);
+}
+
+.btn.btn-contraste-transparente:hover {
+  background-color: var(--contraste-primario-claro);
+  color: var(--primario-claro);
+}
+
+.btn.btn-borde {
+  border: 2px solid var(--contraste-primario-claro);
 }
 
 .solid,
 .transparent:hover {
-  background-color: #fff;
+  background-color: var(--contraste-primario-claro);
   color: var(--variante-primario-claro);
 }
 
