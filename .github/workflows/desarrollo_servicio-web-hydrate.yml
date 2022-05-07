@@ -94,4 +94,4 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_961C7AEDF1294C3194F5D1F4FE749A31 }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          package: .
