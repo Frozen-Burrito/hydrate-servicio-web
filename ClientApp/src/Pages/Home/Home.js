@@ -26,6 +26,7 @@ const escribirAuto = () => {
 }
 
 export default function Home() {
+
   return (
     <Layout>
       <div className='banner'>

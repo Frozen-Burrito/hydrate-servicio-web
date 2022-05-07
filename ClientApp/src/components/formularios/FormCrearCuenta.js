@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
+import useCookie from '../../utils/useCookie';
 import { registrarUsuario } from '../../api/api';
 import { 
   validarCorreo, 
@@ -15,6 +16,8 @@ import {
 function FormCrearCuenta() {
 
   const history = useHistory();
+
+  const [ token, setToken ] = useCookie('jwt');
 
   const [correo, setCorreo] = useState('');
   const [errCorreo, setErrCorreo] = useState('');
@@ -140,6 +143,8 @@ function FormCrearCuenta() {
       // redirigir a inicio.
       //TODO: Guardar token en una cookie HTTP-only del navegador.
       console.log(resultado.cuerpo);
+
+      setToken(resultado.cuerpo.token);
   
       history.push('/');
 
@@ -193,11 +198,11 @@ function FormCrearCuenta() {
                 placeholder='Correo electrónico'
                 value={correo}
                 onChange={e => handleCambioCorreo(e)}/>
-              </div>
+            </div>
 
-              <p className='error' >
-                {errCorreo}
-              </p>
+            <p className='error' >
+              {errCorreo}
+            </p>
           </div>
 
           <div className='form-group'>
