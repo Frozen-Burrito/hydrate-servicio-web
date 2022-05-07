@@ -17,7 +17,12 @@ function FormCrearCuenta() {
 
   const history = useHistory();
 
-  const [ token, setToken ] = useCookie('jwt');
+  const { valor: token, actualizarCookie: setToken } = useCookie('jwt');
+
+  // Si el usuario ya esta autenticado, redirigir a Home.
+  if (token !== undefined || token !== null) {
+    history.push('/');
+  }
 
   const [correo, setCorreo] = useState('');
   const [errCorreo, setErrCorreo] = useState('');

@@ -16,9 +16,14 @@ import './formularios.css';
 
 function FormInicioSesion() {
 
-  const [ token, setToken ] = useCookie('jwt');
-
   const history = useHistory();
+  
+  const { valor: token, actualizarCookie: setToken } = useCookie('jwt');
+
+  // Si el usuario ya esta autenticado, redirigir a Home.
+  if (token !== undefined || token !== null) {
+    history.push('/');
+  }
 
   const [correoOUsuario, setCorreoOUsuario] = useState('');
   const [errCorreoOUsuario, setErrCorreoOUsuario] = useState('');

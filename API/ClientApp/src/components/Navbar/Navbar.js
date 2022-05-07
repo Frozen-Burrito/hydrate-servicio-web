@@ -1,13 +1,13 @@
 import './Navbar.css';
 import React from 'react'
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import useCookie from '../../utils/useCookie';
 import Dropdown from '../Dropdown/dropdown';
 import BotonRedondeado from '../Botones/BotonRedondeado';
 
 export default function Navbar() {
 
-  const [ token, actualizarToken, eliminarToken ] = useCookie('jwt');
+  const { valor: token, eliminarCookie: eliminarToken } = useCookie('jwt');
 
   const textoRegistro = 'Regístrate';
   const textoIniciarSesion = 'Iniciar Sesión';

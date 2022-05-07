@@ -15,7 +15,7 @@ const useCookie = (nombreCookie) => {
     setValor(null);
   }, [ nombreCookie ]);
 
-  return [valor, actualizarCookie, eliminarCookie];
+  return {valor, actualizarCookie, eliminarCookie};
 };
 
 export default useCookie;
