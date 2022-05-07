@@ -1,34 +1,74 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - servicio-web-hydrate
+name: Build y desplegar una app de ASP.Net Core a Azure Web App - servicio-web-hydrate
+
+env:
+  AZURE_WEBAPP_NAME: 'servicio-web-hydrate' # El nombre de la app web.
+  AZURE_WEBAPP_PACKAGE_PATH: './API'        # El path del proyecto de la app web, por defecto es la raiz del repo.
+  DOTNET_VERSION: '6.0.x'                   # La version de .NET a utilizar
 
 on:
   push:
     branches:
+      - main
       - desarrollo
   workflow_dispatch:
 
 jobs:
-  build:
+  build-react:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: './API/ClientApp'
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up .NET Core
+      - name: Configurar Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Build para app de React
+        run: npm run build
+
+  build:
+    runs-on: ubuntu-latest
+    needs: build-react
+
+    defaults:
+      run:
+        working-directory: './API'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configurar .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
           include-prerelease: false
 
-      - name: Build with dotnet
+      - name: Configurar caché de dependencias para builds más rápidas
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Build con dotnet
         run: dotnet build --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
-      - name: Upload artifact for deployment job
+      - name: Subir artefacto para el job de despliegue
         uses: actions/upload-artifact@v2
         with:
           name: .net-app
@@ -42,16 +82,16 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
+      - name: Descargar artefacto del job de build
         uses: actions/download-artifact@v2
         with:
           name: .net-app
 
-      - name: Deploy to Azure Web App
+      - name: Desplegar a Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'servicio-web-hydrate'
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_961C7AEDF1294C3194F5D1F4FE749A31 }}
-          package: .
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
