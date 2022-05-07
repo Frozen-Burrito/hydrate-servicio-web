@@ -7,9 +7,53 @@
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Work Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utilidades de texto */
+
+a.no-underline-link {
+  text-decoration: none;
+}
+
+a:visited {
+  color: var(--primario-claro);
+}
+
+h2 {
+  color: black;
+  font-weight: 500;
+  font-size: 2.6rem;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.mt-1 {
+  margin-top: 0.8rem;
+}
+
+.mt-3 {
+  margin-top: 2.4rem;
+}
+
+.mt-4 {
+  margin-top: 3.2rem;
+}
+
+.mt-5 {
+  margin-top: 4rem;
+}
+
+.redondo {
+  border-radius: 2rem!important;
+}
+
+.fuente-sm {
+  font-size: 1rem!important;
 }
 
 code {

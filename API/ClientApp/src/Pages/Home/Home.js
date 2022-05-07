@@ -1,7 +1,7 @@
 import React from 'react'
 import './Home.css';
 import Typewriter  from 'typewriter-effect';
-import BotonesCompra from '../../components/Botones/BotonesCompra';
+import BotoneCompra from '../../components/Botones/BotonesCompra';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tarjeta from '../../components/Botones/Tarjeta';
 import Layout from '../../components/Layout/Layout';
@@ -26,6 +26,7 @@ const escribirAuto = () => {
 }
 
 export default function Home() {
+
   return (
     <Layout>
       <div className='banner'>
@@ -40,7 +41,7 @@ export default function Home() {
                 <h3 className='description'>Crea un hábito positivo con nuestra botella.</h3>
             </div>
             <div className='btn-container'>
-                <BotonesCompra />
+                <BotoneCompra />
             </div>
           </div>
         </div>
