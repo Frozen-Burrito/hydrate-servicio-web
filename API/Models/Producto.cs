@@ -11,7 +11,7 @@ namespace ServicioHydrate.Modelos
         [MaxLength(32)]
         public string Nombre { get; set; }
 
-        [Range(0.0, 100000.0)]
+        [Range(0.00, 100000.00)]
         public decimal PrecioUnitario { get; set; }
 
         [MaxLength(300)]

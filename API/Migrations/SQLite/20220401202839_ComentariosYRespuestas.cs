@@ -38,7 +38,7 @@ namespace ServicioHydrate.Migrations.SQLite
                 });
 
             migrationBuilder.CreateTable(
-                name: "Comentarios",
+                name: "Comentario",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -111,7 +111,7 @@ namespace ServicioHydrate.Migrations.SQLite
                 });
 
             migrationBuilder.CreateTable(
-                name: "Respuestas",
+                name: "Respuesta",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -191,7 +191,7 @@ namespace ServicioHydrate.Migrations.SQLite
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comentario_AutorId",
-                table: "Comentarios",
+                table: "Comentario",
                 column: "AutorId");
 
             migrationBuilder.CreateIndex(
@@ -206,7 +206,7 @@ namespace ServicioHydrate.Migrations.SQLite
 
             migrationBuilder.CreateIndex(
                 name: "IX_Respuesta_AutorId",
-                table: "Respuestas",
+                table: "Respuesta",
                 column: "AutorId");
 
             migrationBuilder.CreateIndex(

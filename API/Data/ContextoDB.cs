@@ -103,6 +103,10 @@ namespace ServicioHydrate.Data
                 .HasForeignKey(po => po.IdOrden);
 
             modelBuilder.Entity<Producto>()
+                .Property(p => p.PrecioUnitario)
+                .HasPrecision(12, 2);
+
+            modelBuilder.Entity<Producto>()
                 .HasMany(p => p.OrdenesDelProducto)
                 .WithOne(po => po.Producto)
                 .HasForeignKey(po => po.IdProducto);
