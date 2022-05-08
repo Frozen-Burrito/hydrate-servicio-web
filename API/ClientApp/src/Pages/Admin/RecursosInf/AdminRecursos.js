@@ -3,6 +3,7 @@ import useCookie from '../../../utils/useCookie';
 import { Drawer } from '../../../components/Drawer/Drawer';
 import { ElementoDrawer } from '../../../components/Drawer/ElementoDrawer';
 import Layout from '../../../components/Layout/Layout';
+import { FormAgregarRecurso } from '../../../components/formularios/FormAgregarRecurso';
 
 export function AdminRecursos () {
 
@@ -62,6 +63,8 @@ export function AdminRecursos () {
 
       <div className='panel-contenido'>
         <h3>Recursos Informativos</h3>
+
+        <FormAgregarRecurso/>
       </div>
     </Layout>
   )

@@ -1,126 +1,226 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from 'react-router-dom';
+import useCookie from "../../utils/useCookie";
+import { 
+  estaVacio,
+  validarTituloRecurso,
+  validarUrl,
+  validarFechaPub,
+  validarDescripcionRecurso,
+  ErrorDeRecurso,
+} from "../../utils/validaciones";
 
-export const FormAgregarRecurso = () => {
+export const FormAgregarRecurso = ({ recurso }) => {
 
+  const [titulo, setTitulo] = useState('');
+  const [errTitulo, setErrTitulo] = useState('');
+
+  const [fecha, setFecha] = useState('');
+  const [errFecha, setErrFecha] = useState('');
+
+  const [url, setUrl] = useState('');
+  const [errUrl, setErrUrl] = useState('');
+
+  const [descripcion, setDescripcion] = useState('');
+  const [errDescripcion, setErrDescripcion] = useState('');
+
+  const [errGeneral, setErrGeneral] = useState('');
+
+  // Describe si el formulario esta haciendo una peticion a la API.
+  const [estaCargando, setEstaCargando] = useState(false);
 
   const handleCambioTitulo = (e) => {
+    const tituloIntroducido = e.target.value;
+
+    setTitulo(tituloIntroducido);
     
+    const resultadoVal = validarTituloRecurso(tituloIntroducido);
+
+    if (resultadoVal === null) {
+      setErrTitulo('');
+
+    } else {
+      if (resultadoVal.error === ErrorDeRecurso.errTituloVacio.error) {
+        setErrTitulo('El título del recurso es obligatorio');
+
+      } else if (resultadoVal.error === ErrorDeRecurso.errTituloMuyLargo.error) {
+        setErrTitulo('El título del recurso debe tener menos de 40 caracteres');
+      } 
+    }
   }
 
   const handleCambioURL = (e) => {
+    const urlIntroducida = e.target.value;
 
+    setUrl(urlIntroducida);
+
+    const resultadoVal = validarUrl(urlIntroducida);
+
+    if (resultadoVal === null) {
+      setErrUrl('');
+
+    } else {
+      if (resultadoVal.error === ErrorDeRecurso.errUrlVacia.error) {
+        setErrUrl('La URL del recurso informativo es obligatoria');
+
+      } else if (resultadoVal.error === ErrorDeRecurso.errUrlSinHttps.error) {
+        setErrUrl('La URL del recurso informativo debe usar HTTPS');
+      } 
+    }
   }
 
   const handleCambioDescripcion = (e) => {
+    const descripcionIntroducida = e.target.value;
 
+    setDescripcion(descripcionIntroducida);
+
+    const resultadoVal = validarDescripcionRecurso(descripcionIntroducida);
+
+    if (resultadoVal === null) {
+      setErrDescripcion('');
+
+    } else {
+      if (resultadoVal.error === ErrorDeRecurso.errDescripcionMuyLarga.error) {
+        setErrDescripcion('La descripción del recurso debe tener menos de 500 caracteres');
+
+      }
+    }
   }
 
   const handleCambioFecha = (e) => {
+    const fechaIntroducida = e.target.valueAsDate;
+
+    console.log(fechaIntroducida.toISOString());
+
+    setFecha(fechaIntroducida.toString());
+
+    const resultadoVal = validarFechaPub(fechaIntroducida);
+
+    if (resultadoVal === null) {
+      setErrFecha('');
+
+    } else {
+      if (resultadoVal.error === ErrorDeRecurso.errFechaNoValida.error) {
+        setErrFecha('La fecha de publicación del recurso debe ser anterior a la fecha actual.');
+      }
+    }
+  }
+
+  const handleSubmit = async (e) => {
 
   }
+
+  // Es true si existen errores de validación en el formulario.
+  const tieneErrores = !estaVacio(errTitulo) || !estaVacio(errUrl) 
+  || !estaVacio(errFecha) || !estaVacio(errDescripcion);
+    
+  // Desactivar el botón de enviar formulario si está cargando o tiene errores.
+  const submitDesactivado = estaCargando || tieneErrores;
 
   return (
     <form>
         <div className='form-fields'>
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                email
-              </span>
-              <input 
-                type='text' 
-                name='correo' 
-                required
-                disabled={estaCargando}
-                className='input' 
-                placeholder='Correo electrónico'
-                value={correo}
-                onChange={e => handleCambioCorreo(e)}/>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  auto_stories
+                </span>
+                <input 
+                  type='text' 
+                  name='titulo' 
+                  required
+                  disabled={estaCargando}
+                  className='input' 
+                  placeholder='Título del recurso'
+                  value={titulo}
+                  onChange={e => handleCambioTitulo(e)}/>
+              </div>
+
+              <p className='error' >
+                {errTitulo}
+              </p>
             </div>
 
-            <p className='error' >
-              {errCorreo}
-            </p>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  event
+                </span>
+                <input 
+                  type='date' 
+                  name='fechaPub' 
+                  required
+                  disabled={estaCargando}
+                  className='input' 
+                  placeholder='Fecha de Publicación' 
+                  value={fecha}
+                  onChange={e => handleCambioFecha(e)}/>
+              </div>
+
+              <p className='error' >
+                {errFecha}
+              </p>
+            </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                person
-              </span>
-              <input 
-                type='text' 
-                name='nombreUsuario' 
-                required
-                disabled={estaCargando}
-                className='input' 
-                placeholder='Nombre de usuario' value={nombreUsuario}
-                onChange={e => handleUsernameChange(e)}/>
-            </div>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  link
+                </span>
+                <input 
+                  type='text' 
+                  name='url' 
+                  required
+                  disabled={estaCargando}
+                  className='input' 
+                  placeholder='URL' 
+                  value={url}
+                  onChange={e => handleCambioURL(e)}/>
+              </div>
 
-            <p className='error' >
-              {errUsuario}
-            </p>
+              <p className='error' >
+                {errUrl}
+              </p>
+            </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                vpn_key
-              </span>
-              <input 
-                type='password' 
-                name='password' 
-                required
-                disabled={estaCargando}
-                className='input' 
-                placeholder='Constraseña' 
-                value={password}
-                onChange={e => handlePasswordChange(e)}/>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  subject
+                </span>
+                <input 
+                  type='text' 
+                  name='descripcion'
+                  required 
+                  disabled={estaCargando}
+                  className='input' 
+                  placeholder='Descripción breve' 
+                  value={descripcion}
+                  onChange={e => handleCambioDescripcion(e)}/>
+              </div>
+              <p className='error' >
+                {errDescripcion}
+              </p>
             </div>
-
-            <p className='error' >
-              {errPassword}
-            </p>
           </div>
-
-          <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                vpn_key
-              </span>
-              <input 
-                type='password' 
-                name='passwordConfirm'
-                required 
-                disabled={estaCargando}
-                className='input' 
-                placeholder='Confirma tu Constraseña' 
-                value={passConfirm}
-                onChange={e => handlePassConfirmChange(e)}/>
-            </div>
-            <p className='error' >
-              {errPassConfirm}
-            </p>
-          </div>
-
-          <p className='text-acount'>
-            ¿Ya tienes una cuenta? 
-            <Link className='account-link' to='/inicio-sesion'>Iniciar Sesión</Link>
-          </p>
 
           <p className='error' >
             {errGeneral}
           </p>
         </div>
 
-        <div className='center-text mt-1'>
+        <div className='mt-1'>
           <button 
             className={`btn btn-primario ${submitDesactivado ? 'btn-desactivado' : ''}`}
             disabled={submitDesactivado} 
             onClick={handleSubmit}
           >
-            Crear Cuenta
+            Agregr Recurso
           </button>
         </div>
       </form>

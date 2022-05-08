@@ -44,6 +44,28 @@ export class ErrorDeAutenticacion {
   }
 };
 
+export class ErrorDeRecurso {
+  static ninguno = new ErrorDeRecurso('ninguno');
+  static errTituloVacio = new ErrorDeRecurso('errTituloVacio');
+  static errTituloMuyLargo = new ErrorDeRecurso('errTituloMuyLargo');
+  static errUrlVacia = new ErrorDeRecurso('errUrlVacia');
+  static errUrlSinHttps = new ErrorDeRecurso('errUrlSinHttps');
+  static errFechaNoValida = new ErrorDeRecurso('errFechaNoValida');
+  static errDescripcionMuyLarga = new ErrorDeRecurso('errDescripcionMuyLarga');
+
+  constructor(error) {
+    this.error = error;
+  }
+
+  valores() {
+    return Object.keys(this);
+  }
+
+  toString() {
+    return `ErrorDeRecurso.${this.error}`;
+  }
+};
+
 const regexCorreo = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const regexNombreUsuario = /^[a-z0-9_-]{4,20}$/;
@@ -86,6 +108,40 @@ export const validarPassword = (password) => {
 export const validarConfPassword = (password, confPassword) => {
   if (!estaVacio(password) && password !== confPassword) {
     return ErrorDeValidacion.passConfNoCoincide;
+  } else {
+    return null;
+  }
+}
+
+export const validarTituloRecurso = (titulo) => {
+  if (estaVacio(titulo)) return ErrorDeRecurso.errTituloVacio;
+
+  if (titulo.length > 40) return ErrorDeRecurso.errTituloMuyLargo;
+
+  return null;
+}
+
+export const validarFechaPub = (fechaPub) => {
+  if (fechaPub > new Date()) {
+    return ErrorDeRecurso.errFechaNoValida;
+  } else {
+    return null;
+  }
+}
+
+export const validarUrl = (url) => {
+  if (estaVacio(url)) {
+    return ErrorDeRecurso.errUrlVacia;
+  } else if (!url.startsWith("https")) {
+    return ErrorDeRecurso.errUrlSinHttps;
+  } else {
+    return null;
+  }
+}
+
+export const validarDescripcionRecurso = (descripcion) => {
+  if (!estaVacio(descripcion) && descripcion.lenth > 500) {
+    return ErrorDeRecurso.errDescripcionMuyLarga;
   } else {
     return null;
   }

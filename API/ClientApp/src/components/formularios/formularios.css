@@ -50,17 +50,25 @@ main.form-page-left {
 
 form > .form-fields {
   margin-top: 0.8rem;
-  padding: 1.6rem;
+  /* padding: 1.6rem; */
 }
 
 form > .form-fields > .form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.8rem;
+  gap: 1.6rem;
+}
+
+form > .form-fields > .form-group > .campo {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 0.8rem;
 }
 
-form > .form-fields > .form-group > .campo-con-icono {
+form > .form-fields > .form-group > .campo > .campo-con-icono {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -69,14 +77,14 @@ form > .form-fields > .form-group > .campo-con-icono {
   position: relative;
 }
 
-form > .form-fields > .form-group > .campo-con-icono > span.material-icons {
+form > .form-fields > .form-group > .campo > .campo-con-icono > span.material-icons {
   position: absolute;
   left: 16px;
   min-width: 32px;
   color: var(--contraste-superficie-claro);
 }
 
-form > .form-fields > .form-group > .campo-con-icono > input {
+form > .form-fields > .form-group > .campo > .campo-con-icono > input {
   padding: 1.4rem 1rem;
   padding-left: 3.2rem;
   width: 100%;
@@ -94,11 +102,11 @@ form > .form-fields > .form-group > .campo-con-icono > input {
   transition: outline-color .3s ease-in-out;
 }
 
-form > .form-fields > .form-group > .campo-con-icono > input:focus {
+form > .form-fields > .form-group > .campo > .campo-con-icono > input:focus {
   outline: var(--primario-claro) solid 2px;
 }
 
-form > .form-fields > .form-group > p.error {
+form > .form-fields > .form-group > .campo > p.error {
   padding-top: 0.4rem;
   color: var(--error-claro);
 }
