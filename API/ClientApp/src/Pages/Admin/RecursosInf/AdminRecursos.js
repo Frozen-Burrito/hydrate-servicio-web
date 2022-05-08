@@ -147,7 +147,7 @@ export function AdminRecursos () {
     }
     
     obtenerDatos();
-  }, []);
+  }, [jwt]);
 
   return (
     <Layout>

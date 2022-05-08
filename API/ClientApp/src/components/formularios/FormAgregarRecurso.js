@@ -42,7 +42,7 @@ export const FormAgregarRecurso = ({ recursoActual, onRecursoModificado }) => {
 
     setTxtBotonSubmit(recursoExistente ? 'Confirmar Cambios' : 'Agregr Recurso');
     
-  }, [recursoActual])
+  }, [recursoActual, recursoExistente])
   
 
   const handleCambioTitulo = (e) => {
