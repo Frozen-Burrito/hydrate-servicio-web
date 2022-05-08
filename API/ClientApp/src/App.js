@@ -42,7 +42,8 @@ function App() {
         />
         <Route path="/admin/recursos-informativos" 
           component={
-            () => <RutaProtegida rolRequerido={'ADMIN_RECURSOS_INF'}> <AdminRecursos /> </RutaProtegida>
+            // () => <RutaProtegida rolRequerido={'ADMIN_RECURSOS_INF'}> <AdminRecursos /> </RutaProtegida>
+            () => <AdminRecursos />
           } 
         />
         <Route path="/admin/usuarios" 

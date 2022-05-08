@@ -1,0 +1,87 @@
+@import url("../../styles.css");
+
+.menu-drawer {
+  height: 100vh;
+  min-width: 25vw;
+  position: fixed;
+  top: 0;
+  padding: 0 0.8rem;
+  padding-top: 4.8rem;
+  background-color: var(--primario-claro);
+  color: var(--contraste-primario-claro);
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.menu-drawer > .drawer-superior,
+.menu-drawer > .drawer-inferior {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.menu-drawer > .drawer-superior > h5 {
+  margin-top: 2.4rem;
+  margin-bottom: 1.6rem;
+  font-weight: 500;
+  text-align: start;
+  font-size: 1.8rem;
+}
+
+.menu-drawer > .drawer-superior > a.elemento-drawer,
+.menu-drawer > .drawer-inferior > a.elemento-drawer {
+  width: 100%;
+  padding: 1.2rem 0.4rem;
+  border-radius: 10px;
+  text-align: start;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--contraste-primario-claro);
+  text-decoration: none;
+  font-size: 1.4rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color .2s ease-in-out;
+}
+
+.menu-drawer > .drawer-superior > a.elemento-drawer:hover,
+.menu-drawer > .drawer-inferior > a.elemento-drawer:hover {
+  background-color: var(--variante-primario-claro);
+}
+
+a.elemento-drawer > .prefijo {
+  max-width: 90%;
+  display: flex;
+}
+
+a.elemento-drawer > .prefijo > span.material-icons {
+  margin-right: 0.8rem;
+}
+
+a.elemento-drawer > .sufijo > button {
+  background-color: transparent;
+  outline: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--contraste-primario-claro);
+  cursor: pointer;
+}
+
+.panel-contenido { 
+  width: 75vw;
+  min-height: 100vh;
+  /* left: 0; */
+  margin: 0 0 0 auto;
+  padding: 4.8rem 3.2rem;
+}
+
+.panel-contenido > h3 {
+  margin-top: 2.4rem;
+}

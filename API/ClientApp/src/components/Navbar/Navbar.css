@@ -1,10 +1,12 @@
 @import url("../../styles.css");
 
 nav.navbar {
-  position: relative;
+  position: fixed;
+  z-index: 9999;
   top: 0;
   width: 100%;
   background-color: var(--primario-claro);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 }
 
 .container {
