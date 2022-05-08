@@ -3,7 +3,7 @@ import './AboutUs.css';
 import Layout from '../../components/Layout/Layout';
 import Footer from '../../components/Footer/Footer';
 
-const AboutUs = () => {
+export function AboutUs () {
   return (
     <Layout>
         <div className='about-banner'>
@@ -43,5 +43,3 @@ const AboutUs = () => {
     </Layout>
   );
 }
-
-export default AboutUs;

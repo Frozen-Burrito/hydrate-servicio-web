@@ -1,13 +1,20 @@
 import './App.css';
-import {Switch, Route} from 'react-router-dom';
-import Home from './Pages/Home/Home';
-import AboutUs from './Pages/AboutUs/AboutUs';
-import DatosAbiertos from './Pages/DatosAbiertos/DatosAbiertos';
-import Products from './Pages/Products/Products';
-import GuiasUsuario from './Pages/GuiasUsuario/GuiasUsuario';
-import InicioSesion from './Pages/InicioSesion/InicioSesion';
-import CreacionCuenta from './Pages/CreacionCuenta/CreacionCuenta';
-import {BrowserRouter} from 'react-router-dom';
+import {Switch, Route, BrowserRouter} from 'react-router-dom';
+import { RutaProtegida } from './components/RutaProtegida/RutaProtegida';
+
+import {
+  Home,
+  AboutUs,
+  DatosAbiertos,
+  Products,
+  GuiasUsuario,
+  CreacionCuenta,
+  InicioSesion,
+  AdminRecursos,
+  AdminComentarios,
+  AdminOrdenes,
+  AdminUsuarios
+} from './Pages';
 
 function App() {
   return (
@@ -22,6 +29,27 @@ function App() {
         <Route path="/guias-usuario" component={GuiasUsuario} />
         <Route path="/inicio-sesion" component={InicioSesion} />
         <Route path="/creacion-cuenta" component={CreacionCuenta} />
+
+        <Route path="/admin/comentarios" 
+          component={
+            () => <RutaProtegida rolRequerido={'MODERADOR_COMENTARIOS'}> <AdminComentarios /> </RutaProtegida>
+          } 
+        />
+        <Route path="/admin/ordenes" 
+          component={
+            () => <RutaProtegida rolRequerido={'ADMIN_ORDENES'}> <AdminOrdenes /> </RutaProtegida>
+          } 
+        />
+        <Route path="/admin/recursos-informativos" 
+          component={
+            () => <RutaProtegida rolRequerido={'ADMIN_RECURSOS_INF'}> <AdminRecursos /> </RutaProtegida>
+          } 
+        />
+        <Route path="/admin/usuarios" 
+          component={
+            () => <RutaProtegida rolRequerido={'ADMINISTRADOR'}> <AdminUsuarios /> </RutaProtegida>
+          } 
+        />
       </Switch>
     </BrowserRouter>
   );

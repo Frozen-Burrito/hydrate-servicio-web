@@ -1,12 +1,10 @@
 import React from 'react'
 import Layout from '../../components/Layout/Layout';
 
-const GuiasUsuario = () => {
+export function GuiasUsuario () {
   return (
     <Layout>
         <h1>Guias de Usuario</h1>
     </Layout>
   )
 }
-
-export default GuiasUsuario;

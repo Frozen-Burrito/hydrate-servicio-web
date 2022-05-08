@@ -1,21 +1,17 @@
 @import url("../../styles.css");
 
-.card-container {
-  position: relative;
-  width: 69%;
-  height: 90%;
-  padding: 0.75rem;
+.card {
+  padding: 1.2rem;
+  min-height: 7.2rem;
   background: var(--superficie-claro);
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0px 8px 20px 4px rgba(0, 0, 0, 0.3);
 }
 
-.card-text {
+.card > p {
   text-align: center;
-  font-size: 1.25rem;
+  font-size: 1rem;
+  line-height: 1rem;
   font-weight: 400;
   font-style: normal;
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
 import useCookie from '../../utils/useCookie';
 import { registrarUsuario } from '../../api/api';
 import { 
@@ -15,15 +15,13 @@ import {
 
 function FormCrearCuenta() {
 
-  const history = useHistory();
-
+  // Acceder a la cookie con el JWT, para actualizarlo o ver si ya existe.
   const { valor: token, actualizarCookie: setToken } = useCookie('jwt');
 
-  // Si el usuario ya esta autenticado, redirigir a Home.
-  if (token !== undefined || token !== null) {
-    history.push('/');
-  }
+  const history = useHistory();
 
+  // Declarar estado con valor y errores para cada campo del formulario. 
+  // Ambos comienzan como strings vacíos.
   const [correo, setCorreo] = useState('');
   const [errCorreo, setErrCorreo] = useState('');
   
@@ -37,9 +35,12 @@ function FormCrearCuenta() {
   const [errPassConfirm, setErrPassConfirm] = useState('');
 
   const [errGeneral, setErrGeneral] = useState('');
-
+  
+  // Describe si el formulario esta haciendo una peticion a la API.
   const [estaCargando, setEstaCargando] = useState(false);
 
+  // Recibe el valor del campo de correo.
+  // Lo valida y actualiza el estado del valor o el error en el formulario.
   const handleCambioCorreo = (e) => {
     
     const correoIntroducido = e.target.value;
@@ -173,13 +174,16 @@ function FormCrearCuenta() {
 
     setEstaCargando(false);
   }
-  
+    
+  // Es true si existen errores de validación en el formulario.
   const tieneErrores = !estaVacio(errCorreo) || !estaVacio(errUsuario) 
     || !estaVacio(errPassword) || !estaVacio(errPassConfirm);
-
+    
+  // Desactivar el botón de enviar formulario si está cargando o tiene errores.
   const submitDesactivado = estaCargando || tieneErrores;
 
-  return (
+  // Declarar el componente para el formulario.
+  const formulario = (
     <div className='form-container'>
       <Link to='/' className='no-underline-link'>
         <h3 className='form-logo'>Hydrate</h3>
@@ -293,6 +297,17 @@ function FormCrearCuenta() {
       </form>
     </div>
   );
+
+  const usuarioAutenticado = token !== undefined && token !== null;
+
+  // Si el usuario no está autenticado,  mostrar el formulario.
+  // Si ya lo está, redirigir a "/".
+  return !usuarioAutenticado 
+    ? <>{formulario}</>
+    : <Redirect
+        replace={true}
+        to='/'
+      />
 }
 
 export default FormCrearCuenta;

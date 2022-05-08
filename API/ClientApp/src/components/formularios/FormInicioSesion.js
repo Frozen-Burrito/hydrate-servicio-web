@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import useCookie from '../../utils/useCookie';
-import { Link } from 'react-router-dom';
+import { Link, useHistory, Redirect } from 'react-router-dom';
 import { iniciarSesion } from '../../api/api';
 import { 
   validarNombreUsuario, 
@@ -15,16 +14,14 @@ import {
 import './formularios.css';
 
 function FormInicioSesion() {
-
-  const history = useHistory();
   
+  // Acceder a la cookie con el JWT, para actualizarlo o ver si ya existe.
   const { valor: token, actualizarCookie: setToken } = useCookie('jwt');
 
-  // Si el usuario ya esta autenticado, redirigir a Home.
-  if (token !== undefined || token !== null) {
-    history.push('/');
-  }
+  const history = useHistory();
 
+  // Declarar estado con valor y errores para cada campo del formulario. 
+  // Ambos comienzan como strings vacíos.
   const [correoOUsuario, setCorreoOUsuario] = useState('');
   const [errCorreoOUsuario, setErrCorreoOUsuario] = useState('');
 
@@ -33,8 +30,11 @@ function FormInicioSesion() {
 
   const [errGeneral, setErrGeneral] = useState('');
 
+  // Describe si el formulario esta haciendo una peticion a la API.
   const [estaCargando, setEstaCargando] = useState(false);
 
+  // Recibe el valor del campo de correo o nombre de usuario.
+  // Lo valida y actualiza el estado del valor o el error en el formulario.
   const handleCambioCorreoOUsuario = (e) => {
     const valor = e.target.value;
     
@@ -130,11 +130,14 @@ function FormInicioSesion() {
     setEstaCargando(false);
   }
 
+  // Es true si existen errores de validación en el formulario.
   const tieneErrores = !estaVacio(errCorreoOUsuario) || !estaVacio(errPassword);
 
+  // Desactivar el botón de enviar formulario si está cargando o tiene errores.
   const submitDesactivado = estaCargando || tieneErrores;
 
-  return (
+  // Declarar el componente para el formulario.
+  const formulario = (
     <div className='form-container'>
       <Link to='/' className='no-underline-link'>
         <h3 className='form-logo'>Hydrate</h3>
@@ -206,6 +209,17 @@ function FormInicioSesion() {
       </form>
     </div>
   );
+  
+  const usuarioAutenticado = token !== undefined && token !== null;
+
+  // Si el usuario no está autenticado,  mostrar el formulario.
+  // Si ya lo está, redirigir a "/".
+  return !usuarioAutenticado 
+    ? <>{formulario}</>
+    : <Redirect
+        replace={true}
+        to='/'
+      />
 }
 
 export default FormInicioSesion;

@@ -1,53 +1,56 @@
 @import url("../../styles.css");
 
-nav {
+nav.navbar {
   position: relative;
   top: 0;
   width: 100%;
   background-color: var(--primario-claro);
-  height: 7.41vh;
 }
 
 .container {
-  position: relative;
-  max-width: 80vw;
+  max-width: 90vw;
   padding: 0 2rem;
   margin: 0 auto;
   display: flex;
+  align-items: center;
   height: 100%;
+}
+
+@media screen and (min-width: 1920px) {
+  .container {
+    max-width: 80vw;
+  }
+}
+
+nav.navbar > .container {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav.navbar > .container > .logo-container > .logo, 
+nav.navbar > .container > ul.nav-links > li a,
+nav.navbar > .container > .btns-container {
+  padding: 0.6rem 0;
 }
 
 .logo-container {
   display: flex;
-  flex: 1;
   align-items: center;
 }
 
 .links-container {
   display: flex;
-  flex: 3;
-}
-
-.nav-links {
-  display: flex;
-  flex: 3;
-  justify-content: center;
-  align-items: center;
 }
 
 .btns-container {
   display: flex;
-  flex: 2;
   justify-content: center;
   align-items: center;
 }
 
-.nav-links > ul {
-  display: flex;
-}
-
 .logo {
-  color: var(--contraste-primario-claro);
+  color: var(--contraste-fondo-claro);
   font-size: 2rem;
   font-weight: 500;
   letter-spacing: 2.5px;
@@ -66,22 +69,55 @@ nav {
   color: #fff;
 }
 
-.link {
-  position: relative;
+ul.nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: none;
 }
 
-.link > .nav-link {
-  line-height: 3rem;
+button.btn-menu-mobile {
+  margin-left: 1.6rem;
+  display: block;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  color: var(--contraste-primario-claro);
+}
+
+button.btn-menu-mobile > span.material-icons {
+  font-size: 2rem;
+}
+
+@media screen and (min-width: 1526px) {
+  ul.nav-links { 
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+
+  button.btn-menu-mobile {
+    display: none;
+  }
+}
+
+ul.nav-links > li {
+  display: inline-block;
+  max-width: 14vw;
+  text-align: center;
+  cursor: pointer;
+}
+
+ul.nav-links > li > .nav-link {
   color: #fff;
-  padding: 0 0.8rem;
+  height: 100%;
+  margin-right: 0.8rem;
   letter-spacing: 1px;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: 0.5s;
+  font-size: 1.2rem;
+  transition: font-size 0.5s;
 }
 
-.link:hover > .nav-link {
+ul.nav-links > li > a.nav-link:hover {
   transform: scale(1.1);
 }

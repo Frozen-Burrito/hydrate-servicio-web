@@ -43,6 +43,13 @@
 .btn.btn-contraste-relleno {
   background-color: var(--contraste-primario-claro);
   color: var(--primario-claro);
+  border: 2px solid transparent;
+}
+
+.btn.btn-contraste-relleno:hover {
+  background-color: transparent;
+  color: var(--contraste-primario-claro);
+  border: 2px solid var(--contraste-primario-claro);
 }
 
 .btn.btn-contraste-transparente {

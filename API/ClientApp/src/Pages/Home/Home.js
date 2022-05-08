@@ -2,7 +2,6 @@ import React from 'react'
 import './Home.css';
 import Typewriter  from 'typewriter-effect';
 import BotoneCompra from '../../components/Botones/BotonesCompra';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Tarjeta from '../../components/Botones/Tarjeta';
 import Layout from '../../components/Layout/Layout';
 import Footer from '../../components/Footer/Footer';
@@ -25,7 +24,7 @@ const escribirAuto = () => {
            />;
 }
 
-export default function Home() {
+export function Home() {
 
   return (
     <Layout>
@@ -56,39 +55,47 @@ export default function Home() {
         </div>
         <div className='bottle-definition-box'>
           <div className='bottle-definition-container-up'>
-            <div className='bottle-definition-container-up-text-container'>
-              <h2 className='tittle-definion-up'>Una botella para acompañarte</h2>
-              <div className='text-description-container-up'>
-                <FontAwesomeIcon icon="fa-solid fa-cube" />
-                <p className='text-description-up'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                Morbi ultrices tortor sed felis suscipit, id volutpat est 
-                cursus. Morbi eleifend diam efficitur, vehicula dolor nec, 
-                lobortis sem. Cras semper blandit augue sit amet sodales.
-                </p>
-              </div>
-              <div className='text-description-container-up'>
-                <FontAwesomeIcon icon="fa-solid fa-cube" />
-                <p className='text-description-up'>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                Morbi ultrices tortor sed felis suscipit, id volutpat est 
-                cursus. Morbi eleifend diam efficitur, vehicula dolor nec, 
-                lobortis sem. Cras semper blandit augue sit amet sodales.
-                </p>
-              </div>
+            <h2 className='tittle-definion-up'>Una botella para acompañarte</h2>
+            <div className='text-description-container-up'>
+              <span className="material-icons">
+                view_in_ar
+              </span>
+              <p className='text-description-up'>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+              Morbi ultrices tortor sed felis suscipit, id volutpat est 
+              cursus. Morbi eleifend diam efficitur, vehicula dolor nec, 
+              lobortis sem. Cras semper blandit augue sit amet sodales.
+              </p>
+            </div>
+            <div className='text-description-container-up'>
+              <span className="material-icons">
+                phonelink_ring
+              </span>
+              <p className='text-description-up'>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+              Morbi ultrices tortor sed felis suscipit, id volutpat est 
+              cursus. Morbi eleifend diam efficitur, vehicula dolor nec, 
+              lobortis sem. Cras semper blandit augue sit amet sodales.
+              </p>
             </div>
           </div>
           <div className='bottle-definition-container-down'>
             <div className='bottle-definition-container'>
-              <div className='left card'>
-                <Tarjeta />
+              <div className="mr-3">
+                <Tarjeta> 
+                  <p>Maecenas non purus tincidunt, sollicitudin erat ac, feugiat mi.</p>
+                </Tarjeta>
               </div>
-              <div className='center card'>
-                <Tarjeta />
+
+              <div className="mr-3">
+                <Tarjeta>
+                  <p>Maecenas non purus tincidunt, sollicitudin erat ac, feugiat mi.</p>
+                </Tarjeta>
               </div>
-              <div className='right card'>
-                <Tarjeta />
-              </div>
+
+              <Tarjeta>
+                <p>Maecenas non purus tincidunt, sollicitudin erat ac, feugiat mi.</p>
+              </Tarjeta>
             </div>
           </div>
         </div>

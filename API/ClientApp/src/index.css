@@ -48,12 +48,20 @@ h2 {
   margin-top: 4rem;
 }
 
+.mr-3 {
+  margin-right: 2.4rem;
+}
+
 .redondo {
   border-radius: 2rem!important;
 }
 
 .fuente-sm {
   font-size: 1rem!important;
+}
+
+.contraste-primario {
+  color: var(--contraste-primario-claro)!important;
 }
 
 code {

@@ -1,7 +1,7 @@
 import React from 'react'
 import FormInicioSesion from '../../components/formularios/FormInicioSesion';
 
-export default function InicioSesion() {
+export function InicioSesion() {
   return (
     <main className='form-page-left'>
       
