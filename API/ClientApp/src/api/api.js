@@ -121,12 +121,10 @@ export const editarRecurso = async (jwt, recurso) => {
   
   const resultado = await fetch(peticion);
 
-  const resJson = await resultado.json();
-
   return {
     ok: resultado.ok,
     status: resultado.status,
-    cuerpo: resJson,
+    cuerpo: {},
   };
 }
 
@@ -147,11 +145,9 @@ export const eliminarRecurso = async (jwt, idRecurso) => {
   
   const resultado = await fetch(peticion);
 
-  const resJson = await resultado.json();
-
   return {
     ok: resultado.ok,
     status: resultado.status,
-    cuerpo: resJson,
+    cuerpo: {},
   };
 }

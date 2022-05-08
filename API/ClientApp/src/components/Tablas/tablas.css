@@ -1,0 +1,49 @@
+@import url("../../styles.css");
+
+table {
+  background-color: var(--superficie-claro);
+  border-radius: 5px;
+  border-collapse: collapse;
+}
+
+table > tr > td, table > tr > th {
+  text-align: start;
+  padding: 0.6rem;
+}
+
+table > tr > th {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--contraste-fondo-claro);
+}
+
+table > tr.separador-inf {
+  border-bottom: 1px solid var(--contraste-superficie-claro);
+}
+
+table > tr > td {
+  text-overflow: ellipsis;
+}
+
+table > tr > td.acciones-fila {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+table > tr > td.acciones-fila > button {
+  padding: 0.4rem;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  background-color: var(--primario-claro);
+  font-size: 1.2rem;
+  color: var(--contraste-primario-claro);
+}
+
+table > tr > td.acciones-fila > button:hover {
+  background-color: var(--variante-primario-claro);
+  cursor: pointer;
+}

@@ -1,7 +1,6 @@
-import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
 import useCookie from "../../utils/useCookie";
-import { agregarRecurso } from "../../api/api";
+import { agregarRecurso, editarRecurso } from "../../api/api";
 import { 
   estaVacio,
   validarTituloRecurso,
@@ -11,9 +10,11 @@ import {
   ErrorDeRecurso,
 } from "../../utils/validaciones";
 
-export const FormAgregarRecurso = ({ recurso }) => {
+export const FormAgregarRecurso = ({ recursoActual, onRecursoModificado }) => {
 
   const { valor: jwt } = useCookie('jwt');
+
+  const recursoExistente = recursoActual !== undefined && recursoActual !== null;
 
   const [titulo, setTitulo] = useState('');
   const [errTitulo, setErrTitulo] = useState('');
@@ -28,9 +29,21 @@ export const FormAgregarRecurso = ({ recurso }) => {
   const [errDescripcion, setErrDescripcion] = useState('');
 
   const [errGeneral, setErrGeneral] = useState('');
+  const [txtBotonSubmit, setTxtBotonSubmit] = useState('Agregr Recurso');
 
   // Describe si el formulario esta haciendo una peticion a la API.
   const [estaCargando, setEstaCargando] = useState(false);
+
+  useEffect(() => {
+    setTitulo(recursoExistente ? recursoActual.titulo : '');
+    setFecha(recursoExistente ? recursoActual.fechaPublicacion.substring(0, 10) : '');
+    setUrl(recursoExistente ? recursoActual.url : '');
+    setDescripcion(recursoExistente ? recursoActual.descripcion : '');
+
+    setTxtBotonSubmit(recursoExistente ? 'Confirmar Cambios' : 'Agregr Recurso');
+    
+  }, [recursoActual])
+  
 
   const handleCambioTitulo = (e) => {
     const tituloIntroducido = e.target.value;
@@ -113,39 +126,57 @@ export const FormAgregarRecurso = ({ recurso }) => {
     e.preventDefault();
     setEstaCargando(true);
 
-    const recurso = {
-      titulo,
-      url,
-      descripcion,
-      fechaPublicacion: fecha,
-    };
-    
-    const resultado = await agregarRecurso(jwt, recurso);
+    const statusEsperado = recursoExistente ? 204 : 201;
 
-    if (resultado.ok && resultado.status === 201) {
-      // La petición de creacion del recurso fue exitosa.
-      console.log(resultado.cuerpo);
+    let resultado = null;
 
-      setTitulo('');
-      setUrl('');
-      setFecha('');
-      setDescripcion('');
+    if (recursoExistente) {
+      // Crear objeto de recurso modificado, para que sea serializado a JSON por 
+      // editarRecurso.
+      const recursoModificado = {
+        id: recursoActual.id,
+        titulo,
+        url,
+        descripcion,
+        fechaPublicacion: fecha,
+      };
 
-    } else if (resultado.status >= 500) {
+      resultado = await editarRecurso(jwt, recursoModificado);
+
+      resultado.cuerpo = recursoModificado;
+    } else {
+      const recursoCreado = {
+        titulo,
+        url,
+        descripcion,
+        fechaPublicacion: fecha,
+      };
+
+      resultado = await agregarRecurso(jwt, recursoCreado);
+    }   
+
+    if (resultado !== null) {
+      if (resultado.ok && resultado.status === statusEsperado) {
+        // La petición de creacion del recurso fue exitosa.
+        console.log(resultado.cuerpo);
+  
+        setTitulo('');
+        setUrl('');
+        setFecha('');
+        setDescripcion('');
+        
+        // Manejar una modificación en el recurso (agregado o editado).
+        onRecursoModificado(resultado.cuerpo);
+  
+      } else if (resultado.status >= 500) {
+        setErrGeneral('El servicio no está disponible, intente más tarde.');
+  
+      } else if (resultado.status >= 400) {
+  
+        console.log(resultado.cuerpo);
+      }
+    } else {
       setErrGeneral('El servicio no está disponible, intente más tarde.');
-
-    } else if (resultado.status >= 400) {
-
-      console.log(resultado.cuerpo);
-
-      // if (tipoError === ErrorDeAutenticacion.usuarioExiste.error) {
-      //   setErrGeneral('Ya existe un usuario con este correo o nombre de usuario.');
-
-      // } else if (tipoError === ErrorDeAutenticacion.formatoIncorrecto.error) {
-      //   setErrGeneral('Las credenciales no tienen el formato correcto.');
-      // }
-
-      // console.log(tipoError.toString());
     }
 
     setEstaCargando(false);
@@ -265,7 +296,7 @@ export const FormAgregarRecurso = ({ recurso }) => {
             disabled={submitDesactivado} 
             onClick={handleSubmit}
           >
-            Agregr Recurso
+            { txtBotonSubmit }
           </button>
         </div>
       </form>
