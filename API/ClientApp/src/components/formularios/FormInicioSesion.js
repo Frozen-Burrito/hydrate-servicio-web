@@ -148,43 +148,47 @@ function FormInicioSesion() {
 
         <div className='form-fields'>
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                email
-              </span>
-              <input 
-                type='text' 
-                name='correo' 
-                className='input' 
-                placeholder='Correo Electrónico o Usuario'
-                value={correoOUsuario}
-                onChange={handleCambioCorreoOUsuario}
-              />
-            </div>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  email
+                </span>
+                <input 
+                  type='text' 
+                  name='correo' 
+                  className='input' 
+                  placeholder='Correo Electrónico o Usuario'
+                  value={correoOUsuario}
+                  onChange={handleCambioCorreoOUsuario}
+                />
+              </div>
 
-            <p className='error' >
-              {errCorreoOUsuario}
-            </p>
+              <p className='error' >
+                {errCorreoOUsuario}
+              </p>
+            </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                vpn_key
-              </span>
-              <input 
-                type='password' 
-                name='password' 
-                className='input' 
-                placeholder='Constraseña'
-                value={password}
-                onChange={handleCambioPassword}
-              />
-            </div>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  vpn_key
+                </span>
+                <input 
+                  type='password' 
+                  name='password' 
+                  className='input' 
+                  placeholder='Constraseña'
+                  value={password}
+                  onChange={handleCambioPassword}
+                />
+              </div>
 
-            <p className='error' >
-              {errPassword}
-            </p>
+              <p className='error' >
+                {errPassword}
+              </p>
+            </div>
           </div>
 
           <p className='text-acount'>

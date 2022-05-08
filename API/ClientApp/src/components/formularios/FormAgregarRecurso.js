@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 import useCookie from "../../utils/useCookie";
+import { agregarRecurso } from "../../api/api";
 import { 
   estaVacio,
   validarTituloRecurso,
@@ -11,6 +12,8 @@ import {
 } from "../../utils/validaciones";
 
 export const FormAgregarRecurso = ({ recurso }) => {
+
+  const { valor: jwt } = useCookie('jwt');
 
   const [titulo, setTitulo] = useState('');
   const [errTitulo, setErrTitulo] = useState('');
@@ -90,9 +93,7 @@ export const FormAgregarRecurso = ({ recurso }) => {
   const handleCambioFecha = (e) => {
     const fechaIntroducida = e.target.valueAsDate;
 
-    console.log(fechaIntroducida.toISOString());
-
-    setFecha(fechaIntroducida.toString());
+    setFecha(fechaIntroducida.toISOString().substring(0, 10));
 
     const resultadoVal = validarFechaPub(fechaIntroducida);
 
@@ -107,15 +108,59 @@ export const FormAgregarRecurso = ({ recurso }) => {
   }
 
   const handleSubmit = async (e) => {
+    // Evitar el comportamiento por defecto de submit, donde se 
+    // refresca la pagina.
+    e.preventDefault();
+    setEstaCargando(true);
 
+    const recurso = {
+      titulo,
+      url,
+      descripcion,
+      fechaPublicacion: fecha,
+    };
+    
+    const resultado = await agregarRecurso(jwt, recurso);
+
+    if (resultado.ok && resultado.status === 201) {
+      // La petición de creacion del recurso fue exitosa.
+      console.log(resultado.cuerpo);
+
+      setTitulo('');
+      setUrl('');
+      setFecha('');
+      setDescripcion('');
+
+    } else if (resultado.status >= 500) {
+      setErrGeneral('El servicio no está disponible, intente más tarde.');
+
+    } else if (resultado.status >= 400) {
+
+      console.log(resultado.cuerpo);
+
+      // if (tipoError === ErrorDeAutenticacion.usuarioExiste.error) {
+      //   setErrGeneral('Ya existe un usuario con este correo o nombre de usuario.');
+
+      // } else if (tipoError === ErrorDeAutenticacion.formatoIncorrecto.error) {
+      //   setErrGeneral('Las credenciales no tienen el formato correcto.');
+      // }
+
+      // console.log(tipoError.toString());
+    }
+
+    setEstaCargando(false);
   }
 
   // Es true si existen errores de validación en el formulario.
   const tieneErrores = !estaVacio(errTitulo) || !estaVacio(errUrl) 
   || !estaVacio(errFecha) || !estaVacio(errDescripcion);
+
+  // Evitar que el usuario deje vacios campos, si no los modifica y nunca se 
+  // ejecutan las validaciones (el usuario tiene que escribir algo para que se valide).
+  const noTieneValores = estaVacio(titulo) || estaVacio(url) || estaVacio(fecha);
     
   // Desactivar el botón de enviar formulario si está cargando o tiene errores.
-  const submitDesactivado = estaCargando || tieneErrores;
+  const submitDesactivado = estaCargando || tieneErrores || noTieneValores;
 
   return (
     <form>

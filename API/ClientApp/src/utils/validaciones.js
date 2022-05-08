@@ -116,7 +116,7 @@ export const validarConfPassword = (password, confPassword) => {
 export const validarTituloRecurso = (titulo) => {
   if (estaVacio(titulo)) return ErrorDeRecurso.errTituloVacio;
 
-  if (titulo.length > 40) return ErrorDeRecurso.errTituloMuyLargo;
+  if (titulo.length > 80) return ErrorDeRecurso.errTituloMuyLargo;
 
   return null;
 }

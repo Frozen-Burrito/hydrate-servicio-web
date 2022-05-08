@@ -194,85 +194,93 @@ function FormCrearCuenta() {
 
         <div className='form-fields'>
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                email
-              </span>
-              <input 
-                type='text' 
-                name='correo' 
-                required
-                disabled={estaCargando}
-                className='input' 
-                placeholder='Correo electrónico'
-                value={correo}
-                onChange={e => handleCambioCorreo(e)}/>
-            </div>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  email
+                </span>
+                <input 
+                  type='text' 
+                  name='correo' 
+                  required
+                  disabled={estaCargando}
+                  className='input' 
+                  placeholder='Correo electrónico'
+                  value={correo}
+                  onChange={e => handleCambioCorreo(e)}/>
+              </div>
 
-            <p className='error' >
-              {errCorreo}
-            </p>
+              <p className='error' >
+                {errCorreo}
+              </p>
+            </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                person
-              </span>
-              <input 
-                type='text' 
-                name='nombreUsuario' 
-                required
-                disabled={estaCargando}
-                className='input' 
-                placeholder='Nombre de usuario' value={nombreUsuario}
-                onChange={e => handleUsernameChange(e)}/>
-            </div>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  person
+                </span>
+                <input 
+                  type='text' 
+                  name='nombreUsuario' 
+                  required
+                  disabled={estaCargando}
+                  className='input' 
+                  placeholder='Nombre de usuario' value={nombreUsuario}
+                  onChange={e => handleUsernameChange(e)}/>
+              </div>
 
-            <p className='error' >
-              {errUsuario}
-            </p>
+              <p className='error' >
+                {errUsuario}
+              </p>
+            </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                vpn_key
-              </span>
-              <input 
-                type='password' 
-                name='password' 
-                required
-                disabled={estaCargando}
-                className='input' 
-                placeholder='Constraseña' 
-                value={password}
-                onChange={e => handlePasswordChange(e)}/>
-            </div>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  vpn_key
+                </span>
+                <input 
+                  type='password' 
+                  name='password' 
+                  required
+                  disabled={estaCargando}
+                  className='input' 
+                  placeholder='Constraseña' 
+                  value={password}
+                  onChange={e => handlePasswordChange(e)}/>
+              </div>
 
-            <p className='error' >
-              {errPassword}
-            </p>
+              <p className='error' >
+                {errPassword}
+              </p>
+            </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo-con-icono">
-              <span className="material-icons">
-                vpn_key
-              </span>
-              <input 
-                type='password' 
-                name='passwordConfirm'
-                required 
-                disabled={estaCargando}
-                className='input' 
-                placeholder='Confirma tu Constraseña' 
-                value={passConfirm}
-                onChange={e => handlePassConfirmChange(e)}/>
+            <div className="campo">
+              <div className="campo-con-icono">
+                <span className="material-icons">
+                  vpn_key
+                </span>
+                <input 
+                  type='password' 
+                  name='passwordConfirm'
+                  required 
+                  disabled={estaCargando}
+                  className='input' 
+                  placeholder='Confirma tu Constraseña' 
+                  value={passConfirm}
+                  onChange={e => handlePassConfirmChange(e)}/>
+              </div>
+              <p className='error' >
+                {errPassConfirm}
+              </p>
             </div>
-            <p className='error' >
-              {errPassConfirm}
-            </p>
           </div>
 
           <p className='text-acount'>
