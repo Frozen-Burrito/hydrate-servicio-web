@@ -1,6 +1,6 @@
 import './Navbar.css';
 import React from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import useCookie from '../../utils/useCookie';
 import { obtenerClaims, parseJwt } from '../../utils/parseJwt';
 import Dropdown from '../Dropdown/dropdown';
@@ -9,6 +9,8 @@ import BotonRedondeado from '../Botones/BotonRedondeado';
 export default function Navbar() {
 
   const { valor: token, eliminarCookie: eliminarToken } = useCookie('jwt');
+
+  const history = useHistory();
 
   var rolDeUsuario = 'NINGUNO';
 
@@ -105,11 +107,16 @@ export default function Navbar() {
             Perfil
           </Link>
 
+          {/* Insertar las opciones de menú adecuadas, según el rol. */}
           { obtenerOpcionesSegunRol(rolDeUsuario) }
 
           <button className ='elemento-dropdown' onClick={() => {
-            
+            // Eliminar la cookie con el JWT.
             eliminarToken();
+            // Asegurar que el usuario es redirigido, para que no se 
+            // mantenga en la pagina actual (a la que ya no deberia
+            // tener acceso).
+            history.push('/');
           }}>
             Cerrar Sesión
           </button>
