@@ -35,10 +35,16 @@ namespace ServicioHydrate
 
             // Configurar el contexto de base de datos.
             if (_env.IsProduction()) 
-            {
-                // En entrono de producción (ya desplegado en Azure) usar SQL Server.
-                services.AddDbContext<ContextoDB>(options => 
-                    options.UseSqlServer(Configuration.GetConnectionString("DbPrincipal")));
+            {   
+                // String de conexión a la BD principal (es incluido como variable env en
+                // el entorno de producción de Azure)
+                string strConexion = Configuration.GetConnectionString("DbPrincipal");
+
+                // Usar MySQL en entrono de producción (ya desplegado en Azure).
+                services.AddDbContext<ContextoDBMysql>(options => 
+                        options.UseMySql(strConexion, ServerVersion.AutoDetect(strConexion)));
+                // services.AddDbContext<ContextoDB>(options => 
+                //     options.UseSqlServer(Configuration.GetConnectionString("DbPrincipal")));
             } else 
             {
                 // En entrono de desarrollo (local) usar SQLite.

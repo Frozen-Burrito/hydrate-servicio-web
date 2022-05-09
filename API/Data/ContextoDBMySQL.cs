@@ -4,13 +4,13 @@ using ServicioHydrate.Modelos;
 
 namespace ServicioHydrate.Data 
 {
-    /// Permite la interacción con una base de datos en SQL Server y las 
+    /// Permite la interacción con la base de datos en MySQL y las 
     /// entidades de EF core. 
     /// Se utilizan dos contextos de DB diferentes para administrar las 
     /// migraciones de los proveedores especificos.  
-    public class ContextoDB : DbContext
+    public class ContextoDBMysql : DbContext
     {
-        public ContextoDB(DbContextOptions<ContextoDB> opciones)
+        public ContextoDBMysql(DbContextOptions<ContextoDBMysql> opciones)
             : base(opciones)
         {
         }
@@ -38,8 +38,7 @@ namespace ServicioHydrate.Data
         {
             modelBuilder.Entity<Usuario>()
                 .Property(u => u.Id)
-                .HasColumnType("uniqueidentifier")
-                .HasDefaultValueSql("newid()");
+                .HasColumnType("char(36)");
 
             modelBuilder.Entity<Usuario>()
                 .HasKey(u => u.Id);
@@ -85,8 +84,7 @@ namespace ServicioHydrate.Data
 
             modelBuilder.Entity<Orden>()
                 .Property(o => o.Id)
-                .HasColumnType("uniqueidentifier")
-                .HasDefaultValueSql("newid()");
+                .HasColumnType("char(36)");
 
             // Relación uno a muchos entre Usuario y Orden
             modelBuilder.Entity<Usuario>()

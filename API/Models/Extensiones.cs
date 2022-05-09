@@ -26,7 +26,7 @@ namespace ServicioHydrate.Modelos
             }
         }
 
-        public static Usuario ComoModelo(this DTOPeticionAutenticacion usuario, string hashContrasenia)
+        public static Usuario ComoModelo(this DTOPeticionAutenticacion usuario, string hashContrasenia, bool generarGUID = false)
         {
             // Lanzar una excepción de argumento si la contraseña y el hash son iguales.
             if (usuario.Password.Equals(hashContrasenia))
