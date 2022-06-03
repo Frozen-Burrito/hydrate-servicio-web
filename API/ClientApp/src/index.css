@@ -54,6 +54,10 @@ h3 {
   margin-top: 4rem;
 }
 
+.mt-7 {
+  margin-top: 6rem;
+}
+
 .mr-3 {
   margin-right: 2.4rem;
 }
@@ -68,6 +72,11 @@ h3 {
 
 .contraste-primario {
   color: var(--contraste-primario-claro)!important;
+}
+
+section.contenedor {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 code {
