@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useHistory, Redirect } from 'react-router-dom';
 import useCookie from '../../utils/useCookie';
-import { registrarUsuario } from '../../api/api';
+import { registrarUsuario } from '../../api/api_auth';
 import { 
   validarCorreo, 
   validarNombreUsuario,

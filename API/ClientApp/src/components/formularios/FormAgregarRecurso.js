@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import useCookie from "../../utils/useCookie";
-import { agregarRecurso, editarRecurso } from "../../api/api";
+import { agregarRecurso, editarRecurso } from "../../api/api_recursos";
 import { 
   estaVacio,
   validarTituloRecurso,

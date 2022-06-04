@@ -21,10 +21,10 @@ export default function FormPublicarComentario(props) {
     });
 
     const [errores, setErrores] = useState({
-        general: "Error de prueba",
-        email: "Error de prueba",
-        asunto: "Un error de prueba",
-        contenido: "Error de prueba",
+        general: "",
+        email: "",
+        asunto: "",
+        contenido: "",
     });
 
     const [longitudesMax, setLongitudMax] = useState({
@@ -42,6 +42,8 @@ export default function FormPublicarComentario(props) {
             ...valores,
             [e.target.name]: e.target.value, 
         });
+
+        console.log(valores);
     }
 
     const handlePublicarComentario = (e) => {

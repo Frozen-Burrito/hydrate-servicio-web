@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react';
 
-import { eliminarRecurso, obtenerRecursos } from '../../../api/api';
+import { eliminarRecurso, obtenerRecursos } from '../../../api/api_recursos';
 import useCookie from '../../../utils/useCookie';
 import { Drawer } from '../../../components/Drawer/Drawer';
 import { ElementoDrawer } from '../../../components/Drawer/ElementoDrawer';

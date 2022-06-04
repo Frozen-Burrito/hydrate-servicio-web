@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useCookie from '../../utils/useCookie';
 import { Link, useHistory, Redirect } from 'react-router-dom';
-import { iniciarSesion } from '../../api/api';
+import { iniciarSesion } from '../../api/api_auth';
 import { 
   validarNombreUsuario, 
   validarCorreo, 
