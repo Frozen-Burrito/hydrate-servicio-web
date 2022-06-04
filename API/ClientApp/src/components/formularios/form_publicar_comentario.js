@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { estaVacio } from "../../utils/validaciones";
+import { 
+    estaVacio, 
+    validarCorreo,
+    validarAsuntoComentario,
+    validarContenidoComentario,
+    ErrorDeValidacion,
+    ErrorDeComentario
+} from "../../utils/validaciones";
 import './formularios.css';
 
 FormPublicarComentario.defaultProps = {
@@ -34,16 +41,58 @@ export default function FormPublicarComentario(props) {
 
     const [estaCargando, setEstaCargando] = useState(false);
 
+    /**
+     * Valida y actualiza el estado de los valores y errores del
+     * formulario.
+     */
     const handleCambioValor = (e) => {
 
-        // TODO: Validar valores.
+        const nombreValor = e.target.name;
+        const valor = e.target.value;
+
+        let resultadoVal = "";
+
+        switch (nombreValor) {
+            case "email": 
+                resultadoVal = validarCorreo(valor);
+                break;
+            case "asunto": 
+                resultadoVal = validarAsuntoComentario(valor, longitudesMax.asunto);
+                break;
+            case "contenido": 
+                resultadoVal = validarContenidoComentario(valor, longitudesMax.contenido);
+                break;
+        }
 
         setValores({
             ...valores,
-            [e.target.name]: e.target.value, 
+            [nombreValor]: valor, 
         });
 
-        console.log(valores);
+        let errorEnValor = "";
+
+        if (resultadoVal != null) {
+
+            if (resultadoVal.error === ErrorDeValidacion.correoVacio.error) {
+                errorEnValor = "El correo electrónico es obligatorio";
+        
+            } else if (resultadoVal.error === ErrorDeValidacion.correoNoValido.error) {
+                errorEnValor = "El correo no tiene un formato válido";
+            } else if (resultadoVal.error === ErrorDeComentario.errAsuntoVacio.error) {
+                errorEnValor = "El asunto es obligatorio";
+            } else if (resultadoVal.error === ErrorDeComentario.errAsuntoMuyLargo.error) {
+                errorEnValor = `El asunto debe tener menos de ${longitudesMax.asunto} caracteres`;
+            } else if (resultadoVal.error === ErrorDeComentario.errContenidoVacio.error) {
+                errorEnValor = "El contenido es obligatorio";
+            } else if (resultadoVal.error === ErrorDeComentario.errContenidoMuyLargo.error) {
+                errorEnValor = `El contenido debe tener menos de ${longitudesMax.contenido} caracteres`;
+            } 
+        }
+
+        setErrores({
+            ...errores,
+            [nombreValor]: errorEnValor,
+        });
     }
 
     const handlePublicarComentario = (e) => {

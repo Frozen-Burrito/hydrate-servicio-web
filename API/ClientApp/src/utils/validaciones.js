@@ -66,6 +66,26 @@ export class ErrorDeRecurso {
   }
 };
 
+export class ErrorDeComentario {
+  static ninguno = new ErrorDeRecurso('ninguno');
+  static errAsuntoVacio = new ErrorDeRecurso('errAsuntoVacio');
+  static errAsuntoMuyLargo = new ErrorDeRecurso('errAsuntoMuyLargo');
+  static errContenidoVacio = new ErrorDeRecurso('errContenidoVacio');
+  static errContenidoMuyLargo = new ErrorDeRecurso('errContenidoMuyLargo');
+
+  constructor(error) {
+    this.error = error;
+  }
+
+  valores() {
+    return Object.keys(this);
+  }
+
+  toString() {
+    return `ErrorDeComentario.${this.error}`;
+  }
+};
+
 const regexCorreo = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const regexNombreUsuario = /^[a-z0-9_-]{4,20}$/;
@@ -142,6 +162,27 @@ export const validarUrl = (url) => {
 export const validarDescripcionRecurso = (descripcion) => {
   if (!estaVacio(descripcion) && descripcion.lenth > 500) {
     return ErrorDeRecurso.errDescripcionMuyLarga;
+  } else {
+    return null;
+  }
+}
+
+export const validarAsuntoComentario = (asunto, longitudMax) => {
+
+  if (estaVacio(asunto)) {
+    return ErrorDeComentario.errAsuntoVacio;
+  } else if (asunto.length > longitudMax) {
+    return ErrorDeComentario.errAsuntoMuyLargo;
+  } else {
+    return null;
+  }
+}
+
+export const validarContenidoComentario = (contenido, longitudMax) => {
+  if (estaVacio(contenido)) {
+    return ErrorDeComentario.errContenidoVacio;
+  } else if (contenido.length > longitudMax) {
+    return ErrorDeComentario.errContenidoVacio;
   } else {
     return null;
   }
