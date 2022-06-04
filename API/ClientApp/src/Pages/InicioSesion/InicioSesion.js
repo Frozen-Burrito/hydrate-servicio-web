@@ -3,12 +3,11 @@ import FormInicioSesion from '../../components/formularios/FormInicioSesion';
 
 export function InicioSesion() {
   return (
-    <main className='form-page-left'>
+    <main className='form-page fit-pagina start'>
       
       <FormInicioSesion />
 
-      <div className='img-fondo-signin'>
-      </div>
+      <div className='img-fondo img-signin' />
     </main>
   );
 }

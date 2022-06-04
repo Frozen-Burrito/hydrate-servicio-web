@@ -12,6 +12,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body > iframe {
+  display: none;
+}
+
 /* Utilidades de texto */
 
 a.no-underline-link {
@@ -38,6 +42,16 @@ h3 {
   text-align: center;
 }
 
+.end-text {
+  text-align: end;
+}
+
+.fit-pagina {
+  min-height: 100vh!important;
+  height: 100vh;
+  max-height: 100vh;
+}
+
 .mt-1 {
   margin-top: 0.8rem;
 }
@@ -56,6 +70,10 @@ h3 {
 
 .mt-7 {
   margin-top: 6rem;
+}
+
+.mb-3 {
+  margin-bottom: 2.4rem;
 }
 
 .mr-3 {
@@ -86,4 +104,30 @@ code {
 
 ul {
   list-style: none;
+}
+
+.stack {
+  display: flex;
+}
+
+.stack.horizontal {
+  flex-direction: row;
+  width: 100%;
+}
+
+.stack.vertical {
+  flex-direction: column;
+  height: 100%;
+}
+
+.stack.justify-start {
+  justify-content: flex-start;
+}
+
+.stack.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: 1.6rem;
 }

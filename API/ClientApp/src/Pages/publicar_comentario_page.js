@@ -1,4 +1,5 @@
 import React from "react";
+import FormPublicarComentario from "../components/formularios/form_publicar_comentario";
 
 import Layout from "../components/Layout/Layout";
 
@@ -10,10 +11,11 @@ export function PublicarComentarioPage() {
 
     return (
         <Layout>
-            <section className='contenedor'>
-                <h2 className="mt-7">Enviar Comentarios</h2>
+            <main className='form-page center'>
+                <FormPublicarComentario />
 
-            </section>
+                <div className='img-fondo img-enviar-comentario' />
+            </main>
         </Layout>
     );
 }

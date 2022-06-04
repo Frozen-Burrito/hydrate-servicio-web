@@ -1,20 +1,26 @@
 @import url("../../styles.css");
 
-main.form-page-left {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+main.form-page {
+  /* width: 100vw; */
+  position: relative;
+  min-height: 120vh;
+  /* overflow-x: hidden; */
   background-color: var(--fondo-claro);
-  /* display: grid;
-  grid-template-columns: repeat(3, 1fr); */
+  object-fit: cover;
   display: flex;
-  
+}
+
+main.form-page.start {
+  justify-content: flex-start;
+}
+
+main.form-page.center {
+  justify-content: center;
 }
 
 /* Imagenes */
-.img-fondo-signup {
-  background-image: url(../../images/placeholder.png);
-  height: 100%;
+.img-fondo {
+  /* height: 100%; */
   width: 100%;
 
   background-position: center;
@@ -22,22 +28,33 @@ main.form-page-left {
   background-size: cover;
 }
 
-.img-fondo-signin {
+.img-signup {
   background-image: url(../../images/placeholder.png);
-  height: 100%;
-  width: 100%;
+}
 
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+.img-signin {
+  background-image: url(../../images/placeholder.png);
+}
+
+.img-enviar-comentario {
+  background-image: url(../../images/placeholder.png);
 }
 
 /* Formularios y campos */
 
 .form-container {
+  position: absolute;
+  background-color: var(--fondo-claro);
+  z-index: 1;
   min-width: 524px;
-  width: 35%;
-  padding: 1.6rem;
+  max-width: 40vw;
+  height: 100%;
+  padding: 1.6rem 3.2rem;
+}
+
+.form-container.w-50 {
+  min-width: 40vw;
+  max-width: 50vw;
 }
 
 .form-logo {
@@ -68,23 +85,28 @@ form > .form-fields > .form-group > .campo {
   align-items: flex-start;
 }
 
+form > .form-fields > .form-group > .campo > .stack > p {
+  font-size: 0.9rem;
+}
+
 form > .form-fields > .form-group > .campo > .campo-con-icono {
+  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  position: relative;
 }
 
 form > .form-fields > .form-group > .campo > .campo-con-icono > span.material-icons {
   position: absolute;
   left: 16px;
+  top: 22px;
   min-width: 32px;
   color: var(--contraste-superficie-claro);
 }
 
-form > .form-fields > .form-group > .campo > .campo-con-icono > input {
+form > .form-fields > .form-group > .campo > .campo-con-icono > .input {
   padding: 1.4rem 1rem;
   padding-left: 3.2rem;
   width: 100%;
@@ -94,6 +116,8 @@ form > .form-fields > .form-group > .campo > .campo-con-icono > input {
   outline: none;
   background-color: var(--superficie-claro);
 
+  resize: none;
+
   color: var(--contraste-superficie-claro);
   font-size: 1.2rem;
   line-height: 1.2rem;
@@ -102,12 +126,17 @@ form > .form-fields > .form-group > .campo > .campo-con-icono > input {
   transition: outline-color .3s ease-in-out;
 }
 
-form > .form-fields > .form-group > .campo > .campo-con-icono > input:focus {
+form > .form-fields > .form-group > .campo > .campo-con-icono > textarea.input {
+  font-family: inherit;
+  min-height: 10rem;
+  font-size: 1rem;
+}
+
+form > .form-fields > .form-group > .campo > .campo-con-icono > .input:focus {
   outline: var(--primario-claro) solid 2px;
 }
 
-form > .form-fields > .form-group > .campo > p.error {
-  padding-top: 0.4rem;
+.error {
   color: var(--error-claro);
 }
 
