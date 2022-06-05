@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import { 
     estaVacio, 
@@ -9,6 +9,16 @@ import {
     ErrorDeValidacion,
     ErrorDeComentario
 } from "../../utils/validaciones";
+import useCookie from "../../utils/useCookie"; 
+
+import { 
+    resultadoEsOK,
+    resultadoEsErrCliente,
+    resultadoEsErrServidor 
+} from "../../api/api";
+import { publicarComentario } from "../../api/api_comentarios";
+import { registrarUsuarioTemporal } from "../../api/api_auth";
+
 import './formularios.css';
 
 FormPublicarComentario.defaultProps = {
@@ -18,6 +28,8 @@ FormPublicarComentario.defaultProps = {
 export default function FormPublicarComentario(props) {
 
     const { esRespuesta } = props;
+
+    const { valor: token, eliminarCookie: eliminarToken } = useCookie('jwt');
 
     const textoEncabezado = esRespuesta ? "Responder a Comentario" : "Enviar un Comentario";
 
@@ -34,12 +46,14 @@ export default function FormPublicarComentario(props) {
         contenido: "",
     });
 
-    const [longitudesMax, setLongitudMax] = useState({
+    const [longitudesMax, _] = useState({
         asunto: 100,
         contenido: 500
     });
 
     const [estaCargando, setEstaCargando] = useState(false);
+
+    const history = useHistory();
 
     /**
      * Valida y actualiza el estado de los valores y errores del
@@ -95,9 +109,66 @@ export default function FormPublicarComentario(props) {
         });
     }
 
-    const handlePublicarComentario = (e) => {
+    const handlePublicarComentario = async (e) => {
         e.preventDefault();
-        console.log("Publicando comentario...");
+        setEstaCargando(true);
+
+        const { asunto, contenido } = valores;
+
+        const nuevoComentario = {
+            asunto, contenido
+        };
+
+        let usandoCuentaValida = token != null;
+
+        if (!usandoCuentaValida) {
+
+            const respuestaRegistro = await registrarUsuarioTemporal(valores.email);
+
+            usandoCuentaValida = respuestaRegistro.ok && 
+                                    respuestaRegistro.status === 200;
+        }
+
+        if (usandoCuentaValida) {
+            const resultado = await publicarComentario(nuevoComentario, token);
+    
+            if (resultado != null) {
+
+                const { ok, status, cuerpo } = resultado;
+
+                if (ok && resultadoEsOK(status)) {
+                    console.log(cuerpo);
+
+                    history.push("/comentarios");
+
+                } else if (resultadoEsErrCliente(status)) {
+                    setEstaCargando(false);
+                    setErrores({ 
+                        ...errores, 
+                        general: "El servicio no está disponible, intente más tarde."
+                    });
+
+                } else if (resultadoEsErrServidor(status)) {
+                    setEstaCargando(false);
+                    setErrores({ 
+                        ...errores, 
+                        general: resultado.cuerpo.mensaje
+                    });
+                }
+            } else {
+                setEstaCargando(false);
+                setErrores({ 
+                    ...errores, 
+                    general: "Hubo un error inesperado."
+                });
+            }
+        } else {
+            setEstaCargando(false);
+            setErrores({ 
+                ...errores, 
+                general: "No fue posible autenticarlo, el comentario no puede ser publicado."
+            });
+        }
     }
     
     const longitudAsuntoExcede = valores.asunto.length > longitudesMax.asunto;
