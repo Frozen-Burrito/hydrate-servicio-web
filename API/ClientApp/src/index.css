@@ -148,6 +148,14 @@ h6 {
   color: var(--contraste-primario-claro)!important;
 }
 
+.contraste-fondo { 
+  color: var(--contraste-fondo-claro)!important;
+}
+
+.contraste-superficie { 
+  color: var(--contraste-superficie-claro)!important;
+}
+
 section.contenedor {
   max-width: 90vw;
   margin: 0 auto;

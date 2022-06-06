@@ -1,18 +1,25 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 
-import Layout from "../../components/Layout/Layout";
-import Avatar from "../../components/Avatar/avatar";
+import { Layout, DrawerPerfil, ListaComentarios } from "../../components";
 
 export function PaginaComentariosPerfil() {
+
+  const { idUsuario } = useParams();
+
   return (
     <Layout>
-      <section className='contenedor full-page py-5'>
-        <h2 className="mt-3">Comentarios</h2>
+      <DrawerPerfil />
+      
+      <div className="panel-contenido">
+        <div className="stack horizontal justify-between gap-2 my-3">
+          <h2>Comentarios Que Has Escrito</h2>
 
-        <div style={{ display: "flex" }}>
-          <Avatar alt="Juan Perez" />
+          <h4>Ordenar</h4>
         </div>
-      </section>
+
+        <ListaComentarios idAutor={idUsuario} conBusqueda={false}/>
+      </div>
     </Layout>
   );
 }

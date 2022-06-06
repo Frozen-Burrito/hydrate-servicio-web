@@ -2,11 +2,13 @@ import React, { useState, useEffect} from 'react';
 
 import { eliminarRecurso, obtenerRecursos } from '../../../api/api_recursos';
 import useCookie from '../../../utils/useCookie';
-import { Drawer } from '../../../components/Drawer/Drawer';
-import { ElementoDrawer } from '../../../components/Drawer/ElementoDrawer';
-import Layout from '../../../components/Layout/Layout';
-import { FormAgregarRecurso } from '../../../components/formularios/FormAgregarRecurso';
-import { TablaRecursosInf } from '../../../components/Tablas/TablaRecursosInf';
+import { 
+  Layout, 
+  Drawer, 
+  ElementoDrawer, 
+  FormAgregarRecurso, 
+  TablaRecursosInf 
+} from '../../../components';
 
 export function AdminRecursos () {
 
