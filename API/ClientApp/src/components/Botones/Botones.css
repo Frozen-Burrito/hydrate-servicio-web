@@ -78,3 +78,17 @@
   background-color: transparent;
   color: #fff;
 }
+
+.btn-icono {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.btn-icono.seleccionado > span.material-icons,
+.btn-icono.seleccionado > p {
+  color: var(--primario-claro);
+}

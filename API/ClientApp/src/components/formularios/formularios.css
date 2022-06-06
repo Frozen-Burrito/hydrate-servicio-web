@@ -78,7 +78,7 @@ form > .form-fields > .form-group {
   gap: 1.6rem;
 }
 
-form > .form-fields > .form-group > .campo {
+form > .form-fields > .form-group > .campo, .campo {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -89,7 +89,7 @@ form > .form-fields > .form-group > .campo > .stack > p {
   font-size: 0.9rem;
 }
 
-form > .form-fields > .form-group > .campo > .campo-con-icono {
+form > .form-fields > .form-group > .campo > .campo-con-icono, .campo > .campo-con-icono {
   position: relative;
   width: 100%;
   display: flex;
@@ -98,7 +98,8 @@ form > .form-fields > .form-group > .campo > .campo-con-icono {
   justify-content: center;
 }
 
-form > .form-fields > .form-group > .campo > .campo-con-icono > span.material-icons {
+form > .form-fields > .form-group > .campo > .campo-con-icono > span.material-icons,
+.campo > .campo-con-icono > span.material-icons {
   position: absolute;
   left: 16px;
   top: 22px;
@@ -106,9 +107,9 @@ form > .form-fields > .form-group > .campo > .campo-con-icono > span.material-ic
   color: var(--contraste-superficie-claro);
 }
 
-form > .form-fields > .form-group > .campo > .campo-con-icono > .input {
-  padding: 1.4rem 1rem;
-  padding-left: 3.2rem;
+form > .form-fields > .form-group > .campo > .campo-con-icono > .input,
+.campo > .campo-con-icono > .input {
+  padding: 1.4rem 3.2rem;
   width: 100%;
 
   border-radius: 10px;
@@ -126,18 +127,43 @@ form > .form-fields > .form-group > .campo > .campo-con-icono > .input {
   transition: outline-color .3s ease-in-out;
 }
 
+form > .form-fields > .form-group > .campo > .campo-con-icono.compacto > .input,
+.campo > .campo-con-icono.compacto > .input {
+  padding: 0.7rem 2.4rem;
+
+  font-size: 1rem;
+  line-height: 1rem;
+  font-weight: 400;
+}
+
+form > .form-fields > .form-group > .campo > .campo-con-icono > span.material-icons,
+.campo > .campo-con-icono.compacto > span.material-icons {
+  position: absolute;
+  left: 8px;
+  top: 11px;
+  min-width: 18px;
+  color: var(--contraste-superficie-claro);
+}
+
+form > .form-fields > .form-group > .campo > .campo-con-icono > span.sufijo,
+.campo > .campo-con-icono > span.sufijo {
+  right: 8px;
+  left: auto!important;
+} 
+
 form > .form-fields > .form-group > .campo > .campo-con-icono > textarea.input {
   font-family: inherit;
   min-height: 10rem;
   font-size: 1rem;
 }
 
-form > .form-fields > .form-group > .campo > .campo-con-icono > .input:focus {
+form > .form-fields > .form-group > .campo > .campo-con-icono > .input:focus,
+.campo > .campo-con-icono > .input:focus {
   outline: var(--primario-claro) solid 2px;
 }
 
 .error {
-  color: var(--error-claro);
+  color: var(--error-claro)!important;
 }
 
 .text-acount {
