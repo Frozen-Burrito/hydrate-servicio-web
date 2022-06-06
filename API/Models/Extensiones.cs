@@ -118,6 +118,7 @@ namespace ServicioHydrate.Modelos
 
         public static DTOComentario ComoDTO(this Comentario comentario, Guid? idUsuarioActual)
         {
+            int numeroDeRespuestas = 0;
             bool reportadoPorUsuarioActual = false;
             bool utilParaUsuarioActual = false;
 
@@ -145,12 +146,20 @@ namespace ServicioHydrate.Modelos
                 }
             }
 
+            if (comentario.Respuestas is not null) 
+            {
+                numeroDeRespuestas = comentario.Respuestas.Count;
+            }
+
             return new DTOComentario
             {
                 Id = comentario.Id,
                 Asunto = comentario.Asunto,
                 Contenido = comentario.Contenido,
                 IdAutor = comentario.Autor.Id,
+                //TODO: Usar el nombre completo del perfil del usuario autor.
+                NombreAutor = comentario.Autor.NombreUsuario,
+                NumeroDeRespuestas = numeroDeRespuestas,
                 Fecha = VerificarStrISO8601(comentario.Fecha),
                 Publicado = comentario.Publicado,
                 NumeroDeReportes = comentario.ReportesDeUsuarios.Count,
@@ -221,6 +230,8 @@ namespace ServicioHydrate.Modelos
                 Fecha = respuesta.Fecha,
                 Publicada = respuesta.Publicado,
                 IdAutor = respuesta.Autor.Id,
+                //TODO: Usar el nombre completo del perfil del usuario autor.
+                NombreAutor = respuesta.Autor.NombreUsuario,
                 NumeroDeReportes = respuesta.ReportesDeUsuarios.Count,
                 NumeroDeUtil = respuesta.UtilParaUsuarios.Count,
                 ReportadaPorUsuarioActual = reportadoPorUsuarioActual,

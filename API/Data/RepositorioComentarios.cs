@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
@@ -11,9 +13,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioComentarios : IServicioComentarios
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioComentarios(ContextoDBMysql contexto)
+        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
@@ -157,6 +159,7 @@ namespace ServicioHydrate.Data
                 .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
                 .Include(c => c.ReportesDeUsuarios)
+                .Include(c => c.Respuestas)
                 .FirstAsync();
 
             return comentario.ComoDTO(idUsuarioActual);
@@ -176,6 +179,7 @@ namespace ServicioHydrate.Data
                 .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
                 .Include(c => c.ReportesDeUsuarios)
+                .Include(c => c.Respuestas)
                 .AsSplitQuery()
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
@@ -203,10 +207,31 @@ namespace ServicioHydrate.Data
                 .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
                 .Include(c => c.ReportesDeUsuarios)
+                .Include(c => c.Respuestas)
                 .AsSplitQuery()
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
             return await comentariosDelAutor.ToListAsync();
+        }
+
+        public async Task<List<DTOComentario>> GetComentariosPendientes() 
+        {
+            if (_contexto.Comentarios.Count() <= 0)
+            {
+                // Si no existe ningun comentario, retornar una lista vacia desde el principio.
+                return new List<DTOComentario>();
+            }
+
+            var comentariosPendientes = _contexto.Comentarios
+                .Where(c => c.ReportesDeUsuarios.Count > 5 || !c.Publicado)
+                .OrderByDescending(c => c.Fecha)
+                .Include(c => c.Autor)
+                .Include(c => c.Respuestas)
+                .Include(c => c.ReportesDeUsuarios)
+                .AsSplitQuery()
+                .Select(c => c.ComoDTO(null));
+
+            return await comentariosPendientes.ToListAsync();
         }
 
         public async Task<DTORespuesta> GetRespuestaPorId(int idComentario, int idRespuesta, Guid? idUsuarioActual)
@@ -420,6 +445,10 @@ namespace ServicioHydrate.Data
                 // El usuario aún no ha reportado este comentario.
                 comentario.ReportesDeUsuarios.Add(usuario);
                 usuario.ComentariosReportados.Add(comentario);
+
+                if (comentario.ReportesDeUsuarios.Count > 5) {
+                    comentario.Publicado = false;
+                }
             }
             else 
             {

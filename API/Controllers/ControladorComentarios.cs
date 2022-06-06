@@ -121,6 +121,38 @@ namespace ServicioHydrate.Controladores
             }
         }
 
+        /// <summary>
+        /// Retorna los comentarios que han superado el mínimo de reportes y aquellos
+        /// que todavía no han sido publicados.
+        /// </summary>
+        /// <returns>Resultado HTTP</returns>
+        [HttpGet("pendientes")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetComentariosPendientes()
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try 
+            {
+                // Obtener todos los comentarios pendientes de revision.
+                var comentariosPendientes = await _repoComentarios.GetComentariosPendientes();
+
+                return Ok(comentariosPendientes);
+            }
+            catch (Exception e) 
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
         [HttpGet("autor/{idAutor}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -234,10 +266,11 @@ namespace ServicioHydrate.Controladores
 
             try
             {
-                //TODO: Utilizar el ID real del usuario, obtenido del JWT. 
-                Guid autorTemporal = new Guid("3f76a856-a49b-4734-9baf-93dbd82724d2");
+                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+
                 comentarioModificado.Id = idComentario;
-                var comentarioActualizado = await _repoComentarios.ActualizarComentario(comentarioModificado, autorTemporal);
+
+                var comentarioActualizado = await _repoComentarios.ActualizarComentario(comentarioModificado, idUsuario);
 
                 return Ok(comentarioActualizado);
             }

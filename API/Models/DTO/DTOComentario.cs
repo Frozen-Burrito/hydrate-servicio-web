@@ -24,6 +24,11 @@ namespace ServicioHydrate.Modelos.DTO
 
         public Guid IdAutor { get; set; }
 
+        [MaxLength(129)]
+        public String NombreAutor { get; set; }
+
+        public int NumeroDeRespuestas { get; set; }
+
         // Los usuarios que han reportado este comentario.
         public int NumeroDeReportes { get; set; }
         public bool ReportadoPorUsuarioActual { get; set; }

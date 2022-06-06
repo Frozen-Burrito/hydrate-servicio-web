@@ -21,6 +21,9 @@ namespace ServicioHydrate.Modelos
 
         public Guid IdAutor { get; set; }
 
+        [MaxLength(129)]
+        public String NombreAutor { get; set; }
+
         public int NumeroDeReportes { get; set; }
         public bool ReportadaPorUsuarioActual { get; set; }
         
