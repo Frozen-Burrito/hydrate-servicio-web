@@ -113,7 +113,7 @@ export const eliminarComentarioConId = async (id, jwt) => {
 
 export const fetchComentariosDeAutor = async (idAutor, jwt = "") => {
 
-  const url = `${api.urlBase}/comentarios/${idAutor}`;
+  const url = `${api.urlBase}/comentarios/autor/${idAutor}`;
 
   const idUsuario = getIdUsuarioDesdeJwt(jwt);
 
