@@ -44,9 +44,9 @@ export const registrarUsuarioTemporal = async (email) => {
   // Crear cuenta anonima (luego podria confirmarse,
   // desde el correo).
   const credencialesTemporales = {
-    nombreUsuario: "Usuario Anonimo",
+    nombreUsuario: "anonimo99",
     email: email,
-    password: "PasswordTemporalInseguro", 
+    password: "Password1Temporal2Inseguro", 
   };
 
   return await registrarUsuario(credencialesTemporales); 

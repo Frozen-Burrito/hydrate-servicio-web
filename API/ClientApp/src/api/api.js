@@ -24,6 +24,14 @@ export const StatusHttp = {
   Status503ServicioNoDisponible: 503,
 };
 
+/**
+ * Realiza una petición a la API.
+ * 
+ * @param {Request} peticion La petición a realizar.
+ * @param {bool} respuestaConCuerpo Si la respuesta a la petición 
+ * tendrá cuerpo JSON o no.
+ * @returns La respuesta a la petición, incluyendo status y cuerpo.
+ */
 export const hacerPeticion = async (peticion, respuestaConCuerpo = true) => {
   const resultado = await fetch(peticion);
 

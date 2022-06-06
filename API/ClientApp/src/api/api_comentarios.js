@@ -1,8 +1,19 @@
 import * as api from "./api";
+import { getIdUsuarioDesdeJwt } from "../utils/parseJwt";
 
 export const fetchComentariosPublicados = async (jwt = "") => {
 
   const url = `${api.urlBase}/comentarios`;
+  
+  if (jwt) {
+    const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+    console.log();
+
+    url.concat("?" + new URLSearchParams({
+      idUsuario
+    }).toString());
+  }
 
   const peticion = new Request(url, {
     method: api.GET,
@@ -45,6 +56,12 @@ export const publicarComentario = async (comentario, jwt) => {
 export const fetchComentarioConId = async (id, jwt = "") => {
 
   const url = `${api.urlBase}/comentarios/${id}`;
+
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+  url.concat("?" + new URLSearchParams({
+    idUsuario
+  }).toString());
 
   const peticion = new Request(url, {
     method: api.GET,
@@ -97,6 +114,12 @@ export const eliminarComentarioConId = async (id, jwt) => {
 export const fetchComentariosDeAutor = async (idAutor, jwt = "") => {
 
   const url = `${api.urlBase}/comentarios/${idAutor}`;
+
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+  url.concat("?" + new URLSearchParams({
+    idUsuario
+  }).toString());
 
   const peticion = new Request(url, {
     method: api.GET,
@@ -151,6 +174,12 @@ export const fetchRespuestasAComentario = async (idComentario, jwt = "") => {
 
   const url = `${api.urlBase}/comentarios/${idComentario}/respuestas`;
 
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+  url.concat("?" + new URLSearchParams({
+    idUsuario
+  }).toString());
+  
   const peticion = new Request(url, {
     method: api.GET,
     headers: new Headers({
@@ -192,6 +221,12 @@ export const publicarRespuestaAComentario = async (respuesta, idComentario, jwt)
 export const fetchRespuestaConId = async (idComentario, idRespuesta, jwt = "") => {
 
   const url = `${api.urlBase}/comentarios/${idComentario}/respuestas/${idRespuesta}`;
+
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+  url.concat("?" + new URLSearchParams({
+    idUsuario
+  }).toString());
 
   const peticion = new Request(url, {
     method: api.GET,
