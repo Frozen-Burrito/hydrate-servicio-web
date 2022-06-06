@@ -45,17 +45,19 @@ export default function Tarjeta(props) {
       onClick={accionPrincipal}>
 
       <div className="encabezado mb-1">
-        {/* Mostrar prefijo de tarjeta, si lo hay. */}
-        { prefijo != null && (      
-          <div className="prefijo">
-            { prefijo }
+        <div>
+          {/* Mostrar prefijo de tarjeta, si lo hay. */}
+          { prefijo != null && (      
+            <div className="prefijo">
+              { prefijo }
+            </div>
+          )}
+
+          <div className="stack vertical justify-start gap-1">
+            { titulo != null && <h4 className="titulo">{ titulo }</h4> }
+
+            { subtitulo != null && <h6 className="subtitulo">{ subtitulo }</h6> }
           </div>
-        )}
-
-        <div className="stack vertical justify-start gap-1">
-          { titulo != null && <h4 className="titulo">{ titulo }</h4> }
-
-          { subtitulo != null && <h6 className="subtitulo">{ subtitulo }</h6> }
         </div>
 
         { sufijo != null && (      

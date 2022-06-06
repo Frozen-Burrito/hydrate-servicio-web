@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 import useCookie from "../../utils/useCookie";
 import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
@@ -14,8 +14,7 @@ import {
 	eliminarRespuestaConId
 } from "../../api/api_comentarios";
 
-import Avatar from "../Avatar/avatar";
-import BotonIcono from "../Botones/boton_icono";
+import { Avatar, Dropdown, BotonIcono } from "../";
 import Tarjeta, { onClickAccion } from "../Tarjeta/tarjeta";
 
 TarjetaComentario.defaultProps = {
@@ -59,6 +58,8 @@ export default function TarjetaComentario(props) {
 	const [respuestas, setRespuestas] = useState(null);
 	const [estaCargando, setEstaCargando] = useState(false);
 	const [tieneError, setTieneError] = useState(false);
+
+	const esComentarioPropio = getIdUsuarioDesdeJwt(jwt) === comentario.idAutor;
 	
 	// Clases de estilos.
 	const claseSizeTarjeta = !esComentario ? "ancho-max-80 alinear-margen-izq" : "";
@@ -133,7 +134,7 @@ export default function TarjetaComentario(props) {
 		}
 	};
 
-	const tempEliminarComentario = async () => {
+	const eliminarComentario = async () => {
 		setEstaCargando(true);
 
 		// Eliminar el comentario representado por esta tarjeta.
@@ -179,6 +180,40 @@ export default function TarjetaComentario(props) {
 			throw new Error("Intentando obtener respuestas de una respuesta. Solo es posible obtener respuestas de un comentario.");
 		}
 	};
+
+	const dropdownOpciones = (
+    <Dropdown 
+      onColor="background"
+      boton={(
+        <span className="material-icons">
+          more_vert
+        </span>
+      )}
+      items={(
+        <>
+          <Link to={`/comentarios/publicar/${comentario.id}`} className='elemento-dropdown'>
+            Modificar
+          </Link>
+
+          <button className ="elemento-dropdown" onClick={eliminarComentario}>
+            Eliminar
+          </button>
+        </>
+      )}
+    />
+  );
+
+	const renderAlertaArchivado = () => {
+		if (comentario.publicado || comentario.numeroDeReportes > 5) {
+			return (
+				<p className="error">
+					Este comentario ha sido archivado, por ahora. 
+					<Link to="/guias-usuario/comentarios/removidos">¿Por qué fue removido mi comentario?</Link></p>
+			);
+		} else {
+			return null;
+		}
+	}
 
 	const renderRespuestas = () => {
 
@@ -244,14 +279,8 @@ export default function TarjetaComentario(props) {
 				prefijo={<Avatar alt={comentario.nombreAutor} />}
 				accionPrincipal={esComentario ? desplegarRespuestas : null }
 				sufijo={
-					(getIdUsuarioDesdeJwt(jwt) === comentario.idAutor) 
-						? (
-							<BotonIcono
-								icono="more_vert"
-								tipo="texto"
-								onClick={(e) => onClickAccion(e, tempEliminarComentario)}
-							/>
-						)
+					(esComentarioPropio) 
+						? dropdownOpciones
 						: null
 				}
 				acciones={
@@ -272,6 +301,7 @@ export default function TarjetaComentario(props) {
 							label={comentario.numeroDeUtil.toString()}
 							tipo="texto"
 							seleccionado={esUtil}
+							disabled={esComentarioPropio}
 							onClick={(e) => onClickAccion(e, toggleMarcaUtil)}
 						/>
 
@@ -281,8 +311,11 @@ export default function TarjetaComentario(props) {
 							tipo="texto"
 							seleccionado={fueReportado}
 							esDeError={true}
+							disabled={esComentarioPropio}
 							onClick={(e) => onClickAccion(e, toggleReporte)}
 						/>
+
+						{ renderAlertaArchivado() }
 					</div>
 				}
 			>

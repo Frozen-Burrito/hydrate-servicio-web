@@ -5,13 +5,26 @@ export default function Dropdown({ boton, onColor, items }) {
 
   const [ mostrar, setMostrar ] = useState(false);
 
-  function toggleDropdown() {
+  function toggleDropdown(e) {
+    e.stopPropagation();
+    e.preventDefault();
+
     setMostrar(!mostrar);
   }
 
+  const getClaseContrasteBtn = (color) => {
+    switch (color) {
+      case "primario":
+        return "contraste-primario";     
+      case "superficie":
+        return "contraste-superficie";
+      default: return "contraste-fondo";
+    }
+  }
+
   return (
-    <div className='dropdown'>
-      <button className='dropdown-btn' style={{ color: 'var(--contraste-primario-claro)'}} onClick={toggleDropdown}>
+    <div className="dropdown">
+      <button className={`dropdown-btn ${getClaseContrasteBtn(onColor)}`} onClick={toggleDropdown}>
         { boton }
       </button>
 

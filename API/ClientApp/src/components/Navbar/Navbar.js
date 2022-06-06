@@ -2,20 +2,21 @@ import './Navbar.css';
 import React from 'react'
 import { Link, useHistory } from 'react-router-dom';
 import useCookie from '../../utils/useCookie';
-import { obtenerClaims, parseJwt } from '../../utils/parseJwt';
+import { obtenerClaims, parseJwt, getIdUsuarioDesdeJwt } from '../../utils/parseJwt';
 import Dropdown from '../Dropdown/dropdown';
 import BotonRedondeado from '../Botones/BotonRedondeado';
 
 export default function Navbar() {
 
-  const { valor: token, eliminarCookie: eliminarToken } = useCookie('jwt');
+  const { valor: jwt, eliminarCookie: eliminarToken } = useCookie('jwt');
 
   const history = useHistory();
 
-  var rolDeUsuario = 'NINGUNO';
+  let rolDeUsuario = 'NINGUNO';
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
 
-  if (token !== undefined && token !== null) {
-    const datosToken = parseJwt(token);
+  if (jwt !== undefined && jwt !== null) {
+    const datosToken = parseJwt(jwt);
 
     const claimsUsuario = obtenerClaims(datosToken);
 
@@ -49,7 +50,7 @@ export default function Navbar() {
     </>
   );
 
-  const obtenerOpcionesSegunRol = (rolDeusuario) => {
+  const obtenerOpcionesSegunRol = () => {
     if (rolDeUsuario === 'NINGUNO') {
       return (
         <>
@@ -95,7 +96,7 @@ export default function Navbar() {
 
   const btnDropdown = (
     <Dropdown 
-      onColor='primary'
+      onColor='primario'
       boton={(
         <span className="material-icons">
           account_circle
@@ -103,7 +104,7 @@ export default function Navbar() {
       )}
       items={(
         <>
-          <Link to='/perfil' className='elemento-dropdown'>
+          <Link to={`/perfil/${idUsuario ?? ""}`} className='elemento-dropdown'>
             Perfil
           </Link>
 
@@ -148,7 +149,7 @@ export default function Navbar() {
         </ul>
         
         <div className='btns-container'>
-          { token === undefined || token === null ? botonesRegistro : btnDropdown }
+          { jwt === undefined || jwt === null ? botonesRegistro : btnDropdown }
         </div>
       </div>
     </nav>

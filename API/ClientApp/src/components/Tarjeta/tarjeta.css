@@ -20,16 +20,25 @@
 .tarjeta > .encabezado {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.6rem;
+}
+
+.tarjeta > .encabezado > div {
+  display: flex;
+  flex-direction: row;
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: 0.8rem;
 }
 
-.tarjeta > .encabezado > div > h4.titulo {
+.tarjeta > .encabezado > div > div > h4.titulo {
   font-size: 1.4rem;
 }
 
-.tarjeta > .encabezado > div > h6.subtitulo {
+.tarjeta > .encabezado > div > div > h6.subtitulo {
   font-size: 1.2rem;
   line-height: 1.2rem;
   font-weight: 400;

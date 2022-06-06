@@ -2,7 +2,7 @@ import { useLocation, Redirect } from 'react-router-dom';
 import { parseJwt, obtenerClaims } from '../../utils/parseJwt';
 import useCookie from '../../utils/useCookie';
 
-export function RutaProtegida ({ children, rolRequerido }) {
+export default function RutaProtegida ({ children, rolRequerido }) {
 
   const { valor: token } = useCookie('jwt');
   const estaAutenticado = token !== undefined && token !== null;

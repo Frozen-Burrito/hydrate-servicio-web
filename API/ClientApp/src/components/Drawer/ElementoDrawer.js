@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export const ElementoDrawer = ({ texto, url, icono, accionFinal }) => {
+export default function ElementoDrawer({ texto, url, icono, accionFinal }) {
 
   return (
     <Link to={ url } className='elemento-drawer'>

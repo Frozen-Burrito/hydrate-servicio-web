@@ -10,7 +10,7 @@ import {
   ErrorDeRecurso,
 } from "../../utils/validaciones";
 
-export const FormAgregarRecurso = ({ recursoActual, onRecursoModificado }) => {
+export default function FormAgregarRecurso({ recursoActual, onRecursoModificado }) {
 
   const { valor: jwt } = useCookie('jwt');
 

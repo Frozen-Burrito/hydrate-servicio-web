@@ -1,7 +1,7 @@
 import './menu-drawer.css';
 import React from "react";
 
-export const Drawer = ({ encabezado, elementos, elementoFinal }) => {
+export default function Drawer({ encabezado, elementos, elementoFinal }) {
 
   return (
     <div className="menu-drawer">
