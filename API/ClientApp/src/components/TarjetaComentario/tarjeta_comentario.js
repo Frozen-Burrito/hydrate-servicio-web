@@ -29,6 +29,7 @@ TarjetaComentario.defaultProps = {
 		publicado: true,
 		idAutor: "",
 		nombreAutor: "",
+		numeroDeRespuestas: 0,
 		numeroDeReportes: 0,
 		reportadoPorUsuarioActual: false,
 		numeroDeUtil: 0,
@@ -66,15 +67,13 @@ export default function TarjetaComentario(props) {
 	/** Permite al usuario escribir una respuesta al comentario. */
 	const handleClickRespuestas = (e) => {
 		if (esComentario) {
-			console.log(`Escribiendo una respuesta al comentario ${comentario.id}`);
-			//TODO: Implementar navegacion a formulario para respuesta.
 			history.push(`/comentarios/responder/${comentario.id}`);
 		}
 	};
 
 	const desplegarRespuestas = (e) => {
 
-		if (esComentario) {
+		if (esComentario && comentario.numeroDeRespuestas > 0) {
 
 			if (respuestas == null) {
 				obtenerRespuestas();
@@ -160,7 +159,7 @@ export default function TarjetaComentario(props) {
 	 * respuestas. Si no, tieneError sera true.
 	 */
 	const obtenerRespuestas = async () => {
-		if (esComentario) {
+		if (esComentario && comentario.numeroDeRespuestas > 0) {
 			setEstaCargando(true);
 
 			// Obtener todas las respuestas al comentario. Ya vienen ordenados por
@@ -260,7 +259,7 @@ export default function TarjetaComentario(props) {
 						{esComentario && (
 							<BotonIcono
 								icono="forum"
-								label={respuestas ? respuestas.length.toString() : "0"}
+								label={comentario.numeroDeRespuestas.toString()}
 								tipo="texto"
 								// Quizas mostrarlo azul si el usuario respondio a este comentario?
 								// seleccionado={respuestasActivas}

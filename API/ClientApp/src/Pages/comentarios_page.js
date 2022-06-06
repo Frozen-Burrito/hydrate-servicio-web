@@ -7,8 +7,9 @@ import Layout from "../components/Layout/Layout";
 import { StatusHttp } from "../api/api";
 import { fetchComentariosPublicados } from "../api/api_comentarios";
 
+import Footer from "../components/Footer/Footer";
 import SearchBox from "../components/SearchBox/searchbox";
-import TarjetaComentario from "../components/tarjeta_comentario/tarjeta_comentario";
+import TarjetaComentario from "../components/TarjetaComentario/tarjeta_comentario";
 import Tarjeta from "../components/Tarjeta/tarjeta";
 
 /**
@@ -167,6 +168,8 @@ export function ComentariosPage() {
           </div> { /* Columna lateral de temas */}
         </div> { /* Contenido */}
       </section>
+
+      <Footer />
     </Layout>
   );
 }
