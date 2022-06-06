@@ -1,0 +1,15 @@
+.avatar {
+  border-radius: 50%;
+  min-width: 40px;
+  min-height: 40px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar > p {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
+}

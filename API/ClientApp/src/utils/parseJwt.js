@@ -19,3 +19,23 @@ export const obtenerClaims = (tokenDecodificado) => {
     expiracionMillis: tokenDecodificado.exp
   }
 }
+
+/**
+ * Una función de conveniencia para decodificar el ID de usuario
+ * de un JWT de autenticación.
+ * 
+ * @param {string} jwt El token de autenticación.
+ * @returns {string?} El ID del usuario, decodificado del token.
+ */
+export const getIdUsuarioDesdeJwt = (jwt) => {
+
+  if (jwt == null || jwt.length === 0) {
+    return null;
+  }
+
+  const datosToken = parseJwt(jwt);
+
+  const { idUsuario } = obtenerClaims(datosToken);
+
+  return idUsuario;
+}
