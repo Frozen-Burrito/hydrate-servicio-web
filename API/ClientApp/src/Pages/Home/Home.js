@@ -2,7 +2,7 @@ import React from 'react'
 import './Home.css';
 import Typewriter  from 'typewriter-effect';
 import BotoneCompra from '../../components/Botones/BotonesCompra';
-import Tarjeta from '../../components/Botones/Tarjeta';
+import Tarjeta from '../../components/Tarjeta/tarjeta';
 import Layout from '../../components/Layout/Layout';
 import Footer from '../../components/Footer/Footer';
 

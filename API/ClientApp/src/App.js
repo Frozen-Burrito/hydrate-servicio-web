@@ -16,7 +16,9 @@ function App() {
         <Route path="/productos" component={Pages.Products} />
         <Route path="/guias-usuario" component={Pages.GuiasUsuario} />
         <Route path="/comentarios" exact component={Pages.ComentariosPage} />
-        <Route path="/comentarios/publicar" component={Pages.PublicarComentarioPage} />
+        <Route path="/comentarios/publicar" exact component={Pages.PublicarComentarioPage} />
+        <Route path="/comentarios/publicar/:idComentario" component={Pages.PublicarComentarioPage} />
+        <Route path="/comentarios/responder/:idComentario" component={Pages.ResponderComentarioPage} />
         <Route path="/inicio-sesion" component={Pages.InicioSesion} />
         <Route path="/creacion-cuenta" component={Pages.CreacionCuenta} />
 

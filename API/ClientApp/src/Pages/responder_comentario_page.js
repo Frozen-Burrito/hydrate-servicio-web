@@ -5,10 +5,10 @@ import FormPublicarComentario from "../components/formularios/form_publicar_come
 import Layout from "../components/Layout/Layout";
 
 /**
- * La página donde el usuario puede publicar nuevos comentarios de 
- * retroalimentacion con su experiencia del producto.
+ * La página donde el usuario puede publicar una respuesta a 
+ * un comentario.
  */
-export function PublicarComentarioPage() {
+export function ResponderComentarioPage() {
 
     const { idComentario } = useParams();
 
@@ -17,7 +17,7 @@ export function PublicarComentarioPage() {
             <main className='form-page center'>
                 <FormPublicarComentario 
                     idComentario={idComentario}
-                    esRespuesta={false}
+                    esRespuesta={true}
                 />
 
                 <div className='img-fondo img-enviar-comentario' />
