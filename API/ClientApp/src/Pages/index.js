@@ -13,6 +13,11 @@ export { ComentariosPage } from './comentarios_page';
 export { PublicarComentarioPage } from './publicar_comentario_page';
 export { ResponderComentarioPage } from './responder_comentario_page';
 
+// Rutas de perfil de usuario.
+export { PaginaPerfil } from './Perfil';
+export { PaginaTableroPerfil } from './Perfil/pagina_tablero_usuario';
+export { PaginaComentariosPerfil } from './Perfil/pagina_comentarios_usuario';
+
 // Rutas de administracion. 
 export { AdminUsuarios } from './Admin/General/AdminUsuarios';
 export { AdminComentarios } from './Admin/Comentarios/AdminComentarios';

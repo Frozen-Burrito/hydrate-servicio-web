@@ -22,6 +22,10 @@ function App() {
         <Route path="/inicio-sesion" component={Pages.InicioSesion} />
         <Route path="/creacion-cuenta" component={Pages.CreacionCuenta} />
 
+        <Route path="/perfil/:idUsuario" exact component={Pages.PaginaPerfil} />
+        <Route path="/perfil/:idUsuario/comentarios" component={Pages.PaginaComentariosPerfil} />
+        <Route path="/perfil/:idUsuario/tablero" component={Pages.PaginaTableroPerfil} />
+
         <Route path="/admin/comentarios" 
           component={
             () => <RutaProtegida rolRequerido={'MODERADOR_COMENTARIOS'}> <Pages.AdminComentarios /> </RutaProtegida>
