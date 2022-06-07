@@ -88,7 +88,7 @@ namespace ServicioHydrate.Data
             return modeloComentario.ComoDTO(idAutor);
         }
 
-        public async Task ArchivarComentario(DTOArchivarComentario accionArchivarComentario)
+        public async Task<DTOComentarioArchivado> ArchivarComentario(DTOArchivarComentario accionArchivarComentario)
         {
             var comentario = await _contexto.Comentarios.FindAsync(accionArchivarComentario.IdComentario);
 
@@ -97,10 +97,15 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
-            var comentarioYaArchivado = await _contexto.ComentariosArchivados
-                .FirstAsync(ca => ca.IdComentario == accionArchivarComentario.IdComentario);
+            ComentarioArchivado registroComentarioArchivado = null;
 
-            if (comentario.Publicado && comentarioYaArchivado is null) 
+            if (_contexto.ComentariosArchivados.Count() > 0) 
+            {
+                registroComentarioArchivado = await _contexto.ComentariosArchivados
+                    .FirstAsync(ca => ca.IdComentario == accionArchivarComentario.IdComentario);
+            }
+
+            if (comentario.Publicado && registroComentarioArchivado is null) 
             {
                 comentario.Publicado = false;
 
@@ -110,7 +115,12 @@ namespace ServicioHydrate.Data
                 _contexto.Entry(comentario).State = EntityState.Modified;
 
                 await _contexto.SaveChangesAsync();
-            }
+
+                return modeloComentarioArchivado.ComoDTO();
+            } else 
+            {
+                throw new InvalidOperationException("El comentario ya ha sido archivado.");
+            } 
         }
 
         public async Task<List<DTOComentarioArchivado>> GetMotivosDeComentariosArchivados(Guid idUsuario)
@@ -122,10 +132,22 @@ namespace ServicioHydrate.Data
                 return new List<DTOComentarioArchivado>();
             }
 
-            var comentariosUsuario = await GetComentariosPorUsuario(idUsuario, null); 
+            var autorComentarios = await _contexto.Usuarios.FindAsync(idUsuario);
+
+            if (autorComentarios is null)
+            {
+                throw new ArgumentException("No existe un usuario con el ID recibido");
+            }
+
+            var comentariosUsuario = await _contexto.Comentarios
+                .Where(c => c.Autor == autorComentarios)
+                .OrderByDescending(c => c.Fecha)
+                .ToListAsync();
+
+            IEnumerable<int> idsComentariosUsuario = comentariosUsuario.Select(c => c.Id);
 
             var comentariosArchivados = _contexto.ComentariosArchivados
-                .Where(c => comentariosUsuario.Find(comentario => comentario.Id == c.IdComentario) != null)
+                .Where(c => idsComentariosUsuario.Contains(c.Id))
                 .OrderByDescending(c => c.Fecha)
                 .AsSplitQuery()
                 .Select(c => c.ComoDTO());

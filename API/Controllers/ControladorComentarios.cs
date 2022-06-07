@@ -109,7 +109,7 @@ namespace ServicioHydrate.Controladores
             }
             catch (ArgumentException e)
             {
-                // No existe un recurso informativo con el ID solicitado. Retorna 404.
+                // No existe un comentario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
             }
             catch (Exception e)
@@ -145,6 +145,144 @@ namespace ServicioHydrate.Controladores
                 return Ok(comentariosPendientes);
             }
             catch (Exception e) 
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Archiva el comentario especificado, incluye el motivo.
+        /// </summary>
+        /// <remarks>
+        /// Opcionalmente, puede recibir el identificador del usuario actual. Esto
+        /// permite determinar si el usuario que hace la petición ha marcado o reportado
+        /// el comentario obtenido.
+        /// </remarks>
+        /// <param name="idComentario">El ID del comentario por archivar.</param>
+        /// <param name="motivo">El motivo por el que será archivado el comentario.</param>
+        /// <returns>Resultado HTTP</returns>
+        [HttpPatch("{idComentario}/archivar")]
+        [Authorize(Roles = "MODERADOR_COMENTARIOS")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOComentario))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ArchivarComentario(int idComentario, DTOArchivarComentario motivo)
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                var motivoArchivado = await _repoComentarios.ArchivarComentario(motivo);
+
+                return Ok(motivoArchivado);
+            }
+            catch (ArgumentException e)
+            {
+                // No existe un comentario con el ID solicitado. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (InvalidOperationException e) 
+            {
+                // El comentario no puede ser archivado, por su estado actual.
+                return Problem(
+                    e.Message,
+                    statusCode: StatusCodes.Status405MethodNotAllowed
+                );
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Retorna los motivos de cada uno de los comentarios reportados de  
+        /// un usuario.
+        /// </summary>
+        /// <returns>Resultado HTTP</returns>
+        [HttpGet("pendientes/usuario")]
+        [Authorize(Roles = "NINGUNO,MODERADOR_COMENTARIOS")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentarioArchivado>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetMotivosDeComentariosArchivados()
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try 
+            {
+                Guid? idUsuarioAutenticado = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                
+                if (idUsuarioAutenticado is null) 
+                {
+                    throw new UnauthorizedAccessException("El ID usuario no es valido");
+                }
+
+                var motivos = await _repoComentarios.GetMotivosDeComentariosArchivados((Guid)idUsuarioAutenticado);
+
+                return Ok(motivos);
+            }
+            catch (ArgumentException e)
+            {
+                // El ID del usuario no es valido. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (Exception e) 
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Publica un comentario previamente archivado, removiendo los reportes
+        /// que haya tenido.
+        /// </summary>
+        /// <param name="idComentario">El ID del comentario que va a ser re-publicado.</param>
+        /// <returns>Resultado HTTP</returns>
+        [HttpPatch("{idComentario}/publicar")]
+        [Authorize(Roles = "MODERADOR_COMENTARIOS")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> PublicarComentarioPendiente(int idComentario)
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                await _repoComentarios.PublicarComentarioPendiente(idComentario);
+
+                return NoContent();
+            }
+            catch (ArgumentException e)
+            {
+                // No existe un comentario con el ID solicitado, o no hay un 
+                // registro de archivo para el comentario. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
             {
                 // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
                 _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
