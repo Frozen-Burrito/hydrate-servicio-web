@@ -49,3 +49,27 @@
 .dropdown > .dropdown-items > .elemento-dropdown:hover {
   background-color: rgba(var(--contraste-superficie-rgb), 0.1);
 }
+
+.fondo-accion-dropdown {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background-color: transparent;
+  cursor: default;
+}
+
+.fondo-accion-dropdown.inactivo {
+  display: none;
+}
+
+.fondo-accion-dropdown.activo {
+  display: block;
+}
+
+.fondo-accion-dropdown.activo body {
+  overflow-y: hidden;
+}

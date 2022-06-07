@@ -204,7 +204,7 @@ export default function TarjetaComentario(props) {
   );
 
 	const renderAlertaArchivado = () => {
-		if (comentario.publicado || comentario.numeroDeReportes > 5) {
+		if (!comentario.publicado || comentario.numeroDeReportes > 5) {
 			return (
 				<p className="error">
 					Este comentario ha sido archivado, por ahora. 
