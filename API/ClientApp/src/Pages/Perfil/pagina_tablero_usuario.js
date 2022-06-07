@@ -1,18 +1,21 @@
 import React from "react";
 
-import Layout from "../../components/Layout/Layout";
-import Avatar from "../../components/Avatar/avatar";
+import { Layout, Avatar, DrawerPerfil } from "../../components";
 
 export function PaginaTableroPerfil() {
   return (
     <Layout>
-      <section className='contenedor full-page py-5'>
-        <h2 className="mt-3">Tablero</h2>
+      <DrawerPerfil indiceItemActivo={1}/>
 
-        <div style={{ display: "flex" }}>
-          <Avatar alt="Juan Perez" />
+      <div className="panel-contenido">
+        <div className="stack horizontal justify-between gap-2 my-3">
+          <h2>Tablero</h2>
+
+          <div style={{ display: "flex" }}>
+            <Avatar alt="Juan Perez" />
+          </div>
         </div>
-      </section>
+      </div>
     </Layout>
   );
 }

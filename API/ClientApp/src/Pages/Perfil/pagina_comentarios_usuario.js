@@ -9,7 +9,7 @@ export function PaginaComentariosPerfil() {
 
   return (
     <Layout>
-      <DrawerPerfil />
+      <DrawerPerfil indiceItemActivo={2}/>
       
       <div className="panel-contenido">
         <div className="stack horizontal justify-between gap-2 my-3">
