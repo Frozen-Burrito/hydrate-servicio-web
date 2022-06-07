@@ -188,11 +188,11 @@ namespace ServicioHydrate.Modelos
             };
         }
 
-        public static ComentarioArchivado ComoModelo(this DTOArchivarComentario comentarioArchivado)
+        public static ComentarioArchivado ComoModelo(this DTOArchivarComentario comentarioArchivado, int idComentario)
         {
             return new ComentarioArchivado
             {
-                IdComentario = comentarioArchivado.IdComentario,
+                IdComentario = idComentario,
                 Motivo = comentarioArchivado.Motivo,
                 Fecha = DateTime.Now.ToString("o"),
             };

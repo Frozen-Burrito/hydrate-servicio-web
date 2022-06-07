@@ -88,9 +88,9 @@ namespace ServicioHydrate.Data
             return modeloComentario.ComoDTO(idAutor);
         }
 
-        public async Task<DTOComentarioArchivado> ArchivarComentario(DTOArchivarComentario accionArchivarComentario)
+        public async Task<DTOComentarioArchivado> ArchivarComentario(int idComentario, DTOArchivarComentario motivos)
         {
-            var comentario = await _contexto.Comentarios.FindAsync(accionArchivarComentario.IdComentario);
+            var comentario = await _contexto.Comentarios.FindAsync(idComentario);
 
             if (comentario is null)
             {
@@ -102,14 +102,14 @@ namespace ServicioHydrate.Data
             if (_contexto.ComentariosArchivados.Count() > 0) 
             {
                 registroComentarioArchivado = await _contexto.ComentariosArchivados
-                    .FirstAsync(ca => ca.IdComentario == accionArchivarComentario.IdComentario);
+                    .FirstAsync(ca => ca.IdComentario == idComentario);
             }
 
             if (comentario.Publicado && registroComentarioArchivado is null) 
             {
                 comentario.Publicado = false;
 
-                var modeloComentarioArchivado = accionArchivarComentario.ComoModelo();
+                var modeloComentarioArchivado = motivos.ComoModelo(idComentario);
 
                 _contexto.Add(modeloComentarioArchivado);
                 _contexto.Entry(comentario).State = EntityState.Modified;
@@ -318,11 +318,12 @@ namespace ServicioHydrate.Data
             }
 
             var comentariosPendientes = _contexto.Comentarios
-                .Where(c => c.ReportesDeUsuarios.Count > 5 || !c.Publicado)
+                .Where(c => c.ReportesDeUsuarios.Count >= 5 || !c.Publicado)
                 .OrderByDescending(c => c.Fecha)
                 .Include(c => c.Autor)
                 .Include(c => c.Respuestas)
                 .Include(c => c.ReportesDeUsuarios)
+                .Include(c => c.UtilParaUsuarios)
                 .AsSplitQuery()
                 .Select(c => c.ComoDTO(null));
 
@@ -530,7 +531,7 @@ namespace ServicioHydrate.Data
                 // Obtener la entidad del usuario actual desde la lista de reportes del comentario.
                 usuarioEnReportes = comentario.ReportesDeUsuarios
                     .Where(u => u.Id == usuario.Id)
-                    .First();
+                    .FirstOrDefault();
             }
             
 
@@ -540,10 +541,6 @@ namespace ServicioHydrate.Data
                 // El usuario aún no ha reportado este comentario.
                 comentario.ReportesDeUsuarios.Add(usuario);
                 usuario.ComentariosReportados.Add(comentario);
-
-                if (comentario.ReportesDeUsuarios.Count > 5) {
-                    comentario.Publicado = false;
-                }
             }
             else 
             {

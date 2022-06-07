@@ -121,12 +121,46 @@ namespace ServicioHydrate.Controladores
             }
         }
 
+        [HttpGet("autor/{idAutor}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetComentariosDeAutor(Guid idAutor, Guid? idUsuario)
+        {
+            // Registrar un log de la peticion.
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                var comentarios = await _repoComentarios.GetComentariosPorUsuario(idAutor, idUsuario);
+
+                return Ok(comentarios);
+            }
+            catch (ArgumentException e)
+            {
+                // No existe un usuario con el ID solicitado. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
         /// <summary>
         /// Retorna los comentarios que han superado el mínimo de reportes y aquellos
         /// que todavía no han sido publicados.
         /// </summary>
         /// <returns>Resultado HTTP</returns>
         [HttpGet("pendientes")]
+        [Authorize(Roles = "MODERADOR_COMENTARIOS")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -154,6 +188,53 @@ namespace ServicioHydrate.Controladores
         }
 
         /// <summary>
+        /// Retorna los motivos de cada uno de los comentarios reportados de  
+        /// un usuario.
+        /// </summary>
+        /// <returns>Resultado HTTP</returns>
+        [HttpGet("pendientes/usuario/{idUsuario?}")]
+        [Authorize(Roles = "NINGUNO,MODERADOR_COMENTARIOS")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentarioArchivado>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetMotivosDeComentariosArchivados(Guid idUsuario)
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try 
+            {
+                //TODO: Encontrar manera de hacer el idUsuario opcional.
+                Guid? idUsuarioAutenticado = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                
+                if (idUsuarioAutenticado is null) 
+                {
+                    throw new UnauthorizedAccessException("El ID usuario no es valido");
+                }
+
+                var motivos = await _repoComentarios.GetMotivosDeComentariosArchivados(idUsuario);
+
+                return Ok(motivos);
+            }
+            catch (ArgumentException e)
+            {
+                // El ID del usuario no es valido. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (Exception e) 
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
         /// Archiva el comentario especificado, incluye el motivo.
         /// </summary>
         /// <remarks>
@@ -166,7 +247,7 @@ namespace ServicioHydrate.Controladores
         /// <returns>Resultado HTTP</returns>
         [HttpPatch("{idComentario}/archivar")]
         [Authorize(Roles = "MODERADOR_COMENTARIOS")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOComentario))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOComentarioArchivado))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -179,7 +260,7 @@ namespace ServicioHydrate.Controladores
 
             try
             {
-                var motivoArchivado = await _repoComentarios.ArchivarComentario(motivo);
+                var motivoArchivado = await _repoComentarios.ArchivarComentario(idComentario, motivo);
 
                 return Ok(motivoArchivado);
             }
@@ -197,52 +278,6 @@ namespace ServicioHydrate.Controladores
                 );
             }
             catch (Exception e)
-            {
-                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
-                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
-
-                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
-            }
-        }
-
-        /// <summary>
-        /// Retorna los motivos de cada uno de los comentarios reportados de  
-        /// un usuario.
-        /// </summary>
-        /// <returns>Resultado HTTP</returns>
-        [HttpGet("pendientes/usuario")]
-        [Authorize(Roles = "NINGUNO,MODERADOR_COMENTARIOS")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentarioArchivado>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetMotivosDeComentariosArchivados()
-        {
-            string strFecha = DateTime.Now.ToString("G");
-            string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
-            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
-
-            try 
-            {
-                Guid? idUsuarioAutenticado = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
-                
-                if (idUsuarioAutenticado is null) 
-                {
-                    throw new UnauthorizedAccessException("El ID usuario no es valido");
-                }
-
-                var motivos = await _repoComentarios.GetMotivosDeComentariosArchivados((Guid)idUsuarioAutenticado);
-
-                return Ok(motivos);
-            }
-            catch (ArgumentException e)
-            {
-                // El ID del usuario no es valido. Retorna 404.
-                return NotFound(e.Message);
-            }
-            catch (Exception e) 
             {
                 // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
                 _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
@@ -280,39 +315,6 @@ namespace ServicioHydrate.Controladores
             {
                 // No existe un comentario con el ID solicitado, o no hay un 
                 // registro de archivo para el comentario. Retorna 404.
-                return NotFound(e.Message);
-            }
-            catch (Exception e)
-            {
-                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
-                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
-
-                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
-            }
-        }
-
-        [HttpGet("autor/{idAutor}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetComentariosDeAutor(Guid idAutor, Guid? idUsuario)
-        {
-            // Registrar un log de la peticion.
-            string strFecha = DateTime.Now.ToString("G");
-            string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
-            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
-
-            try
-            {
-                var comentarios = await _repoComentarios.GetComentariosPorUsuario(idAutor, idUsuario);
-
-                return Ok(comentarios);
-            }
-            catch (ArgumentException e)
-            {
-                // No existe un usuario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
             }
             catch (Exception e)
