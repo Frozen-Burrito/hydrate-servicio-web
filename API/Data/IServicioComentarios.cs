@@ -19,6 +19,12 @@ namespace ServicioHydrate.Data
 
         Task<DTOComentario> AgregarNuevoComentario(DTONuevoComentario comentario, Guid? idAutor);
 
+        Task ArchivarComentario(DTOArchivarComentario accionArchivarComentario);
+
+        Task<List<DTOComentarioArchivado>> GetMotivosDeComentariosArchivados(Guid idUsuario);
+
+        Task PublicarComentarioPendiente(int idComentario);
+
         Task<DTOComentario> ActualizarComentario(DTOComentario comentarioModificado, Guid? idUsuarioActual);
 
         Task EliminarComentario(int idComentario, Guid? idUsuario, string rolDeUsuario);

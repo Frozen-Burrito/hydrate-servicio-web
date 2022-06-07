@@ -88,6 +88,79 @@ namespace ServicioHydrate.Data
             return modeloComentario.ComoDTO(idAutor);
         }
 
+        public async Task ArchivarComentario(DTOArchivarComentario accionArchivarComentario)
+        {
+            var comentario = await _contexto.Comentarios.FindAsync(accionArchivarComentario.IdComentario);
+
+            if (comentario is null)
+            {
+                throw new ArgumentException("No existe un comentario con el ID especificado.");
+            }
+
+            var comentarioYaArchivado = await _contexto.ComentariosArchivados
+                .FirstAsync(ca => ca.IdComentario == accionArchivarComentario.IdComentario);
+
+            if (comentario.Publicado && comentarioYaArchivado is null) 
+            {
+                comentario.Publicado = false;
+
+                var modeloComentarioArchivado = accionArchivarComentario.ComoModelo();
+
+                _contexto.Add(modeloComentarioArchivado);
+                _contexto.Entry(comentario).State = EntityState.Modified;
+
+                await _contexto.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<DTOComentarioArchivado>> GetMotivosDeComentariosArchivados(Guid idUsuario)
+        {
+            if (_contexto.ComentariosArchivados.Count() <= 0)
+            {
+                // Si no hay ningun comentario archivado, retornar una 
+                // lista vacia desde el principio.
+                return new List<DTOComentarioArchivado>();
+            }
+
+            var comentariosUsuario = await GetComentariosPorUsuario(idUsuario, null); 
+
+            var comentariosArchivados = _contexto.ComentariosArchivados
+                .Where(c => comentariosUsuario.Find(comentario => comentario.Id == c.IdComentario) != null)
+                .OrderByDescending(c => c.Fecha)
+                .AsSplitQuery()
+                .Select(c => c.ComoDTO());
+
+            return await comentariosArchivados.ToListAsync();
+        }
+
+        public async Task PublicarComentarioPendiente(int idComentario)
+        {
+            var comentario = await _contexto.Comentarios.FindAsync(idComentario);
+
+            if (comentario is null)
+            {
+                throw new ArgumentException("No existe un comentario con el ID especificado.");
+            }
+
+            var registroArchivo = await _contexto.ComentariosArchivados
+                .FirstOrDefaultAsync(ca => ca.IdComentario == idComentario);
+            
+            
+            if (registroArchivo is null) 
+            {
+                throw new ArgumentException("El comentario con ID " + idComentario + " aún no ha sido archivado.");
+            }
+            
+            comentario.Publicado = true;
+
+            //TODO: Eliminar reportes del comentario (en teoria fueron solucionados, si es publicado).
+
+            _contexto.Entry(comentario).State = EntityState.Modified;
+            _contexto.Remove(registroArchivo);
+
+            await _contexto.SaveChangesAsync();
+        }
+
         public async Task EliminarComentario(int idComentario, Guid? idUsuario, string rolDeUsuario)
         {
             var comentario = await _contexto.Comentarios.FindAsync(idComentario);

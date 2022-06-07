@@ -32,6 +32,8 @@ namespace ServicioHydrate.Data
 
         // Colección de entidades de Producto.
         public DbSet<Producto> Productos { get; set; }
+
+        public DbSet<ComentarioArchivado> ComentariosArchivados { get; set; }
         
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 

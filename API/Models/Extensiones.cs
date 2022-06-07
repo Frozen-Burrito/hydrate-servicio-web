@@ -175,6 +175,27 @@ namespace ServicioHydrate.Modelos
             modelo.Contenido = modificaciones.Contenido;
             modelo.Publicado = modificaciones.Publicado;
             modelo.Fecha = VerificarStrISO8601(modificaciones.Fecha);
+        } 
+
+        public static DTOComentarioArchivado ComoDTO(this ComentarioArchivado modelo)
+        {
+            return new DTOComentarioArchivado
+            {
+                Id = modelo.Id,
+                IdComentario = modelo.IdComentario,
+                Motivo = modelo.Motivo,
+                Fecha = modelo.Fecha,
+            };
+        }
+
+        public static ComentarioArchivado ComoModelo(this DTOArchivarComentario comentarioArchivado)
+        {
+            return new ComentarioArchivado
+            {
+                IdComentario = comentarioArchivado.IdComentario,
+                Motivo = comentarioArchivado.Motivo,
+                Fecha = DateTime.Now.ToString("o"),
+            };
         }
 
         public static Respuesta ComoNuevoModelo(this DTONuevaRespuesta nuevaRespuesta, Comentario comentarioOriginal, Usuario autor)
