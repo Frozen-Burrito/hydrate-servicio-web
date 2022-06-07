@@ -1,11 +1,22 @@
 import React from 'react';
-import Layout from '../../components/Layout/Layout';
+
+import { Layout, ListaComentarios, DrawerAdmin } from '../../components';
 
 export function PaginaAdminComentarios () {
 
   return (
     <Layout>
-      <h1>Administrar Comentarios</h1>
+      <DrawerAdmin indiceItemActivo={2} />
+
+      <div className="panel-contenido ancho-max-70">
+        <div className="stack horizontal justify-between gap-2 my-3">
+          <h2>Comentarios Pendientes de Revisión</h2>
+
+          <h4>Ordenar</h4>
+        </div>
+
+        <ListaComentarios pendientes conBusqueda={false}/>
+      </div>
     </Layout>
   )
 }

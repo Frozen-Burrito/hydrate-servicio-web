@@ -36,6 +36,7 @@
 .menu-drawer > .drawer-superior > a.elemento-drawer,
 .menu-drawer > .drawer-inferior > a.elemento-drawer {
   width: 100%;
+  margin-bottom: 0.4rem;
   padding: 1.2rem 0.4rem;
   border-radius: 10px;
   text-align: start;
@@ -52,7 +53,8 @@
 }
 
 .menu-drawer > .drawer-superior > a.elemento-drawer:hover,
-.menu-drawer > .drawer-inferior > a.elemento-drawer:hover {
+.menu-drawer > .drawer-inferior > a.elemento-drawer:hover,
+a.elemento-drawer.activo {
   background-color: var(--variante-primario-claro);
 }
 

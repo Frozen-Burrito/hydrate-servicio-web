@@ -4,15 +4,14 @@ import { eliminarRecurso, obtenerRecursos } from '../../api/api_recursos';
 import useCookie from '../../utils/useCookie';
 import { 
   Layout, 
-  Drawer, 
-  ElementoDrawer, 
+  DrawerAdmin,
   FormAgregarRecurso, 
   TablaRecursosInf 
 } from '../../components';
 
 export function PaginaAdminRecursos () {
 
-  const { valor: jwt, eliminarCookie: eliminarToken } = useCookie('jwt');
+  const { valor: jwt } = useCookie('jwt');
   
   const [recursosInformativos, setRecursosInformativos] = useState([]);
 
@@ -20,49 +19,6 @@ export function PaginaAdminRecursos () {
 
   const [estaCargando, setEstaCargando] = useState(false);
   const [tieneError, setTieneError] = useState(false);
-
-  const elementoCuenta = (
-    <ElementoDrawer
-      icono='account_circle'
-      texto={'Usuario autenticado'}
-      url='/perfil'
-      accionFinal={(
-        <button onClick={() => {
-            
-          eliminarToken();
-        }}>
-          <span className="material-icons">
-            logout
-          </span>
-        </button>
-      )}
-    />
-  );
-
-  const elementosMenu = (
-    <>
-      <ElementoDrawer
-        icono='account_circle'
-        texto={'Usuarios'}
-        url='/admin/usuarios'
-      />
-      <ElementoDrawer
-        icono='dashboard'
-        texto={'Órdenes'}
-        url='/admin/ordenes'
-      />
-      <ElementoDrawer
-        icono='forum'
-        texto={'Comentarios'}
-        url='/admin/comentarios'
-      />
-      <ElementoDrawer
-        icono='auto_stories'
-        texto={'Recuros Informativos'}
-        url='/admin/recursos-informativos'
-      />
-    </>
-  );
 
   // Es invocada cuando el usuario realiza un cambio con un recurso,
   // puede ser creación o modificación.
@@ -154,11 +110,7 @@ export function PaginaAdminRecursos () {
   return (
     <Layout>
 
-      <Drawer
-        encabezado='Administrar'
-        elementos={elementosMenu}
-        elementoFinal={elementoCuenta}
-      />
+      <DrawerAdmin />
 
       <div className='panel-contenido'>
         <h3>Recursos Informativos</h3>
