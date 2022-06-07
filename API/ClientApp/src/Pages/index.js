@@ -19,7 +19,7 @@ export { PaginaTableroPerfil } from './Perfil/pagina_tablero_usuario';
 export { PaginaComentariosPerfil } from './Perfil/pagina_comentarios_usuario';
 
 // Rutas de administracion. 
-export { AdminUsuarios } from './Admin/General/AdminUsuarios';
-export { AdminComentarios } from './Admin/Comentarios/AdminComentarios';
-export { AdminOrdenes } from './Admin/Ordenes/AdminOrdenes';
-export { AdminRecursos } from './Admin/RecursosInf/AdminRecursos';
+export { PaginaAdminUsuarios } from './Admin/pagina_admin_usuarios';
+export { PaginaAdminComentarios } from './Admin/pagina_admin_comentarios';
+export { PaginaAdminOrdenes } from './Admin/pagina_admin_ordenes';
+export { PaginaAdminRecursos } from './Admin/pagina_admin_recursos';

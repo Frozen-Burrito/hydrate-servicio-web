@@ -28,22 +28,22 @@ function App() {
 
         <Route path="/admin/comentarios" 
           component={
-            () => <RutaProtegida rolRequerido={'MODERADOR_COMENTARIOS'}> <Pages.AdminComentarios /> </RutaProtegida>
+            () => <RutaProtegida rolRequerido={'MODERADOR_COMENTARIOS'}> <Pages.PaginaAdminComentarios /> </RutaProtegida>
           } 
         />
         <Route path="/admin/ordenes" 
           component={
-            () => <RutaProtegida rolRequerido={'ADMIN_ORDENES'}> <Pages.AdminOrdenes /> </RutaProtegida>
+            () => <RutaProtegida rolRequerido={'ADMIN_ORDENES'}> <Pages.PaginaAdminOrdenes /> </RutaProtegida>
           } 
         />
         <Route path="/admin/recursos-informativos" 
           component={
-            () => <RutaProtegida rolRequerido={'ADMIN_RECURSOS_INF'}> <Pages.AdminRecursos /> </RutaProtegida>
+            () => <RutaProtegida rolRequerido={'ADMIN_RECURSOS_INF'}> <Pages.PaginaAdminRecursos /> </RutaProtegida>
           } 
         />
         <Route path="/admin/usuarios" 
           component={
-            () => <RutaProtegida rolRequerido={'ADMINISTRADOR'}> <Pages.AdminUsuarios /> </RutaProtegida>
+            () => <RutaProtegida rolRequerido={'ADMINISTRADOR'}> <Pages.PaginaAdminUsuarios /> </RutaProtegida>
           } 
         />
       </Switch>

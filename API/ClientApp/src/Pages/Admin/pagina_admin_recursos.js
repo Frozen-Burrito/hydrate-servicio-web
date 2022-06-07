@@ -1,16 +1,16 @@
 import React, { useState, useEffect} from 'react';
 
-import { eliminarRecurso, obtenerRecursos } from '../../../api/api_recursos';
-import useCookie from '../../../utils/useCookie';
+import { eliminarRecurso, obtenerRecursos } from '../../api/api_recursos';
+import useCookie from '../../utils/useCookie';
 import { 
   Layout, 
   Drawer, 
   ElementoDrawer, 
   FormAgregarRecurso, 
   TablaRecursosInf 
-} from '../../../components';
+} from '../../components';
 
-export function AdminRecursos () {
+export function PaginaAdminRecursos () {
 
   const { valor: jwt, eliminarCookie: eliminarToken } = useCookie('jwt');
   
