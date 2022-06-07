@@ -22,6 +22,8 @@ namespace ServicioHydrate.Modelos.DTO
 
         public bool Publicado { get; set; }
 
+        public bool NecesitaModificaciones { get; set; }
+
         public Guid IdAutor { get; set; }
 
         [MaxLength(129)]

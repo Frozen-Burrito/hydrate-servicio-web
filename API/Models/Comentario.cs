@@ -23,6 +23,8 @@ namespace ServicioHydrate.Modelos
 
         public bool Publicado { get; set; }
 
+        public bool NecesitaModificaciones { get; set; }
+
         public Usuario Autor { get; set; }
 
         // Los usuarios que han reportado este comentario.
