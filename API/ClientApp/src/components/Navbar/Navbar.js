@@ -19,8 +19,6 @@ export default function Navbar() {
 
     const claimsUsuario = obtenerClaims(datosToken);
 
-    console.log(claimsUsuario);
-
     rolDeUsuario = claimsUsuario.rol;
   }
 

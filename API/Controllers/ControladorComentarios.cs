@@ -4,16 +4,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-
-using ServicioHydrate.Data;
-using ServicioHydrate.Autenticacion;
-using ServicioHydrate.Modelos;
-using ServicioHydrate.Modelos.DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 using System.Security.Claims;
+
+using ServicioHydrate.Data;
+using ServicioHydrate.Modelos;
+using ServicioHydrate.Modelos.DTO;
+using ServicioHydrate.Utilidades;
 
 namespace ServicioHydrate.Controladores
 {
@@ -26,11 +25,15 @@ namespace ServicioHydrate.Controladores
         /// El repositorio de acceso a los Comentarios.
         private readonly IServicioComentarios _repoComentarios;
 
+        /// El servicio de filtrado de contenido para los comentarios.
+        private readonly IServicioFiltroContenido _filtroDeContenido;
+
         // Permite generar Logs desde las acciones del controlador.
         private readonly ILogger<ControladorComentarios> _logger;
 
         public ControladorComentarios(
             IServicioComentarios servicioComentarios,
+            IServicioFiltroContenido filtroDeContenido,
             ILogger<ControladorComentarios> logger
         )
         {
@@ -41,6 +44,7 @@ namespace ServicioHydrate.Controladores
             }
 
             this._repoComentarios = servicioComentarios;
+            this._filtroDeContenido = filtroDeContenido;
             this._logger = logger;
         }
 
@@ -357,7 +361,16 @@ namespace ServicioHydrate.Controladores
 
                 _logger.LogInformation($"Id usuario: {idUsuario.ToString()}");
 
-                var comentarioCreado = await _repoComentarios.AgregarNuevoComentario(nuevoComentario, idUsuario);
+                bool asuntoEsApto = _filtroDeContenido.ContenidoEsApto(nuevoComentario.Asunto);
+                bool contenidoEsApto = _filtroDeContenido.ContenidoEsApto(nuevoComentario.Contenido);
+
+                bool asuntoTieneKeywords = asuntoEsApto 
+                    ? _filtroDeContenido.ContenidoIncluyePalabrasClave(nuevoComentario.Asunto)
+                    : false;
+
+                bool comentarioEsAdecuado = asuntoEsApto && contenidoEsApto && asuntoTieneKeywords;
+
+                var comentarioCreado = await _repoComentarios.AgregarNuevoComentario(nuevoComentario, idUsuario, comentarioEsAdecuado);
 
                 return CreatedAtAction(
                     nameof(GetComentarioPorId),

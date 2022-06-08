@@ -71,7 +71,7 @@ namespace ServicioHydrate.Data
             return modeloRespuesta.ComoDTO(null);
         }
 
-        public async Task<DTOComentario> AgregarNuevoComentario(DTONuevoComentario comentario, Guid? idAutor)
+        public async Task<DTOComentario> AgregarNuevoComentario(DTONuevoComentario comentario, Guid? idAutor, bool autoPublicar)
         {
             var autorComentario = await _contexto.Usuarios.FindAsync(idAutor);
 
@@ -81,6 +81,9 @@ namespace ServicioHydrate.Data
             }
 
             var modeloComentario = comentario.ComoNuevoModelo(autorComentario);
+
+            modeloComentario.Publicado = autoPublicar;
+            modeloComentario.NecesitaModificaciones = !autoPublicar;
 
             _contexto.Add(modeloComentario);
             await _contexto.SaveChangesAsync();

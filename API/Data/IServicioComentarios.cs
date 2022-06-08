@@ -17,7 +17,7 @@ namespace ServicioHydrate.Data
 
         Task<List<DTOComentario>> GetComentariosPendientes();
 
-        Task<DTOComentario> AgregarNuevoComentario(DTONuevoComentario comentario, Guid? idAutor);
+        Task<DTOComentario> AgregarNuevoComentario(DTONuevoComentario comentario, Guid? idAutor, bool autoPublicar = false);
 
         Task<DTOComentarioArchivado> ArchivarComentario(int idComentario, DTOArchivarComentario motivos);
 

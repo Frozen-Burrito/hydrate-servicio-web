@@ -61,6 +61,9 @@ namespace ServicioHydrate
             // Incluye el servicio de generación de JWT.
             services.AddScoped<GeneradorDeToken>();
 
+            // Incluye el servicio de filtrado de contenido de comentarios.
+            services.AddScoped<IServicioFiltroContenido, FiltroDeComentarios>();
+
             // Incluye los servicios de acceso a datos.
             services.AddScoped<IServicioUsuarios, RepositorioUsuarios>();
             services.AddScoped<IServicioRecursos, RepositorioRecursos>();
