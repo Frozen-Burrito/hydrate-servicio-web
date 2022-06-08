@@ -102,12 +102,13 @@ namespace ServicioHydrate.Data
             if (_contexto.ComentariosArchivados.Count() > 0) 
             {
                 registroComentarioArchivado = await _contexto.ComentariosArchivados
-                    .FirstAsync(ca => ca.IdComentario == idComentario);
+                    .FirstOrDefaultAsync(ca => ca.IdComentario == idComentario);
             }
 
             if (comentario.Publicado && registroComentarioArchivado is null) 
             {
                 comentario.Publicado = false;
+                comentario.NecesitaModificaciones = true;
 
                 var modeloComentarioArchivado = motivos.ComoModelo(idComentario);
 
@@ -125,12 +126,12 @@ namespace ServicioHydrate.Data
 
         public async Task<List<DTOComentarioArchivado>> GetMotivosDeComentariosArchivados(Guid idUsuario)
         {
-            if (_contexto.ComentariosArchivados.Count() <= 0)
-            {
-                // Si no hay ningun comentario archivado, retornar una 
-                // lista vacia desde el principio.
-                return new List<DTOComentarioArchivado>();
-            }
+            // if (_contexto.ComentariosArchivados.Count() <= 0)
+            // {
+            //     // Si no hay ningun comentario archivado, retornar una 
+            //     // lista vacia desde el principio.
+            //     return new List<DTOComentarioArchivado>();
+            // }
 
             var autorComentarios = await _contexto.Usuarios.FindAsync(idUsuario);
 
@@ -141,15 +142,13 @@ namespace ServicioHydrate.Data
 
             var comentariosUsuario = await _contexto.Comentarios
                 .Where(c => c.Autor == autorComentarios)
-                .OrderByDescending(c => c.Fecha)
                 .ToListAsync();
 
             IEnumerable<int> idsComentariosUsuario = comentariosUsuario.Select(c => c.Id);
 
             var comentariosArchivados = _contexto.ComentariosArchivados
-                .Where(c => idsComentariosUsuario.Contains(c.Id))
+                .Where(c => idsComentariosUsuario.Contains(c.IdComentario))
                 .OrderByDescending(c => c.Fecha)
-                .AsSplitQuery()
                 .Select(c => c.ComoDTO());
 
             return await comentariosArchivados.ToListAsync();
