@@ -20,6 +20,27 @@ export const obtenerClaims = (tokenDecodificado) => {
   }
 }
 
+export const getIdYRolDesdeJwt = (jwt) => {
+
+  const datosUsuario = {
+    idUsuario: null,
+    rol: null,
+  }
+  
+  if (jwt == null || jwt.length === 0) {
+    return datosUsuario;
+  }
+
+  const datosToken = parseJwt(jwt);
+
+  const { idUsuario, rol } = obtenerClaims(datosToken);
+
+  datosUsuario.idUsuario = idUsuario;
+  datosUsuario.rol = rol;
+
+  return datosUsuario;
+} 
+
 /**
  * Una función de conveniencia para decodificar el ID de usuario
  * de un JWT de autenticación.
@@ -28,14 +49,8 @@ export const obtenerClaims = (tokenDecodificado) => {
  * @returns {string?} El ID del usuario, decodificado del token.
  */
 export const getIdUsuarioDesdeJwt = (jwt) => {
+  
+  const idYRol = getIdYRolDesdeJwt(jwt);
 
-  if (jwt == null || jwt.length === 0) {
-    return null;
-  }
-
-  const datosToken = parseJwt(jwt);
-
-  const { idUsuario } = obtenerClaims(datosToken);
-
-  return idUsuario;
+  return (idYRol != null ? idYRol.idUsuario : null);
 }

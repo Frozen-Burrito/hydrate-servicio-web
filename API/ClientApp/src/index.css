@@ -20,7 +20,11 @@ body > iframe {
   min-height: 100vh;
 }
 
-.ancho-max-80 {
+.ancho-max-70 {
+  max-width: 70vw;
+}
+
+.ancho-max-95 {
   max-width: 95%;
 }
 
@@ -182,6 +186,10 @@ section.contenedor {
 .columnas-flex > div,
 .columnas-flex > .col-3 {
   width: 100%;
+}
+
+.flex-45 {
+  flex: 35% 0;
 }
 
 @media screen and (min-width: 1280px) {

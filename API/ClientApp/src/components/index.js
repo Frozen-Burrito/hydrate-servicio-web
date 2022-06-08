@@ -1,7 +1,8 @@
 export { default as Avatar } from "./Avatar/avatar";
 export { default as Drawer } from "./Drawer/Drawer";
 export { default as ElementoDrawer } from "./Drawer/ElementoDrawer";
-export { default as DrawerPerfil } from "./DrawerPerfil/drawer_perfil";
+export { default as DrawerPerfil } from "./DrawerConfigurados/drawer_perfil";
+export { default as DrawerAdmin } from "./DrawerConfigurados/drawer_admin";
 export { default as Dropdown } from "./Dropdown/dropdown";
 export { default as Footer } from "./Footer/Footer";
 export { default as ListaComentarios } from "./ListaComentarios/lista_comentarios";

@@ -1,5 +1,13 @@
 import * as api from "./api";
 
+export const RolesAutorizacion = {
+  ninguno: "NINGUNO",
+  moderadorComentarios: "MODERADOR_COMENTARIOS",
+  adminOrdenes: "ADMIN_ORDENES",
+  adminRecursos: "ADMIN_RECURSOS_INF",
+  administrador: "ADMINISTRADOR",
+};
+
 export const registrarUsuario = async (credenciales) => {
   const url = `${api.urlBase}/usuarios/registro`;
 

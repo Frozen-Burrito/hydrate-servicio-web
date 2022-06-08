@@ -3,19 +3,18 @@ import React, { useState, useEffect } from "react";
 import useCookie from "../../utils/useCookie";
 
 import { StatusHttp } from "../../api/api";
-import { 
-  fetchComentariosPublicados,
-  fetchComentariosDeAutor 
-} from "../../api/api_comentarios";
+import * as api from "../../api/api_comentarios";
+import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
 
 import { TarjetaComentario, SearchBox } from "../";
 
-export default function ListaComentarios({ idAutor, conBusqueda }) {
+export default function ListaComentarios({ idAutor, pendientes, conBusqueda }) {
 
   const { valor: jwt } = useCookie("jwt");
 
   // La lista con todos los comentarios publicados obtenidos.
   const [comentarios, setComentarios] = useState([]);
+  const [motivosDeRemovidos, setMotivosDeRemovidos] = useState([]);
 
   const [comentariosFiltrados, setComentariosFiltrados] = useState([]);
 
@@ -76,11 +75,29 @@ export default function ListaComentarios({ idAutor, conBusqueda }) {
     // Si aún no hay, mostrar un placeholder.
     if (comentarios.length > 0) {
       if (comentariosFiltrados.length > 0) {
+
+        const hayComentariosRemovidos = (motivosDeRemovidos.length > 0 && comentarios.find(c => !c.publicado) !== undefined);
+        const idsComentariosRemovidos = [];
+        
+        if (hayComentariosRemovidos) {
+          motivosDeRemovidos.forEach((registroMotivo) => {
+            idsComentariosRemovidos.push(registroMotivo.idComentario);
+          });
+        }
+
         return comentariosFiltrados.map(comentario => {
+
+          const fueRemovido = hayComentariosRemovidos ? idsComentariosRemovidos.includes(comentario.id) : false;
+
+          const motivoRemovido = fueRemovido 
+            ? motivosDeRemovidos.find(c => c.idComentario === comentario.id).motivo
+            : null;
+
           return (
             <TarjetaComentario 
               key={comentario.id} 
-              comentario={comentario} 
+              comentario={comentario}
+              motivoDeReportes={motivoRemovido} 
               onComentarioEliminado={(idComentario) => {
 
                 const comentariosRestantes = comentarios.filter(comentario => comentario.id !== idComentario); 
@@ -95,42 +112,65 @@ export default function ListaComentarios({ idAutor, conBusqueda }) {
         return ( <p>No se encontró ningún comentario para tu búsqueda.</p> );
       }
     } else {
-      return ( <p>Aún no hay comentarios publicados.</p> );
+      return ( <p>{`Aún no hay comentarios ${pendientes ? "pendientes" : "publicados"}.`}</p> );
     }
   }
 
   useEffect(() => {
 
     async function obtenerComentarios() {
-      setEstaCargando(true);
 
-      console.log(idAutor);
-
-      // Obtener todos los comentarios publicados. Ya vienen ordenados por
+      const obtenerDeAutor = (idAutor != null && idAutor.length > 0)
+  
+      // Obtener todos los comentarios pendientes. Ya vienen ordenados por
       // fecha desde la API.
-      const resultado = idAutor != null && idAutor.length > 0 
-        ? await fetchComentariosDeAutor(idAutor, jwt)
-        : await fetchComentariosPublicados(jwt);
-
+      const resultado = pendientes
+        ? await api.fetchComentariosPendientes(jwt)
+        : (obtenerDeAutor 
+          ? await api.fetchComentariosDeAutor(idAutor, jwt)
+          : await api.fetchComentariosPublicados(jwt));
+  
       if (resultado.ok && resultado.status === StatusHttp.Status200OK) {
-
+  
         setComentarios(resultado.cuerpo);
-
+  
         // Inicializar los comentarios filtrados con todos los comentarios
         // disponibles.
         setComentariosFiltrados(resultado.cuerpo);
       } else {
         setTieneError(true)
       }
+    }
+  
+    async function obtenerMotivosDeComentariosRemovidos() {
+  
+      const idUsuario = getIdUsuarioDesdeJwt(jwt);
+  
+      const resultado = await api.fetchMotivosComentariosRetirados(idUsuario, jwt);
+  
+      if (resultado.ok && resultado.status === StatusHttp.Status200OK) {
+        
+        setMotivosDeRemovidos(resultado.cuerpo);
+  
+      } else {
+        setTieneError(true)
+      }
+    }
 
-      console.log(resultado);
-
+    async function obtenerDatosComentarios() {
+      
+      setEstaCargando(true);
+      
+      await Promise.all([
+        obtenerComentarios(),
+        (!pendientes && obtenerMotivosDeComentariosRemovidos()),
+      ]);
+  
       setEstaCargando(false);
     }
 
-    obtenerComentarios();
-
-  }, [ jwt ]);
+    obtenerDatosComentarios();
+  }, [ jwt, pendientes, idAutor ]);
 
   return (
     <div>

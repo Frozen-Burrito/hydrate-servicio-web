@@ -134,6 +134,107 @@ export const fetchComentariosDeAutor = async (idAutor, jwt = "") => {
   return await api.hacerPeticion(peticion);
 }
 
+export const fetchComentariosPendientes = async (jwt = "") => {
+
+  const url = `${api.urlBase}/comentarios/pendientes`;
+
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+  url.concat("?" + new URLSearchParams({
+    idUsuario
+  }).toString());
+
+  const peticion = new Request(url, {
+    method: api.GET,
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      'Authorization': jwt.length > 0 ? `Bearer ${jwt}` : "", 
+      // Utiliza JSON para el cuerpo.
+      'Content-Type': 'application/json'
+    }),
+  });
+  
+  return await api.hacerPeticion(peticion);
+}
+
+/**
+ * Obtiene los motivos de retiro de los comentarios removidos, si los hay, 
+ * de un usuario. Solo 
+ * 
+ * los moderadores de comentarios pueden especificar un
+ * ID de usuario específico (los usuarios normales solo pueden ver los 
+ * motivos de sus propios comentarios).
+ * @param {string} idUsuario El ID de un usuario específico.
+ * @param {string} jwt El token de autenticación del usuario.
+ * @returns Una lista con los motivos para cada comentario removido.
+ */
+export const fetchMotivosComentariosRetirados = async (idUsuario = "", jwt) => {
+
+  if (idUsuario.length === 0) {
+    // Si no se especifica un ID de usuario, usar ID del mismo 
+    // usuario, desde el JWT. 
+    idUsuario = getIdUsuarioDesdeJwt(jwt);
+  }
+
+  const url = `${api.urlBase}/comentarios/pendientes/usuario/${idUsuario}`;
+
+  const peticion = new Request(url, {
+    method: api.GET,
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      'Authorization': `Bearer ${jwt}`, 
+      // Utiliza JSON para el cuerpo.
+      'Content-Type': 'application/json'
+    }),
+  });
+  
+  return await api.hacerPeticion(peticion);
+}
+
+export const publicarComentarioPendiente = async (idComentario, jwt) => {
+  const url = `${api.urlBase}/comentarios/${idComentario}/publicar`;
+
+  const peticion = new Request(url, {
+    method: api.PATCH,
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      'Authorization': `Bearer ${jwt}`, 
+      // Utiliza JSON para el cuerpo.
+      'Content-Type': 'application/json'
+    }),
+  });
+  
+  return await api.hacerPeticion(peticion, false);
+}
+
+/**
+ * Remueve temporalmente un comentario público, usualmente porque
+ * es considerado no adecuado.
+ * 
+ * Es solo accesible para usuarios moderadores de comentarios.
+ * 
+ * @param {number} idComentario El ID del comentario por archivar.
+ * @param {string} motivos Los datos con la razón de retiro.
+ * @param {string} jwt El token de autenticación del usuario.
+ * @returns El registro con el motivo del retiro del comentario.
+ */
+export const archivarComentario = async (idComentario, motivos, jwt) => {
+  const url = `${api.urlBase}/comentarios/${idComentario}/archivar`;
+
+  const peticion = new Request(url, {
+    method: api.PATCH,
+    body: JSON.stringify(motivos),
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      'Authorization': `Bearer ${jwt}`, 
+      // Utiliza JSON para el cuerpo.
+      'Content-Type': 'application/json'
+    }),
+  });
+  
+  return await api.hacerPeticion(peticion);
+}
+
 export const marcarUtilComentarioConId = async (id, jwt) => {
 
   const url = `${api.urlBase}/comentarios/${id}/util`;

@@ -13,16 +13,15 @@ export default function Navbar() {
   const history = useHistory();
 
   let rolDeUsuario = 'NINGUNO';
-  const idUsuario = getIdUsuarioDesdeJwt(jwt);
 
   if (jwt !== undefined && jwt !== null) {
     const datosToken = parseJwt(jwt);
 
     const claimsUsuario = obtenerClaims(datosToken);
 
-    rolDeUsuario = claimsUsuario.rol;
-
     console.log(claimsUsuario);
+
+    rolDeUsuario = claimsUsuario.rol;
   }
 
   const textoRegistro = 'Regístrate';
@@ -104,7 +103,7 @@ export default function Navbar() {
       )}
       items={(
         <>
-          <Link to={`/perfil/${idUsuario ?? ""}`} className='elemento-dropdown'>
+          <Link to={`/perfil/${getIdUsuarioDesdeJwt(jwt) ?? ""}`} className='elemento-dropdown'>
             Perfil
           </Link>
 

@@ -136,19 +136,24 @@ form > .form-fields > .form-group > .campo > .campo-con-icono.compacto > .input,
   font-weight: 400;
 }
 
-form > .form-fields > .form-group > .campo > .campo-con-icono > span.material-icons,
-.campo > .campo-con-icono.compacto > span.material-icons {
+form > .form-fields > .form-group > .campo > .campo-con-icono > span.material-icons {
   position: absolute;
-  left: 8px;
-  top: 11px;
+  left: 16px;
+  top: 22px;
   min-width: 18px;
   color: var(--contraste-superficie-claro);
+}
+
+.campo > .campo-con-icono.compacto > span.material-icons {
+  left: 8px;
+  top:  9px;
 }
 
 form > .form-fields > .form-group > .campo > .campo-con-icono > span.sufijo,
 .campo > .campo-con-icono > span.sufijo {
   right: 8px;
   left: auto!important;
+  cursor: pointer;
 } 
 
 form > .form-fields > .form-group > .campo > .campo-con-icono > textarea.input {

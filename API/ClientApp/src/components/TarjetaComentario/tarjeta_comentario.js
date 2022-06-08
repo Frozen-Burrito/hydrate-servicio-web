@@ -2,17 +2,12 @@ import React, { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 
 import useCookie from "../../utils/useCookie";
-import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
+import { getIdYRolDesdeJwt } from "../../utils/parseJwt";
+
 import { StatusHttp } from "../../api/api";
-import { 
-	fetchRespuestasAComentario,
-	marcarUtilComentarioConId,
-	reportarComentarioConId,
-	marcarUtilRespuestaConId,
-	reportarRespuestaConId, 
-	eliminarComentarioConId,
-	eliminarRespuestaConId
-} from "../../api/api_comentarios";
+import { RolesAutorizacion } from "../../api/api_auth";
+
+import * as api from "../../api/api_comentarios";
 
 import { Avatar, Dropdown, BotonIcono } from "../";
 import Tarjeta, { onClickAccion } from "../Tarjeta/tarjeta";
@@ -20,6 +15,7 @@ import Tarjeta, { onClickAccion } from "../Tarjeta/tarjeta";
 TarjetaComentario.defaultProps = {
 	idComentarioPadre: -1,
 	idUsuarioActual: null,
+	motivoDeReportes: null,
 	comentario: {
 		id: -1,
 		asunto: "",
@@ -39,7 +35,13 @@ TarjetaComentario.defaultProps = {
 
 export default function TarjetaComentario(props) {
 	// Destructurar props del componente.
-	const { comentario, idComentarioPadre, idUsuarioActual, onComentarioEliminado } = props;
+	const { 
+		comentario, 
+		idComentarioPadre, 
+		idUsuarioActual,
+		motivoDeReportes, 
+		onComentarioEliminado 
+	} = props;
 
 	const [esComentario] = useState(idComentarioPadre < 0);
 
@@ -59,10 +61,13 @@ export default function TarjetaComentario(props) {
 	const [estaCargando, setEstaCargando] = useState(false);
 	const [tieneError, setTieneError] = useState(false);
 
-	const esComentarioPropio = getIdUsuarioDesdeJwt(jwt) === comentario.idAutor;
+	const datosUsuario = getIdYRolDesdeJwt(jwt);
+
+	const esComentarioPropio = datosUsuario.idUsuario === comentario.idAutor;
+	const usuarioEsModerador = datosUsuario.rol === RolesAutorizacion.moderadorComentarios;
 	
 	// Clases de estilos.
-	const claseSizeTarjeta = !esComentario ? "ancho-max-80 alinear-margen-izq" : "";
+	const claseSizeTarjeta = !esComentario ? "ancho-max-95 alinear-margen-izq" : "";
 	const claseColapsableResp = mostrandoRespuestas ? "expandido" : "colapsado";
 
 	/** Permite al usuario escribir una respuesta al comentario. */
@@ -88,8 +93,8 @@ export default function TarjetaComentario(props) {
 	const toggleMarcaUtil = async (e) => {
 
 		const resultado = esComentario
-			? await marcarUtilComentarioConId(comentario.id, jwt)
-			: await marcarUtilRespuestaConId(idComentarioPadre, comentario.id, jwt)
+			? await api.marcarUtilComentarioConId(comentario.id, jwt)
+			: await api.marcarUtilRespuestaConId(idComentarioPadre, comentario.id, jwt)
 
 		if (resultado.ok && resultado.status === StatusHttp.Status204SinContenido) {
 			const marcadoComoUtil = !comentario.utilParaUsuarioActual;
@@ -115,8 +120,8 @@ export default function TarjetaComentario(props) {
 	const toggleReporte = async (e) => {
 
 		const resultado = esComentario
-		? await reportarComentarioConId(comentario.id, jwt)
-		: await reportarRespuestaConId(idComentarioPadre, comentario.id, jwt)
+		? await api.reportarComentarioConId(comentario.id, jwt)
+		: await api.reportarRespuestaConId(idComentarioPadre, comentario.id, jwt)
 
 		if (resultado.ok && resultado.status === StatusHttp.Status204SinContenido) {
 			const comentarioReportado = !comentario.reportadoPorUsuarioActual;
@@ -134,13 +139,31 @@ export default function TarjetaComentario(props) {
 		}
 	};
 
+	const marcarComoResuelto = async (e) => {
+		
+		const resultado = await api.publicarComentarioPendiente(comentario.id, jwt);
+
+		console.log(resultado);
+
+		if (resultado.ok && resultado.status === StatusHttp.Status204SinContenido) {
+			onComentarioEliminado(comentario.id);
+		} else {
+			setTieneError(true);
+		}
+	}
+
+	const archivarComentario = async (e) => {
+		//TODO: Mostrar dialog, para que el moderador escriba el motivo.
+		api.archivarComentario(comentario.id, { motivo: "Ta feo" }, jwt);
+	}
+
 	const eliminarComentario = async () => {
 		setEstaCargando(true);
 
 		// Eliminar el comentario representado por esta tarjeta.
 		const resultado = esComentario
-			? await eliminarComentarioConId(comentario.id, jwt)
-			: await eliminarRespuestaConId(idComentarioPadre, comentario.id, jwt);
+			? await api.eliminarComentarioConId(comentario.id, jwt)
+			: await api.eliminarRespuestaConId(idComentarioPadre, comentario.id, jwt);
 
 		console.log(resultado);
 
@@ -165,7 +188,7 @@ export default function TarjetaComentario(props) {
 
 			// Obtener todas las respuestas al comentario. Ya vienen ordenados por
 			// fecha desde la API.
-			const resultado = await fetchRespuestasAComentario(comentario.id, jwt);
+			const resultado = await api.fetchRespuestasAComentario(comentario.id, jwt);
 
 			console.log(resultado);
 
@@ -181,34 +204,57 @@ export default function TarjetaComentario(props) {
 		}
 	};
 
-	const dropdownOpciones = (
-    <Dropdown 
-      onColor="background"
-      boton={(
-        <span className="material-icons">
-          more_vert
-        </span>
-      )}
-      items={(
-        <>
-          <Link to={`/comentarios/publicar/${comentario.id}`} className='elemento-dropdown'>
-            Modificar
-          </Link>
+	const renderDropdownOpciones = () => {
+		
+		const itemsUsuarioModerador = (
+			<>
+				<button className ="elemento-dropdown" onClick={marcarComoResuelto}>
+					Marcar como resuelto
+				</button>
+				<button className ="elemento-dropdown" onClick={archivarComentario}>
+					Archivar
+				</button>
+				<button className ="elemento-dropdown" onClick={eliminarComentario}>
+					Eliminar
+				</button>
+			</>
+		);
 
-          <button className ="elemento-dropdown" onClick={eliminarComentario}>
-            Eliminar
-          </button>
-        </>
-      )}
-    />
-  );
+		const itemsComentarioPropio = (
+			<>
+				{ esComentario && (
+					<Link to={`/comentarios/publicar/${comentario.id}`} className='elemento-dropdown'>
+						Modificar
+					</Link>
+				)}
+				<button className ="elemento-dropdown" onClick={eliminarComentario}>
+					Eliminar
+				</button>
+			</>
+		);
+
+		return (
+			<Dropdown 
+				onColor="background"
+				boton={(
+					<span className="material-icons">
+						more_vert
+					</span>
+				)}
+				items={usuarioEsModerador
+					? itemsUsuarioModerador
+					: ( esComentarioPropio ? itemsComentarioPropio : null ) }
+			/>
+		);
+	}
 
 	const renderAlertaArchivado = () => {
-		if (!comentario.publicado || comentario.numeroDeReportes > 5) {
+		if (!comentario.publicado && motivoDeReportes != null) {
 			return (
-				<p className="error">
-					Este comentario ha sido archivado, por ahora. 
-					<Link to="/guias-usuario/comentarios/removidos">¿Por qué fue removido mi comentario?</Link></p>
+				<div className="stack horizontal justify-start gap-1">
+					<p className="error">Este comentario ha sido removido, por el momento. Motivo: "{ motivoDeReportes}".</p>
+					{/* <Link to="/guias-usuario/comentarios/removidos">¿Por qué no ha sido publicado mi comentario?</Link> */}
+				</div>
 			);
 		} else {
 			return null;
@@ -278,11 +324,7 @@ export default function TarjetaComentario(props) {
 				cuerpo={comentario.contenido}
 				prefijo={<Avatar alt={comentario.nombreAutor} />}
 				accionPrincipal={esComentario ? desplegarRespuestas : null }
-				sufijo={
-					(esComentarioPropio) 
-						? dropdownOpciones
-						: null
-				}
+				sufijo={ renderDropdownOpciones() }
 				acciones={
 					<div className="stack horizontal justify-start gap-2">
 						{esComentario && (
@@ -301,7 +343,7 @@ export default function TarjetaComentario(props) {
 							label={comentario.numeroDeUtil.toString()}
 							tipo="texto"
 							seleccionado={esUtil}
-							disabled={esComentarioPropio}
+							disabled={esComentarioPropio || usuarioEsModerador}
 							onClick={(e) => onClickAccion(e, toggleMarcaUtil)}
 						/>
 
@@ -311,11 +353,11 @@ export default function TarjetaComentario(props) {
 							tipo="texto"
 							seleccionado={fueReportado}
 							esDeError={true}
-							disabled={esComentarioPropio}
+							disabled={esComentarioPropio || usuarioEsModerador}
 							onClick={(e) => onClickAccion(e, toggleReporte)}
 						/>
 
-						{ renderAlertaArchivado() }
+						{  renderAlertaArchivado() }
 					</div>
 				}
 			>

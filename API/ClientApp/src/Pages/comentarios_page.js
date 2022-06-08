@@ -14,7 +14,7 @@ export function ComentariosPage() {
         <h2 className="mt-3">Comentarios de Usuarios</h2>
 
         <div className="columnas-flex">
-          <ListaComentarios />
+          <ListaComentarios conBusqueda />
 
           <div className="col-3">
             <Tarjeta
