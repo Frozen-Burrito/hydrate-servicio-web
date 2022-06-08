@@ -11,9 +11,9 @@ ListItem.defaultProps = {
 
 export default function ListItem(props) {
 
-    const { titulo, subtitulo, children, iconoSufijo, expandible, onClick } = props;
+    const { titulo, subtitulo, iconoSufijo, expandible } = props;
 
-    const [expandido, setExpandido] = useState(false);
+    const [expandido] = useState(false);
 
     const renderIconoSufijo = () => {
         let nombreIcono = iconoSufijo;
