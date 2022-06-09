@@ -20,6 +20,16 @@ export const obtenerClaims = (tokenDecodificado) => {
   }
 }
 
+export const esJwtExpirado = (jwt) => {
+  const datosToken = parseJwt(jwt);
+
+  const { expiracionMillis } = obtenerClaims(datosToken);
+
+  const now = Math.trunc(Date.now() / 1000);
+
+  return (expiracionMillis != null && now > expiracionMillis);
+}
+
 export const getIdYRolDesdeJwt = (jwt) => {
 
   const datosUsuario = {

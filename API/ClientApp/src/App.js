@@ -1,10 +1,32 @@
-import './App.css';
+import React, { useEffect } from "react";
 import {Switch, Route, BrowserRouter} from 'react-router-dom';
+
+import useCookie from './utils/useCookie';
 import { RutaProtegida } from './components';
 
 import * as Pages from './Pages';
+import './App.css';
+import { esJwtExpirado } from "./utils/parseJwt";
 
 function App() {
+
+  const { valor: jwt, eliminarCookie: removerJwt } = useCookie("jwt");
+
+  useEffect(() => {
+
+    function revisarSiJwtEsValido(token) {
+
+      if (esJwtExpirado(token)) {
+        removerJwt();
+      }
+    }
+
+    if (jwt != null) {
+      revisarSiJwtEsValido(jwt);
+    }
+    
+  }, [ jwt, removerJwt ]);
+
   return (
     <BrowserRouter>
       <Switch>

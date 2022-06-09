@@ -4,7 +4,7 @@ import { getIdUsuarioDesdeJwt } from "../utils/parseJwt";
 export const fetchComentariosPublicados = async (jwt = "") => {
 
   const url = `${api.urlBase}/comentarios`;
-  
+
   if (jwt) {
     const idUsuario = getIdUsuarioDesdeJwt(jwt);
 
