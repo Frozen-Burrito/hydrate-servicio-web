@@ -1,6 +1,8 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 
 import useCookie from "../../utils/useCookie";
+import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
 
 import { Drawer, ElementoDrawer } from "../";
 
@@ -10,7 +12,11 @@ DrawerAdmin.defaultProps = {
 
 export default function DrawerAdmin({ indiceItemActivo }) {
 
-  const { eliminarCookie: cerrarSesion } = useCookie('jwt');
+  const { valor: jwt, eliminarCookie: cerrarSesion } = useCookie("jwt");
+
+  const history = useHistory();
+
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
 
   const elementosMenu = (
     <>
@@ -45,11 +51,14 @@ export default function DrawerAdmin({ indiceItemActivo }) {
     <ElementoDrawer
       icono="account_circle"
       texto="Usuario autenticado"
-      url="/perfil"
+      url={`/perfil/${idUsuario}`}
       accionFinal={(
-        <button onClick={() => {
-            
+        <button onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
           cerrarSesion();
+          history.push("/");
         }}>
           <span className="material-icons">
             logout

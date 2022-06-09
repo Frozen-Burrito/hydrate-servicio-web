@@ -1,4 +1,5 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 
 import useCookie from "../../utils/useCookie";
 
@@ -12,6 +13,8 @@ DrawerPerfil.defaultProps = {
 export default function DrawerPerfil({ indiceItemActivo }) {
 
   const { valor: jwt, eliminarCookie: cerrarSesion } = useCookie("jwt");
+
+  const history = useHistory();
 
   const idUsuario = getIdUsuarioDesdeJwt(jwt);
 
@@ -41,12 +44,16 @@ export default function DrawerPerfil({ indiceItemActivo }) {
   const elementoCuenta = (
     <ElementoDrawer
       icono='account_circle'
+      //TODO: Incluir nombre del usuario
       texto={'Usuario autenticado'}
-      url='/perfil'
+      url={`/perfil/${idUsuario}`}
       accionFinal={(
-        <button onClick={() => {
-            
+        <button onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
           cerrarSesion();
+          history.push("/");
         }}>
           <span className="material-icons">
             logout
