@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data 
 {
     public interface IServicioOrdenes
@@ -28,7 +29,7 @@ namespace ServicioHydrate.Data
         /// <param name="fechaHasta">La fecha de término del rango del filtro por fecha.</param>
         /// <param name="estado">El estado que debe tener una orden para ser retornada.</param>
         /// <returns>La lista de órdenes filtradas, en forma de DTOs.</returns>
-        Task<List<DTOOrden>> GetOrdenes(Guid? idUsuario, DateTime? fechaDesde = null, DateTime? fechaHasta = null, EstadoOrden? estado = null);
+        Task<ICollection<DTOOrden>> GetOrdenes(DTOParamsPagina? paramsPagina, Guid? idUsuario, DateTime? fechaDesde = null, DateTime? fechaHasta = null, EstadoOrden? estado = null);
 
         /// <summary>
         /// Obtiene de la BD una lista con todas las órdenes de un usuario específico.
@@ -36,7 +37,7 @@ namespace ServicioHydrate.Data
         /// <param name="idUsuario">El Id del usuario.</param>
         /// <param name="estado">El estado que deben tener las órdenes retornadas.</param>
         /// <returns>Una lista de órdenes del usuario.</returns>
-        Task<List<DTOOrden>> GetOrdenesDeUsuario(Guid idUsuario, EstadoOrden? estado = null);
+        Task<ICollection<DTOOrden>> GetOrdenesDeUsuario(Guid idUsuario, DTOParamsPagina? paramsPagina, EstadoOrden? estado = null);
         
         /// <summary>
         /// Obtiene una lista con todas las órdenes que cumplan con los 
@@ -51,7 +52,7 @@ namespace ServicioHydrate.Data
         /// <param name="idOrden">El identificador de la orden, opcional.</param>
         /// <param name="estado">El estado de las órdenes, opcional.</param>
         /// <returns>Una lista de órdenes resultantes.</returns>
-        Task<List<DTOOrden>> BuscarOrdenes(string nombreDelUsuario, string emailUsuario, Guid? idOrden, EstadoOrden? estado = null);
+        Task<ICollection<DTOOrden>> BuscarOrdenes(string? nombreDelUsuario, string? emailUsuario, DTOParamsPagina? paramsPagina, Guid? idOrden, EstadoOrden? estado = null);
 
         /// <summary>
         /// Busca una orden con un Id determinado.
@@ -85,3 +86,4 @@ namespace ServicioHydrate.Data
         Task<DTOOrden> ModificarEstadoDeOrden(Guid idOrden, EstadoOrden nuevoEstado);
     }
 }
+#nullable disable

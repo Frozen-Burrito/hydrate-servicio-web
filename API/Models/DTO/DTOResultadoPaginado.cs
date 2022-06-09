@@ -53,14 +53,14 @@ namespace ServicioHydrate.Modelos.DTO
 			return new DTOResultadoPaginado<T>(1, 1, urlBase, new List<T>());
 		}
 
-		public static DTOResultadoPaginado<T> DesdeColeccion(ICollection<T> coleccion, int paginaActual = 1, string urlBase = "")
+		public static DTOResultadoPaginado<T> DesdeColeccion(ICollection<T> coleccion, int? paginaActual = 1, string urlBase = "")
 		{
 			if (coleccion is ListaPaginada<T>)
 			{
 				var listaPaginada = coleccion as ListaPaginada<T>;
 
 				return new DTOResultadoPaginado<T>(
-					paginaActual, 
+					paginaActual ?? 1, 
 					listaPaginada!.PaginasTotales, 
 					urlBase, 
 					listaPaginada,

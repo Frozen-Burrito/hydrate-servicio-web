@@ -14,15 +14,15 @@ namespace ServicioHydrate.Data
 
         Task<DTOComentario> GetComentarioPorId(int idComentario, Guid? idUsuarioActual);
 
-        Task<List<DTOComentario>> GetComentariosPorUsuario(Guid idUsuario, Guid? idUsuarioActual);
+        Task<ICollection<DTOComentario>> GetComentariosPorUsuario(Guid idUsuario, Guid? idUsuarioActual, DTOParamsPagina? paramsPagina);
 
-        Task<List<DTOComentario>> GetComentariosPendientes();
+        Task<ICollection<DTOComentario>> GetComentariosPendientes(DTOParamsPagina? paramsPagina);
 
         Task<DTOComentario> AgregarNuevoComentario(DTONuevoComentario comentario, Guid? idAutor, bool autoPublicar = false);
 
         Task<DTOComentarioArchivado> ArchivarComentario(int idComentario, DTOArchivarComentario motivos);
 
-        Task<List<DTOComentarioArchivado>> GetMotivosDeComentariosArchivados(Guid idUsuario);
+        Task<ICollection<DTOComentarioArchivado>> GetMotivosDeComentariosArchivados(Guid idUsuario, DTOParamsPagina? paramsPagina);
 
         Task PublicarComentarioPendiente(int idComentario);
 
@@ -34,11 +34,11 @@ namespace ServicioHydrate.Data
 
         Task ReportarComentario(int idComentario, Guid idUsuarioActual);
 
-        Task<List<DTORespuesta>> GetRespuestasDeComentario(int idComentario, Guid? idUsuarioActual);
+        Task<ICollection<DTORespuesta>> GetRespuestasDeComentario(int idComentario, Guid? idUsuarioActual, DTOParamsPagina? paramsPagina);
 
         Task<DTORespuesta> GetRespuestaPorId(int idComentario, int idRespuesta, Guid? idUsuarioActual);
 
-        Task<DTORespuesta> AgregarNuevaRespuesta(int idComentario, DTONuevaRespuesta respuesta, Guid idAutor);
+        Task<DTORespuesta> AgregarNuevaRespuesta(int idComentario, DTONuevaRespuesta respuesta, Guid idAutor, bool autoPublicar = false);
 
         Task EliminarRespuesta(int idComentario, int idRespuesta, Guid idUsuario, string rolUsuario);
 

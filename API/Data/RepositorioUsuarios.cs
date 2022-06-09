@@ -9,17 +9,18 @@ using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Autenticacion;
 
+#nullable enable
 namespace ServicioHydrate.Data
 {
     // Implementa todas las operaciones con Usuarios en la base de datos.
     public class RepositorioUsuarios : IServicioUsuarios
     {
         // El contexto de EF para la base de datos.
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
         // Generador de JWT, utilizado por la autenticación. 
         private readonly GeneradorDeToken _generadorToken;
 
-        public RepositorioUsuarios(ContextoDBMysql contexto, GeneradorDeToken generadorToken)
+        public RepositorioUsuarios(ContextoDBSqlite contexto, GeneradorDeToken generadorToken)
         {
             this._contexto = contexto;
             this._generadorToken = generadorToken;
@@ -161,7 +162,7 @@ namespace ServicioHydrate.Data
             return usuario.ComoDTO();
         }
 
-        public async Task<List<DTOUsuario>> GetUsuarios()
+        public async Task<ICollection<DTOUsuario>> GetUsuarios(DTOParamsPagina? paramsPagina)
         {
             if (_contexto.Usuarios.Count() == 0)
             {
@@ -213,3 +214,4 @@ namespace ServicioHydrate.Data
         }
     }
 }
+#nullable disable

@@ -7,20 +7,21 @@ using Microsoft.EntityFrameworkCore;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data 
 {
     public class RepositorioRecursos : IServicioRecursos
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioRecursos(ContextoDBMysql contexto)
+        public RepositorioRecursos(ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
 
         public async Task ActualizarRecursoAsync(DTORecursoInformativo recursoModificado)
         {
-            RecursoInformativo modeloRecurso = await _contexto.Recursos.FindAsync(recursoModificado.Id);
+            RecursoInformativo? modeloRecurso = await _contexto.Recursos.FindAsync(recursoModificado.Id);
 
             if (modeloRecurso is null)
             {
@@ -69,11 +70,12 @@ namespace ServicioHydrate.Data
             return recurso.ComoDTO();
         }
 
-        public Task<List<DTORecursoInformativo>> GetRecursosAsync()
+        public async Task<ICollection<DTORecursoInformativo>> GetRecursosAsync(DTOParamsPagina? paramsPagina)
         {
             var recursos = _contexto.Recursos.Select(r => r.ComoDTO());
 
-            return recursos.ToListAsync();
+            return await recursos.ToListAsync();
         }
     }
 }
+#nullable disable

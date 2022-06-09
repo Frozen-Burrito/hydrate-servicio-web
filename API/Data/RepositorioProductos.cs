@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data
 {
     public class RepositorioProductos : IServicioProductos
@@ -17,7 +18,7 @@ namespace ServicioHydrate.Data
             throw new System.NotImplementedException();
         }
 
-        public Task<List<DTOProducto>> GetProductos(bool soloDisponibles)
+        public Task<ICollection<DTOProducto>> GetProductos(DTOParamsPagina? paramsPagina, bool soloDisponibles)
         {
             throw new System.NotImplementedException();
         }
@@ -33,3 +34,4 @@ namespace ServicioHydrate.Data
         }
     }
 }
+#nullable disable
