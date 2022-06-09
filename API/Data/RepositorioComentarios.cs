@@ -13,9 +13,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioComentarios : IServicioComentarios
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBMysql contexto)
+        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
@@ -262,16 +262,26 @@ namespace ServicioHydrate.Data
             return comentario.ComoDTO(idUsuarioActual);
         }
 
-        public async Task<List<DTOComentario>> GetComentarios(Guid? idUsuarioActual, bool publicados = true)
+        public async Task<ICollection<DTOComentario>> GetComentarios(Guid? idUsuarioActual, int? numeroPagina, string query, bool soloPublicados = true)
         {
-            if (_contexto.Comentarios.Count() <= 0)
+            if (await _contexto.Comentarios.CountAsync() <= 0)
             {
                 // Si no existe ningun comentario, retornar una lista vacia desde el principio.
                 return new List<DTOComentario>();
             }
 
+			bool buscar = !String.IsNullOrEmpty(query);
+
+			if (buscar) 
+			{
+				query = query.Trim().ToLower();
+			}
+
             var comentarios = _contexto.Comentarios
-                .Where(c => c.Publicado == publicados)
+				.Where(c => buscar 
+					? (c.Asunto.ToLower().Contains(query) || c.Contenido.ToLower().Contains(query)) 
+					: true)
+                .Where(c => soloPublicados ? c.Publicado : true)
                 .OrderByDescending(c => c.Fecha)
                 .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
@@ -280,7 +290,10 @@ namespace ServicioHydrate.Data
                 .AsSplitQuery()
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
-            return await comentarios.ToListAsync();
+            var comentariosPaginados = await ListaPaginada<DTOComentario>
+                .CrearAsync(comentarios, numeroPagina ?? 1, 5);
+
+            return comentariosPaginados;
         }
 
         public async Task<List<DTOComentario>> GetComentariosPorUsuario(Guid idUsuario, Guid? idUsuarioActual)
@@ -620,5 +633,5 @@ namespace ServicioHydrate.Data
             // Guardar cambios en entidades del contexto.
             await _contexto.SaveChangesAsync();
         }
-    }
+  }
 }
