@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -54,24 +55,27 @@ namespace ServicioHydrate.Controladores
         /// /// <param name="idUsuarioActual">El identificador del usuario actual.</param>
         /// <returns>Resultado HTTP</returns>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetComentariosPublicados(Guid? idUsuarioActual)
+        public async Task<IActionResult> GetComentariosPublicados(Guid? idUsuarioActual, [FromQuery] DTOParamsPagina? paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
-                _logger.LogInformation($"Id usuario: {idUsuarioActual.ToString()}");
+                _logger.LogInformation($"Numero de pagina: {paramsPagina.Pagina}");
                  
                 // Obtener todos los comentarios publicados disponibles.
-                var comentariosPublicados = await _repoComentarios.GetComentarios(idUsuarioActual, publicados: true);
+                var comentariosPublicados = await _repoComentarios.GetComentarios(idUsuarioActual, paramsPagina, soloPublicados: true);
 
-                return Ok(comentariosPublicados);
+                var resultado = DTOResultadoPaginado<DTOComentario>
+                                .DesdeColeccion(comentariosPublicados, paramsPagina.Pagina ?? 1, ruta);
+
+                return Ok(resultado);
             }
             catch (Exception e) 
             {

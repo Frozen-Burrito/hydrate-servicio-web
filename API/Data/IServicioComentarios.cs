@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data
 {
     public interface IServicioComentarios 
     {
-        Task<List<DTOComentario>> GetComentarios(Guid? idUsuarioActual, bool publicados = true);
+        Task<ICollection<DTOComentario>> GetComentarios(Guid? idUsuarioActual, DTOParamsPagina? paramsPagina, bool soloPublicados = true);
 
         Task<DTOComentario> GetComentarioPorId(int idComentario, Guid? idUsuarioActual);
 
@@ -46,3 +47,4 @@ namespace ServicioHydrate.Data
         Task ReportarRespuesta(int idComentario, int idRespuesta, Guid idUsuarioActual);
     }
 }
+#nullable disable

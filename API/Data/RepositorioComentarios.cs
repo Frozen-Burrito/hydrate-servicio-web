@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data
 {
     public class RepositorioComentarios : IServicioComentarios
@@ -262,7 +263,7 @@ namespace ServicioHydrate.Data
             return comentario.ComoDTO(idUsuarioActual);
         }
 
-        public async Task<ICollection<DTOComentario>> GetComentarios(Guid? idUsuarioActual, int? numeroPagina, string query, bool soloPublicados = true)
+        public async Task<ICollection<DTOComentario>> GetComentarios(Guid? idUsuarioActual, DTOParamsPagina? paramsPagina, bool soloPublicados = true)
         {
             if (await _contexto.Comentarios.CountAsync() <= 0)
             {
@@ -270,12 +271,11 @@ namespace ServicioHydrate.Data
                 return new List<DTOComentario>();
             }
 
-			bool buscar = !String.IsNullOrEmpty(query);
+			bool buscar = paramsPagina is not null && !String.IsNullOrEmpty(paramsPagina.Query);
 
-			if (buscar) 
-			{
-				query = query.Trim().ToLower();
-			}
+            // paramsPagina nunca deberia ser null aqui, porque [buscar] solo es true  
+            // si paramsPagina no es null.
+            string query = buscar ? paramsPagina!.Query!.Trim().ToLower() : ""; 
 
             var comentarios = _contexto.Comentarios
 				.Where(c => buscar 
@@ -291,7 +291,7 @@ namespace ServicioHydrate.Data
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
             var comentariosPaginados = await ListaPaginada<DTOComentario>
-                .CrearAsync(comentarios, numeroPagina ?? 1, 5);
+                .CrearAsync(comentarios, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return comentariosPaginados;
         }
@@ -635,3 +635,4 @@ namespace ServicioHydrate.Data
         }
   }
 }
+#nullable disable
