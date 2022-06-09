@@ -6,6 +6,7 @@ export { default as DrawerAdmin } from "./DrawerConfigurados/drawer_admin";
 export { default as Dropdown } from "./Dropdown/dropdown";
 export { default as Footer } from "./Footer/Footer";
 export { default as ListaComentarios } from "./ListaComentarios/lista_comentarios";
+export { default as ControlPaginas } from "./ControlPaginas/control_paginas";
 
 /** Botones */
 export { default as Boton } from "./Botones/Botones";
