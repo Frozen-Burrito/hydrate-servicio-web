@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -54,24 +55,27 @@ namespace ServicioHydrate.Controladores
         /// /// <param name="idUsuarioActual">El identificador del usuario actual.</param>
         /// <returns>Resultado HTTP</returns>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetComentariosPublicados(Guid? idUsuarioActual)
+        public async Task<IActionResult> GetComentariosPublicados(Guid? idUsuarioActual, [FromQuery] DTOParamsPagina? paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
-            {
-                _logger.LogInformation($"Id usuario: {idUsuarioActual.ToString()}");
-                 
+            {                 
                 // Obtener todos los comentarios publicados disponibles.
-                var comentariosPublicados = await _repoComentarios.GetComentarios(idUsuarioActual, publicados: true);
+                var comentariosPublicados = await _repoComentarios.GetComentarios(idUsuarioActual, paramsPagina, soloPublicados: true);
 
-                return Ok(comentariosPublicados);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOComentario>
+                                .DesdeColeccion(comentariosPublicados, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (Exception e) 
             {
@@ -126,23 +130,28 @@ namespace ServicioHydrate.Controladores
         }
 
         [HttpGet("autor/{idAutor}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetComentariosDeAutor(Guid idAutor, Guid? idUsuario)
+        public async Task<IActionResult> GetComentariosDeAutor(Guid idAutor, Guid? idUsuario, [FromQuery] DTOParamsPagina? paramsPagina)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
             {
-                var comentarios = await _repoComentarios.GetComentariosPorUsuario(idAutor, idUsuario);
+                var comentarios = await _repoComentarios.GetComentariosPorUsuario(idAutor, idUsuario, paramsPagina);
 
-                return Ok(comentarios);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOComentario>
+                                .DesdeColeccion(comentarios, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (ArgumentException e)
             {
@@ -165,10 +174,10 @@ namespace ServicioHydrate.Controladores
         /// <returns>Resultado HTTP</returns>
         [HttpGet("pendientes")]
         [Authorize(Roles = "MODERADOR_COMENTARIOS")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentario>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOComentario>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetComentariosPendientes()
+        public async Task<IActionResult> GetComentariosPendientes([FromQuery] DTOParamsPagina? paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -178,9 +187,14 @@ namespace ServicioHydrate.Controladores
             try 
             {
                 // Obtener todos los comentarios pendientes de revision.
-                var comentariosPendientes = await _repoComentarios.GetComentariosPendientes();
+                var comentariosPendientes = await _repoComentarios.GetComentariosPendientes(paramsPagina);
 
-                return Ok(comentariosPendientes);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOComentario>
+                                .DesdeColeccion(comentariosPendientes, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (Exception e) 
             {
@@ -198,36 +212,41 @@ namespace ServicioHydrate.Controladores
         /// <returns>Resultado HTTP</returns>
         [HttpGet("pendientes/usuario/{idUsuario?}")]
         [Authorize(Roles = "NINGUNO,MODERADOR_COMENTARIOS")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOComentarioArchivado>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOComentarioArchivado>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status405MethodNotAllowed)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetMotivosDeComentariosArchivados(Guid idUsuario)
+        public async Task<IActionResult> GetMotivosDeComentariosArchivados(Guid idUsuario, [FromQuery] DTOParamsPagina? paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
                 //TODO: Encontrar manera de hacer el idUsuario opcional.
-                Guid? idUsuarioAutenticado = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
-                
-                if (idUsuarioAutenticado is null) 
-                {
-                    throw new UnauthorizedAccessException("El ID usuario no es valido");
-                }
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? String.Empty;
+                Guid idUsuarioAutenticado = new Guid(idStr);
 
-                var motivos = await _repoComentarios.GetMotivosDeComentariosArchivados(idUsuario);
+                var motivos = await _repoComentarios.GetMotivosDeComentariosArchivados(idUsuario, paramsPagina);
 
-                return Ok(motivos);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOComentarioArchivado>
+                                .DesdeColeccion(motivos, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (ArgumentException e)
             {
                 // El ID del usuario no es valido. Retorna 404.
                 return NotFound(e.Message);
+            }
+            catch (FormatException e) 
+            {
+                return Unauthorized($"El ID usuario no es valido: {e.Message}");
             }
             catch (Exception e) 
             {
@@ -259,7 +278,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -306,7 +325,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -350,14 +369,13 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
-                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
-
-                if (idUsuario is null) throw new ArgumentException("El ID del autor no debe ser null.");
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
+                Guid idUsuario = new Guid(idStr);
 
                 _logger.LogInformation($"Id usuario: {idUsuario.ToString()}");
 
@@ -378,7 +396,7 @@ namespace ServicioHydrate.Controladores
                     comentarioCreado
                 );
             }
-            catch (ArgumentException)
+            catch (FormatException)
             {
                 // EL usuario con el ID de la peticion no existe. Retornar no autorizado.
                 return Unauthorized();
@@ -414,7 +432,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -461,7 +479,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -521,7 +539,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -578,7 +596,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -622,22 +640,22 @@ namespace ServicioHydrate.Controladores
         /// <param name="idUsuario">El identificador del usuario actual.</param>
         /// <returns>Resultado HTTP</returns>
         [HttpGet("{idComentario}/respuestas")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTORespuesta>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTORespuesta>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetRespuestasComentario(int idComentario, Guid? idUsuario)
+        public async Task<IActionResult> GetRespuestasComentario(int idComentario, Guid? idUsuario, [FromQuery] DTOParamsPagina? paramsPagina)
         {
             // Buscar comentario requerido.
             // Si se encuentra, retornar todas las respuestas publicadas asociadas con el.
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
                 // Obtener todas las respuestas de un comentario.
-                var respuestas = await _repoComentarios.GetRespuestasDeComentario(idComentario, idUsuario);
+                var respuestas = await _repoComentarios.GetRespuestasDeComentario(idComentario, idUsuario, paramsPagina);
 
                 return Ok(respuestas);
             }
@@ -671,14 +689,13 @@ namespace ServicioHydrate.Controladores
             // Si se encuentra, retornar todas las respuestas publicadas asociadas con el.
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
-                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
-
-                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? String.Empty;
+                Guid idUsuario = new Guid(idStr);
 
                 // Obtener todos los comentarios publicados disponibles.
                 var respuesta = await _repoComentarios.GetRespuestaPorId(idComentario, idRespuesta, (Guid) idUsuario);
@@ -689,6 +706,10 @@ namespace ServicioHydrate.Controladores
             {
                 // No existe un comentario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
+            }
+            catch (FormatException) 
+            {
+                return Unauthorized();
             }
             catch (Exception e) 
             {
@@ -716,19 +737,20 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
-                Guid? idAutor = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? String.Empty;
+                Guid idUsuario = new Guid(idStr);
 
-                if (idAutor is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+                bool contenidoEsApto = _filtroDeContenido.ContenidoEsApto(nuevaRespuesta.Contenido);
 
                 //TODO: Verificar el contenido de la respuesta.
                 // Si el comentario no es apto, crear el comentario y marcar "Publicado" como false.
                 // Si el contenido es apto, crear el comentario y marcar "Publicado" como true.
-                var respuestaCreada = await _repoComentarios.AgregarNuevaRespuesta(idComentario, nuevaRespuesta, (Guid) idAutor);
+                var respuestaCreada = await _repoComentarios.AgregarNuevaRespuesta(idComentario, nuevaRespuesta, idUsuario, contenidoEsApto);
 
                 return CreatedAtAction(
                     nameof(GetRespuestaPorId),
@@ -740,6 +762,10 @@ namespace ServicioHydrate.Controladores
             {
                 // No existe un comentario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
+            }
+            catch (FormatException) 
+            {
+                return Unauthorized();
             }
             catch (DbUpdateException e)
             {
@@ -780,16 +806,15 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
             {
-                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? String.Empty;
+                Guid idUsuario = new Guid(idStr);
 
-                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
-
-                await _repoComentarios.MarcarRespuestaComoUtil(idComentario, idRespuesta, (Guid) idUsuario);
+                await _repoComentarios.MarcarRespuestaComoUtil(idComentario, idRespuesta, idUsuario);
 
                 return NoContent();
             }
@@ -797,6 +822,10 @@ namespace ServicioHydrate.Controladores
             {
                 // No existe un comentario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
+            }
+            catch (FormatException)
+            {
+                return Unauthorized();
             }
             catch (DbUpdateException e)
             {
@@ -838,16 +867,15 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
             {
-                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? String.Empty;
+                Guid idUsuario = new Guid(idStr);
 
-                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
-
-                await _repoComentarios.ReportarRespuesta(idComentario, idRespuesta, (Guid) idUsuario);
+                await _repoComentarios.ReportarRespuesta(idComentario, idRespuesta, idUsuario);
 
                 return NoContent();
             }
@@ -855,6 +883,10 @@ namespace ServicioHydrate.Controladores
             {
                 // No existe un comentario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
+            }
+            catch (FormatException)
+            {
+                return Unauthorized();
             }
             catch (DbUpdateException e)
             {
@@ -891,15 +923,15 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
             {
-                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
-                string rol = this.User.Claims.First(i => i.Type == ClaimTypes.Role).Value;
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? String.Empty;
+                Guid idUsuario = new Guid(idStr);
 
-                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+                string rol = this.User.Claims.First(i => i.Type == ClaimTypes.Role).Value;
 
                 await _repoComentarios.EliminarRespuesta(idComentario, idRespuesta, (Guid) idUsuario, rol);
 

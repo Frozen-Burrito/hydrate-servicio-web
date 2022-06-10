@@ -43,10 +43,10 @@ namespace ServicioHydrate.Controladores
         /// Regresa todos los Recursos Informativos disponibles.
         [HttpGet]
         [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTORecursoInformativo>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTORecursoInformativo>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetRecursosInformativos()
+        public async Task<IActionResult> GetRecursosInformativos([FromQuery] DTOParamsPagina? paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = "";
@@ -62,9 +62,14 @@ namespace ServicioHydrate.Controladores
 
             try 
             {
-                var recursosInf = await _repoRecursos.GetRecursosAsync();
+                var recursosInf = await _repoRecursos.GetRecursosAsync(paramsPagina);
 
-                return Ok(recursosInf);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTORecursoInformativo>
+                                .DesdeColeccion(recursosInf, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (Exception e) 
             {

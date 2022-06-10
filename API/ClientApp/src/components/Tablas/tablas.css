@@ -6,26 +6,26 @@ table {
   border-collapse: collapse;
 }
 
-table > tr > td, table > tr > th {
+table > tbody > tr > td, table > thead > tr > th {
   text-align: start;
   padding: 0.6rem;
 }
 
-table > tr > th {
+table > thead > tr > th {
   font-size: 1rem;
   font-weight: 500;
   color: var(--contraste-fondo-claro);
 }
 
-table > tr.separador-inf {
+table > thead > tr.separador-inf {
   border-bottom: 1px solid var(--contraste-superficie-claro);
 }
 
-table > tr > td {
+table > tbody > tr > td {
   text-overflow: ellipsis;
 }
 
-table > tr > td.acciones-fila {
+table > tbody > tr > td.acciones-fila {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -33,7 +33,7 @@ table > tr > td.acciones-fila {
   gap: 0.8rem;
 }
 
-table > tr > td.acciones-fila > button {
+table > tbody > tr > td.acciones-fila > button {
   padding: 0.4rem;
   border: none;
   border-radius: 5px;
@@ -43,7 +43,7 @@ table > tr > td.acciones-fila > button {
   color: var(--contraste-primario-claro);
 }
 
-table > tr > td.acciones-fila > button:hover {
+table > tbody > tr > td.acciones-fila > button:hover {
   background-color: var(--variante-primario-claro);
   cursor: pointer;
 }

@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data 
 {
     public interface IServicioProductos
     {
-        Task<List<DTOProducto>> GetProductos(bool soloDisponibles);
+        Task<ICollection<DTOProducto>> GetProductos(DTOParamsPagina? paramsPagina, bool soloDisponibles = true);
 
         Task<DTOProducto> GetProductoPorId(int idProducto);
 
@@ -19,3 +20,4 @@ namespace ServicioHydrate.Data
         Task EliminarProducto(int idProducto);
     }
 }
+#nullable disable

@@ -5,21 +5,22 @@ using System.Threading.Tasks;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data
 {
     public class RepositorioOrdenes : IServicioOrdenes
     {
-        public Task<List<DTOOrden>> BuscarOrdenes(string nombreDelUsuario, string emailUsuario, Guid? idOrden, EstadoOrden? estado = null)
+        public Task<ICollection<DTOOrden>> BuscarOrdenes(string? nombreDelUsuario, string? emailUsuario, DTOParamsPagina? paramsPagina, Guid? idOrden, EstadoOrden? estado = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<DTOOrden>> GetOrdenes(Guid? idUsuario, DateTime? fechaInicio = null, DateTime? fechaFinal = null, EstadoOrden? estado = null)
+        public Task<ICollection<DTOOrden>> GetOrdenes(DTOParamsPagina? paramsPagina, Guid? idUsuario, DateTime? fechaInicio = null, DateTime? fechaFinal = null, EstadoOrden? estado = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<List<DTOOrden>> GetOrdenesDeUsuario(Guid idUsuario, EstadoOrden? estado = null)
+        public Task<ICollection<DTOOrden>> GetOrdenesDeUsuario(Guid idUsuario, DTOParamsPagina? paramsPagina, EstadoOrden? estado = null)
         {
             throw new NotImplementedException();
         }
@@ -40,3 +41,4 @@ namespace ServicioHydrate.Data
         }
     }
 }
+#nullable disable

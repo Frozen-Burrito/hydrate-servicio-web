@@ -1,31 +1,13 @@
 import * as api from "./api";
 import { getIdUsuarioDesdeJwt } from "../utils/parseJwt";
 
-export const fetchComentariosPublicados = async (jwt = "") => {
+export const fetchComentariosPublicados = async (numPagina = 1, jwt = "") => {
 
-  const url = `${api.urlBase}/comentarios`;
+  const endpoint = "comentarios";
 
-  if (jwt) {
-    const idUsuario = getIdUsuarioDesdeJwt(jwt);
-
-    console.log();
-
-    url.concat("?" + new URLSearchParams({
-      idUsuario
-    }).toString());
-  }
-
-  const peticion = new Request(url, {
-    method: api.GET,
-    headers: new Headers({
-      // Incluir el JWT en el header de autorizacion.
-      'Authorization': jwt ? `Bearer ${jwt}` : "", 
-      // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json'
-    }),
-  });
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
   
-  return await api.hacerPeticion(peticion);
+  return resultados;
 }
 
 export const publicarComentario = async (comentario, jwt) => {
@@ -111,50 +93,24 @@ export const eliminarComentarioConId = async (id, jwt) => {
   return await api.hacerPeticion(peticion, false);
 }
 
-export const fetchComentariosDeAutor = async (idAutor, jwt = "") => {
+export const fetchComentariosDeAutor = async (idAutor, numPagina = 1, jwt = "") => {
 
-  const url = `${api.urlBase}/comentarios/autor/${idAutor}`;
+  const endpoint = `comentarios/autor/${idAutor}`;
 
-  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+  console.log(numPagina);
 
-  url.concat("?" + new URLSearchParams({
-    idUsuario
-  }).toString());
-
-  const peticion = new Request(url, {
-    method: api.GET,
-    headers: new Headers({
-      // Incluir el JWT en el header de autorizacion.
-      'Authorization': jwt.length > 0 ? `Bearer ${jwt}` : "", 
-      // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json'
-    }),
-  });
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
   
-  return await api.hacerPeticion(peticion);
+  return resultados;
 }
 
-export const fetchComentariosPendientes = async (jwt = "") => {
+export const fetchComentariosPendientes = async (numPagina = 1, jwt = "") => {
 
-  const url = `${api.urlBase}/comentarios/pendientes`;
+  const endpoint = "comentarios/pendientes";
 
-  const idUsuario = getIdUsuarioDesdeJwt(jwt);
-
-  url.concat("?" + new URLSearchParams({
-    idUsuario
-  }).toString());
-
-  const peticion = new Request(url, {
-    method: api.GET,
-    headers: new Headers({
-      // Incluir el JWT en el header de autorizacion.
-      'Authorization': jwt.length > 0 ? `Bearer ${jwt}` : "", 
-      // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json'
-    }),
-  });
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
   
-  return await api.hacerPeticion(peticion);
+  return resultados;
 }
 
 /**
@@ -168,7 +124,7 @@ export const fetchComentariosPendientes = async (jwt = "") => {
  * @param {string} jwt El token de autenticación del usuario.
  * @returns Una lista con los motivos para cada comentario removido.
  */
-export const fetchMotivosComentariosRetirados = async (idUsuario = "", jwt) => {
+export const fetchMotivosComentariosRetirados = async (jwt, idUsuario = "", numPagina = 1, numResultados = 100) => {
 
   if (idUsuario.length === 0) {
     // Si no se especifica un ID de usuario, usar ID del mismo 
@@ -176,19 +132,11 @@ export const fetchMotivosComentariosRetirados = async (idUsuario = "", jwt) => {
     idUsuario = getIdUsuarioDesdeJwt(jwt);
   }
 
-  const url = `${api.urlBase}/comentarios/pendientes/usuario/${idUsuario}`;
+  const endpoint = `comentarios/pendientes/usuario/${idUsuario}`;
 
-  const peticion = new Request(url, {
-    method: api.GET,
-    headers: new Headers({
-      // Incluir el JWT en el header de autorizacion.
-      'Authorization': `Bearer ${jwt}`, 
-      // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json'
-    }),
-  });
+  const resultados = await api.fetchPaginado(endpoint, numPagina, numResultados, jwt, true);
   
-  return await api.hacerPeticion(peticion);
+  return resultados;
 }
 
 export const publicarComentarioPendiente = async (idComentario, jwt) => {
@@ -271,27 +219,13 @@ export const reportarComentarioConId = async (id, jwt) => {
 
 // Respuestas
 
-export const fetchRespuestasAComentario = async (idComentario, jwt = "") => {
+export const fetchRespuestasAComentario = async (idComentario, numPagina = 1, jwt = "") => {
 
-  const url = `${api.urlBase}/comentarios/${idComentario}/respuestas`;
+  const endpoint = `comentarios/${idComentario}/respuestas`;
 
-  const idUsuario = getIdUsuarioDesdeJwt(jwt);
-
-  url.concat("?" + new URLSearchParams({
-    idUsuario
-  }).toString());
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
   
-  const peticion = new Request(url, {
-    method: api.GET,
-    headers: new Headers({
-      // Incluir el JWT en el header de autorizacion.
-      'Authorization': jwt ? `Bearer ${jwt}` : "", 
-      // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json'
-    }),
-  });
-  
-  return await api.hacerPeticion(peticion);
+  return resultados;
 }
 
 export const publicarRespuestaAComentario = async (respuesta, idComentario, jwt) => {

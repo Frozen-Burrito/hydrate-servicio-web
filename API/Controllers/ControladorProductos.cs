@@ -10,6 +10,7 @@ using ServicioHydrate.Modelos.DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 
+#nullable enable
 namespace ServicioHydrate.Controladores
 {
     [ApiController]
@@ -47,22 +48,27 @@ namespace ServicioHydrate.Controladores
         /// <returns>Resultado HTTP</returns>
         [HttpGet]
         [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOProducto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOProducto>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetProductos(bool soloDisponibles = false)
+        public async Task<IActionResult> GetProductos([FromQuery] DTOParamsPagina? paramsPagina, bool soloDisponibles = false)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
             {
                 // Obtener todos los productos, segun los filtros recibidos.
-                var productos = await _repositorioProductos.GetProductos(soloDisponibles);
+                var productos = await _repositorioProductos.GetProductos(paramsPagina, soloDisponibles);
 
-                return Ok(productos);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOProducto>
+                                .DesdeColeccion(productos, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (Exception e) 
             {
@@ -87,7 +93,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -126,7 +132,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -176,7 +182,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -227,7 +233,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -261,3 +267,4 @@ namespace ServicioHydrate.Controladores
         }
     }
 }
+#nullable disable

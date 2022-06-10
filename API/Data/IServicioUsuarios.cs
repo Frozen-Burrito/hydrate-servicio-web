@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data 
 {
     public interface IServicioUsuarios
     {
-        Task<List<DTOUsuario>> GetUsuarios();
+        Task<ICollection<DTOUsuario>> GetUsuarios(DTOParamsPagina? paramsPagina);
         Task<DTOUsuario> GetUsuarioPorId(Guid id);
         Task<DTORespuestaAutenticacion> AutenticarUsuario(DTOPeticionAutenticacion datosUsuario);
         Task<DTOUsuario> RegistrarNuevoUsuario(DTOPeticionAutenticacion datosUsuario);
@@ -18,3 +19,4 @@ namespace ServicioHydrate.Data
         Task EliminarUsuario(Guid id);
     }
 }
+#nullable disable

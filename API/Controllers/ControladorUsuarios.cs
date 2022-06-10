@@ -153,11 +153,11 @@ namespace ServicioHydrate.Controladores
         /// </summary>
         /// <returns>Una colección con todas las cuentas de usuario.</returns>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOUsuario>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOUsuario>))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUsuarios()
+        public async Task<IActionResult> GetUsuarios([FromQuery] DTOParamsPagina? paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -166,9 +166,14 @@ namespace ServicioHydrate.Controladores
 
             try 
             {
-                List<DTOUsuario> usuarios = await _repoUsuarios.GetUsuarios();
+                var usuarios = await _repoUsuarios.GetUsuarios(paramsPagina);
 
-                return Ok(usuarios);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOUsuario>
+                                .DesdeColeccion(usuarios, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (Exception e) 
             {

@@ -88,6 +88,11 @@
   cursor: pointer;
 }
 
+.btn-icono.desactivado {
+  color: var(--contraste-fondo-claro-sesenta);
+  cursor: default;
+}
+
 .btn-icono.seleccionado > span.material-icons,
 .btn-icono.seleccionado > p {
   color: var(--primario-claro);

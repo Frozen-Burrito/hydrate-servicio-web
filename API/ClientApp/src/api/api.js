@@ -1,3 +1,4 @@
+import { getIdUsuarioDesdeJwt } from "../utils/parseJwt";
 
 export const urlBase = '/api/v1'; 
 
@@ -6,6 +7,8 @@ export const POST = "POST";
 export const PUT = "PUT";
 export const PATCH = "PATCH";
 export const DELETE = "DELETE";
+
+export const SIZE_PAGINA_DEFAULT = 10;
 
 export const StatusHttp = {
   // Satisfactorias
@@ -35,12 +38,65 @@ export const StatusHttp = {
 export const hacerPeticion = async (peticion, respuestaConCuerpo = true) => {
   const resultado = await fetch(peticion);
 
-  const resJson = respuestaConCuerpo ? await resultado.json() : {};
+  const resJson = respuestaConCuerpo && resultado.ok
+    ? await resultado.json() 
+    : null;
 
   return {
     ok: resultado.ok,
     status: resultado.status,
     cuerpo: resJson,
+  };
+}
+
+/**
+ * Hace una petición GET a un endpoint que produce un resultado con paginación.
+ * 
+ * @param {string} endpoint El endpoint que realiza la acción.
+ * @param {number} numPagina El número de la página.
+ * @param {number} elemsPorPagina El número de elementos por página.
+ * @param {string} jwt El token de autenticación del usuario.
+ * @returns Una respuesta con los resultados paginados, o un error.
+ */
+export async function fetchPaginado(endpoint, numPagina = 1, elemsPorPagina = 25, jwt = "", incluirIdUsuario = false) {
+  let urlConParams = `${urlBase}/${endpoint}`;
+  
+  if (incluirIdUsuario && jwt) {
+    const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+    urlConParams = urlConParams.concat("?" + new URLSearchParams({
+      idUsuarioActual: idUsuario
+    }).toString());
+  }
+
+  if (numPagina && elemsPorPagina) {
+
+    const parametros = "?" + new URLSearchParams({ 
+      pagina: numPagina,
+      sizePagina: elemsPorPagina,
+    }).toString();
+
+    urlConParams = urlConParams.concat(parametros);
+  }
+
+  console.log(urlConParams);
+
+  const peticion = new Request(urlConParams, {
+    method: GET,
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      'Authorization': `Bearer ${jwt}`, 
+      // Utiliza JSON para el cuerpo.
+      'Content-Type': 'application/json'
+    }),
+  });
+
+  const respuesta = await hacerPeticion(peticion, true);
+
+  return {
+    ok: respuesta.ok,
+    status: respuesta.status,
+    datos: respuesta.cuerpo,
   };
 }
 

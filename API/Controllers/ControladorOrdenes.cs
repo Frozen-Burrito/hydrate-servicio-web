@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
+#nullable enable
 namespace ServicioHydrate.Controladores
 {
     [ApiController]
@@ -52,14 +53,14 @@ namespace ServicioHydrate.Controladores
         /// <returns>Resultado HTTP</returns>
         [HttpGet]
         [Authorize(Roles = "ADMIN_ORDENES,NINGUNO")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOOrden>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOrdenesConFiltros(DateTime? desde, DateTime? hasta, EstadoOrden? estado)
+        public async Task<IActionResult> GetOrdenesConFiltros([FromQuery] DTOParamsPagina? paramsPagina, DateTime? desde, DateTime? hasta, EstadoOrden? estado)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -69,13 +70,19 @@ namespace ServicioHydrate.Controladores
 
                 // Obtener todas las ordenes, segun los filtros recibidos.
                 var ordenes = await _repositorioOrdenes.GetOrdenes(
+                    paramsPagina,
                     idUsuarioActual,
                     fechaDesde: desde,
                     fechaHasta: hasta, 
                     estado: estado
                 );
 
-                return Ok(ordenes);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOOrden>
+                                .DesdeColeccion(ordenes, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (Exception e) 
             {
@@ -88,16 +95,16 @@ namespace ServicioHydrate.Controladores
 
         [HttpGet("{idUsuario}")]
         [Authorize(Roles = "ADMIN_ORDENES,NINGUNO")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOOrden>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOrdenesDeUsuario(Guid idUsuario, EstadoOrden? estado)
+        public async Task<IActionResult> GetOrdenesDeUsuario(Guid idUsuario, EstadoOrden? estado, [FromQuery] DTOParamsPagina? paramsPagina)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -113,9 +120,14 @@ namespace ServicioHydrate.Controladores
                     return Unauthorized();
                 }
 
-                var ordenes = await _repositorioOrdenes.GetOrdenesDeUsuario(idUsuario, estado);
+                var ordenes = await _repositorioOrdenes.GetOrdenesDeUsuario(idUsuario, paramsPagina, estado);
 
-                return Ok(ordenes);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOOrden>
+                                .DesdeColeccion(ordenes, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (ArgumentException e)
             {
@@ -141,7 +153,7 @@ namespace ServicioHydrate.Controladores
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -166,23 +178,28 @@ namespace ServicioHydrate.Controladores
 
         [HttpGet("buscar")]
         [Authorize(Roles = "ADMIN_ORDENES,NINGUNO")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DTOOrden>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> BuscarOrdenes(string nombre, string email, Guid idOrden, EstadoOrden? estado)
+        public async Task<IActionResult> BuscarOrdenes(string nombre, string email, [FromQuery] DTOParamsPagina? paramsPagina, Guid idOrden, EstadoOrden? estado)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
             {
-                var ordenes = await _repositorioOrdenes.BuscarOrdenes(nombre, email, idOrden, estado);
+                var ordenes = await _repositorioOrdenes.BuscarOrdenes(nombre, email, paramsPagina, idOrden, estado);
 
-                return Ok(ordenes);
+                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
+
+                var resultado = DTOResultadoPaginado<DTOOrden>
+                                .DesdeColeccion(ordenes, numPagina, ruta);
+
+                return Ok(resultado);
             }
             catch (Exception e)
             {
@@ -210,7 +227,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -264,7 +281,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -306,3 +323,4 @@ namespace ServicioHydrate.Controladores
         }
     }
 }
+#nullable disable

@@ -9,13 +9,14 @@ using Microsoft.AspNetCore.Hosting;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Data
 {
     public class RepositorioComentarios : IServicioComentarios
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBMysql contexto)
+        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
@@ -44,7 +45,7 @@ namespace ServicioHydrate.Data
             return comentario.ComoDTO(idUsuarioActual);
         }
 
-        public async Task<DTORespuesta> AgregarNuevaRespuesta(int idComentario, DTONuevaRespuesta respuesta, Guid idAutor)
+        public async Task<DTORespuesta> AgregarNuevaRespuesta(int idComentario, DTONuevaRespuesta respuesta, Guid idAutor, bool autoPublicar)
         {
             Comentario comentario = await _contexto.Comentarios
                 .Where(c => c.Publicado && c.Id == idComentario)
@@ -56,7 +57,7 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
-            Usuario autorRespuesta = await _contexto.Usuarios.FindAsync(idAutor);
+            Usuario? autorRespuesta = await _contexto.Usuarios.FindAsync(idAutor);
 
             if (autorRespuesta is null)
             {
@@ -64,6 +65,8 @@ namespace ServicioHydrate.Data
             }
 
             Respuesta modeloRespuesta = respuesta.ComoNuevoModelo(comentario, autorRespuesta);
+
+            modeloRespuesta.Publicado = autoPublicar;
 
             comentario.Respuestas.Add(modeloRespuesta);
             await _contexto.SaveChangesAsync();
@@ -100,15 +103,17 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
-            ComentarioArchivado registroComentarioArchivado = null;
+            bool comentarioYaArchivado = false;
 
             if (_contexto.ComentariosArchivados.Count() > 0) 
             {
-                registroComentarioArchivado = await _contexto.ComentariosArchivados
+                ComentarioArchivado? registroComentarioArchivado = await _contexto.ComentariosArchivados
                     .FirstOrDefaultAsync(ca => ca.IdComentario == idComentario);
+
+                comentarioYaArchivado = registroComentarioArchivado is not null;
             }
 
-            if (comentario.Publicado && registroComentarioArchivado is null) 
+            if (comentarioYaArchivado && comentario.Publicado) 
             {
                 comentario.Publicado = false;
                 comentario.NecesitaModificaciones = true;
@@ -127,7 +132,7 @@ namespace ServicioHydrate.Data
             } 
         }
 
-        public async Task<List<DTOComentarioArchivado>> GetMotivosDeComentariosArchivados(Guid idUsuario)
+        public async Task<ICollection<DTOComentarioArchivado>> GetMotivosDeComentariosArchivados(Guid idUsuario, DTOParamsPagina? paramsPagina)
         {
             // if (_contexto.ComentariosArchivados.Count() <= 0)
             // {
@@ -153,6 +158,9 @@ namespace ServicioHydrate.Data
                 .Where(c => idsComentariosUsuario.Contains(c.IdComentario))
                 .OrderByDescending(c => c.Fecha)
                 .Select(c => c.ComoDTO());
+
+            var comentariosArchivadosPaginados = await ListaPaginada<DTOComentarioArchivado>
+                .CrearAsync(comentariosArchivados, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return await comentariosArchivados.ToListAsync();
         }
@@ -262,16 +270,25 @@ namespace ServicioHydrate.Data
             return comentario.ComoDTO(idUsuarioActual);
         }
 
-        public async Task<List<DTOComentario>> GetComentarios(Guid? idUsuarioActual, bool publicados = true)
+        public async Task<ICollection<DTOComentario>> GetComentarios(Guid? idUsuarioActual, DTOParamsPagina? paramsPagina, bool soloPublicados = true)
         {
-            if (_contexto.Comentarios.Count() <= 0)
+            if (await _contexto.Comentarios.CountAsync() <= 0)
             {
                 // Si no existe ningun comentario, retornar una lista vacia desde el principio.
                 return new List<DTOComentario>();
             }
 
+			bool buscar = paramsPagina is not null && !String.IsNullOrEmpty(paramsPagina.Query);
+
+            // paramsPagina nunca deberia ser null aqui, porque [buscar] solo es true  
+            // si paramsPagina no es null.
+            string query = buscar ? paramsPagina!.Query!.Trim().ToLower() : ""; 
+
             var comentarios = _contexto.Comentarios
-                .Where(c => c.Publicado == publicados)
+				.Where(c => buscar 
+					? (c.Asunto.ToLower().Contains(query) || c.Contenido.ToLower().Contains(query)) 
+					: true)
+                .Where(c => soloPublicados ? c.Publicado : true)
                 .OrderByDescending(c => c.Fecha)
                 .Include(c => c.Autor)
                 .Include(c => c.UtilParaUsuarios)
@@ -280,10 +297,13 @@ namespace ServicioHydrate.Data
                 .AsSplitQuery()
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
-            return await comentarios.ToListAsync();
+            var comentariosPaginados = await ListaPaginada<DTOComentario>
+                .CrearAsync(comentarios, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return comentariosPaginados;
         }
 
-        public async Task<List<DTOComentario>> GetComentariosPorUsuario(Guid idUsuario, Guid? idUsuarioActual)
+        public async Task<ICollection<DTOComentario>> GetComentariosPorUsuario(Guid idUsuario, Guid? idUsuarioActual, DTOParamsPagina? paramsPagina)
         {
             if (_contexto.Comentarios.Count() <= 0)
             {
@@ -308,10 +328,13 @@ namespace ServicioHydrate.Data
                 .AsSplitQuery()
                 .Select(c => c.ComoDTO(idUsuarioActual));
 
-            return await comentariosDelAutor.ToListAsync();
+            var comentariosPaginados = await ListaPaginada<DTOComentario>
+                .CrearAsync(comentariosDelAutor, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return comentariosPaginados;
         }
 
-        public async Task<List<DTOComentario>> GetComentariosPendientes() 
+        public async Task<ICollection<DTOComentario>> GetComentariosPendientes(DTOParamsPagina? paramsPagina) 
         {
             if (_contexto.Comentarios.Count() <= 0)
             {
@@ -329,12 +352,15 @@ namespace ServicioHydrate.Data
                 .AsSplitQuery()
                 .Select(c => c.ComoDTO(null));
 
-            return await comentariosPendientes.ToListAsync();
+            var comentariosPendientesPaginados = await ListaPaginada<DTOComentario>
+                .CrearAsync(comentariosPendientes, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return comentariosPendientesPaginados;
         }
 
         public async Task<DTORespuesta> GetRespuestaPorId(int idComentario, int idRespuesta, Guid? idUsuarioActual)
         {
-            Respuesta respuesta = await _contexto.Respuestas.FindAsync(idRespuesta);
+            Respuesta? respuesta = await _contexto.Respuestas.FindAsync(idRespuesta);
 
             if (respuesta is null)
             {
@@ -351,7 +377,7 @@ namespace ServicioHydrate.Data
             return respuesta.ComoDTO(idUsuarioActual);
         }
 
-        public async Task<List<DTORespuesta>> GetRespuestasDeComentario(int idComentario, Guid? idUsuarioActual)
+        public async Task<ICollection<DTORespuesta>> GetRespuestasDeComentario(int idComentario, Guid? idUsuarioActual, DTOParamsPagina? paramsPagina)
         {
             int numRespuestas = await _contexto.Respuestas.CountAsync();
 
@@ -361,29 +387,31 @@ namespace ServicioHydrate.Data
                 return new List<DTORespuesta>();
             }
 
-            Comentario comentario = await _contexto.Comentarios.FindAsync(idComentario);
+            Comentario? comentario = await _contexto.Comentarios.FindAsync(idComentario);
 
             if (comentario is null)
             {
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
-            List<DTORespuesta> dtosRespuestas = await _contexto.Respuestas
+            var respuestas = _contexto.Respuestas
                 .Where(r => r.IdComentario == idComentario)
                 .Include(r => r.Autor)
                 .Include(r => r.UtilParaUsuarios)
                 .Include(r => r.ReportesDeUsuarios)
                 .AsSplitQuery()
                 .OrderBy(r => r.Fecha)
-                .Select(r => r.ComoDTO(idUsuarioActual))
-                .ToListAsync();
+                .Select(r => r.ComoDTO(idUsuarioActual));
 
-            return dtosRespuestas;
+            var respuestasPaginadas = await ListaPaginada<DTORespuesta>
+                .CrearAsync(respuestas, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return respuestasPaginadas;
         }
 
         public async Task MarcarComentarioComoUtil(int idComentario, Guid idUsuarioActual)
         {
-            Comentario comentario = await _contexto.Comentarios.FindAsync(idComentario);
+            Comentario? comentario = await _contexto.Comentarios.FindAsync(idComentario);
 
             if (comentario is null)
             {
@@ -411,26 +439,28 @@ namespace ServicioHydrate.Data
             }
 
             bool existenMarcadores = comentario.UtilParaUsuarios.Count > 0;
-            Usuario usuarioEnUtiles = null;
+            bool yaFueMarcadoComoUtil = false;
 
             if (existenMarcadores)
             {
-                usuarioEnUtiles = comentario.UtilParaUsuarios
+                Usuario usuarioEnMarcasComoUtil = comentario.UtilParaUsuarios
                     .Where(u => u.Id == usuario.Id)
                     .First();
+
+                yaFueMarcadoComoUtil = usuarioEnMarcasComoUtil is not null;
             }
 
-            if (!existenMarcadores || usuarioEnUtiles is null)
-            {
-                // El usuario aún no ha marcado como útil el comentario.
-                comentario.UtilParaUsuarios.Add(usuario);
-                usuario.ComentariosUtiles.Add(comentario);
-            }
-            else 
+            if (yaFueMarcadoComoUtil)
             {
                 // El usuario tiene marcado como útil este comentario.
                 comentario.UtilParaUsuarios.Remove(usuario);
                 usuario.ComentariosUtiles.Remove(comentario);
+            }
+            else 
+            {
+                // El usuario aún no ha marcado como útil el comentario.
+                comentario.UtilParaUsuarios.Add(usuario);
+                usuario.ComentariosUtiles.Add(comentario);
             }
 
             // Marcar la entidad del comentario como modificada.
@@ -442,14 +472,14 @@ namespace ServicioHydrate.Data
 
         public async Task MarcarRespuestaComoUtil(int idComentario, int idRespuesta, Guid idUsuarioActual)
         {
-            var comentario = await _contexto.Comentarios.FindAsync(idComentario);
+            Comentario? comentario = await _contexto.Comentarios.FindAsync(idComentario);
 
             if (comentario is null)
             {
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
-            Respuesta respuesta = await _contexto.Respuestas.FindAsync(idRespuesta);
+            Respuesta? respuesta = await _contexto.Respuestas.FindAsync(idRespuesta);
 
             if (respuesta is null)
             {
@@ -472,26 +502,28 @@ namespace ServicioHydrate.Data
             }
 
             bool existenMarcadores = respuesta.UtilParaUsuarios.Count > 0;
-            Usuario usuarioEnUtiles = null;
+            bool yaFueMarcadaComoUtil = false;
 
             if (existenMarcadores)
             {
-                usuarioEnUtiles = respuesta.UtilParaUsuarios
+                Usuario? usuarioEnMarcasComoUtil = respuesta.UtilParaUsuarios
                     .Where(u => u.Id == usuario.Id)
                     .First();
+
+                yaFueMarcadaComoUtil = usuarioEnMarcasComoUtil is not null;
             }
 
-            if (!existenMarcadores || usuarioEnUtiles is null)
-            {
-                // El usuario aún no ha marcado como útil esta respuesta.
-                respuesta.UtilParaUsuarios.Add(usuario);
-                usuario.RespuestasUtiles.Add(respuesta);
-            }
-            else 
+            if (yaFueMarcadaComoUtil)
             {
                 // El usuario tiene marcado como útil esta respuesta.
                 respuesta.UtilParaUsuarios.Remove(usuario);
                 usuario.RespuestasUtiles.Remove(respuesta);
+            }
+            else 
+            {
+                // El usuario aún no ha marcado como útil esta respuesta.
+                respuesta.UtilParaUsuarios.Add(usuario);
+                usuario.RespuestasUtiles.Add(respuesta);
             }
 
             // Marcar la entidad de la respuesta como modificada.
@@ -503,7 +535,7 @@ namespace ServicioHydrate.Data
 
         public async Task ReportarComentario(int idComentario, Guid idUsuarioActual)
         {
-            Comentario comentario = await _contexto.Comentarios.FindAsync(idComentario);
+            Comentario? comentario = await _contexto.Comentarios.FindAsync(idComentario);
 
             if (comentario is null)
             {
@@ -515,7 +547,7 @@ namespace ServicioHydrate.Data
                 .Include(c => c.ReportesDeUsuarios)
                 .FirstAsync();
 
-            Usuario usuario = await _contexto.Usuarios
+            Usuario? usuario = await _contexto.Usuarios
                 .Where(u => u.Id == idUsuarioActual)
                 .Include(u => u.ComentariosReportados)
                 .FirstAsync();
@@ -526,29 +558,30 @@ namespace ServicioHydrate.Data
             }
 
             bool existenReportes = comentario.ReportesDeUsuarios.Count > 0;
-            Usuario usuarioEnReportes = null;
+            bool yaFueReportado = false;
 
             if (existenReportes)
             {
                 // Obtener la entidad del usuario actual desde la lista de reportes del comentario.
-                usuarioEnReportes = comentario.ReportesDeUsuarios
+                Usuario? usuarioEnReportes = comentario.ReportesDeUsuarios
                     .Where(u => u.Id == usuario.Id)
                     .FirstOrDefault();
+
+                yaFueReportado = usuarioEnReportes is not null;
             }
             
-
             // Revisar si existe el usuario en los reportes del comentario.
-            if (!existenReportes || usuarioEnReportes is null)
-            {
-                // El usuario aún no ha reportado este comentario.
-                comentario.ReportesDeUsuarios.Add(usuario);
-                usuario.ComentariosReportados.Add(comentario);
-            }
-            else 
+            if (yaFueReportado)
             {
                 // El usuario ya ha reportado este comentario.
                 comentario.ReportesDeUsuarios.Remove(usuario);
                 usuario.ComentariosReportados.Remove(comentario);
+            }
+            else 
+            {
+                // El usuario aún no ha reportado este comentario.
+                comentario.ReportesDeUsuarios.Add(usuario);
+                usuario.ComentariosReportados.Add(comentario);
             }
 
             // Marcar la entidad del comentario como modificada.
@@ -560,14 +593,14 @@ namespace ServicioHydrate.Data
 
         public async Task ReportarRespuesta(int idComentario, int idRespuesta, Guid idUsuarioActual)
         {
-            var comentario = await _contexto.Comentarios.FindAsync(idComentario);
+            Comentario? comentario = await _contexto.Comentarios.FindAsync(idComentario);
 
             if (comentario is null)
             {
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
-            Respuesta respuesta = await _contexto.Respuestas.FindAsync(idRespuesta);
+            Respuesta? respuesta = await _contexto.Respuestas.FindAsync(idRespuesta);
 
             if (respuesta is null)
             {
@@ -590,28 +623,30 @@ namespace ServicioHydrate.Data
             }
 
             bool existenReportes = respuesta.ReportesDeUsuarios.Count > 0;
-            Usuario usuarioEnReportes = null;
+            bool yaFueReportada = false;
 
             if (existenReportes)
             {
                 // Obtener la entidad del usuario actual desde la lista de reportes del respuesta.
-                usuarioEnReportes = respuesta.ReportesDeUsuarios
+                Usuario? usuarioEnReportes = respuesta.ReportesDeUsuarios
                     .Where(u => u.Id == usuario.Id)
                     .First();
+
+                yaFueReportada = usuarioEnReportes is not null;
             }
 
             // Revisar si existe el usuario en los reportes de esta respuesta.
-            if (!existenReportes || usuarioEnReportes is null)
-            {
-                // El usuario aún no ha reportado esta respuesta.
-                respuesta.ReportesDeUsuarios.Add(usuario);
-                usuario.RespuestasReportadas.Add(respuesta);
-            }
-            else 
+            if (yaFueReportada)
             {
                 // El usuario ya ha reportado esta respuesta.
                 respuesta.ReportesDeUsuarios.Remove(usuario);
                 usuario.RespuestasReportadas.Remove(respuesta);
+            }
+            else 
+            {
+                // El usuario aún no ha reportado esta respuesta.
+                respuesta.ReportesDeUsuarios.Add(usuario);
+                usuario.RespuestasReportadas.Add(respuesta);
             }
 
             // Marcar la entidad de la respuesta como modificada.
@@ -620,5 +655,6 @@ namespace ServicioHydrate.Data
             // Guardar cambios en entidades del contexto.
             await _contexto.SaveChangesAsync();
         }
-    }
+  }
 }
+#nullable disable
