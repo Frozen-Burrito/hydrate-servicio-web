@@ -259,5 +259,70 @@ namespace ServicioHydrate.Modelos
                 UtilParaUsuarioActual = utilParaUsuarioActual
             };
         }
+
+        public static DTOOrden ComoDTO(this Orden orden)
+        {
+            decimal montoTotal = orden.Productos.Sum(p => p.Cantidad * p.Producto.PrecioUnitario);
+
+            List<DTOProductoCantidad> productosOrden = orden.Productos
+                .Select(po => po.ComoProductoConCantidad())
+                .ToList();
+
+            return new DTOOrden
+            {
+                Id = orden.Id,
+                Estado = orden.Estado,
+                Fecha = VerificarStrISO8601(orden.Fecha),
+                MontoTotal = montoTotal,
+                IdCliente = orden.Cliente.Id,
+                Productos = productosOrden,
+            };
+        }
+
+        public static Orden ComoNuevoModelo(this DTONuevaOrden nuevaOrden, Usuario cliente)
+        {
+            return new Orden
+            {
+                Estado = EstadoOrden.PENDIENTE,
+                Fecha = DateTime.Now.ToString("o"),
+                Cliente = cliente,
+                Productos = new List<ProductosOrdenados>(),
+            };
+        }
+
+        public static DTOProducto ComoDTO(this Producto producto)
+        {
+            return new DTOProducto
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Disponibles = producto.Disponibles,
+                PrecioUnitario = producto.PrecioUnitario,
+                UrlImagen = producto.UrlImagen
+            };
+        }
+
+        public static Producto ComoNuevoProducto(this DTONuevoProducto nuevoProducto)
+        {
+            return new Producto
+            {
+                Nombre = nuevoProducto.Nombre,
+                PrecioUnitario = nuevoProducto.PrecioUnitario,
+                Descripcion = nuevoProducto.Descripcion,
+                Disponibles = nuevoProducto.Disponibles,
+                UrlImagen = nuevoProducto.UrlImagen,
+                OrdenesDelProducto = new List<ProductosOrdenados>()
+            };
+        }
+
+        public static DTOProductoCantidad ComoProductoConCantidad(this ProductosOrdenados productoOrdenado)
+        {
+            return new DTOProductoCantidad
+            {
+                IdProducto = productoOrdenado.IdProducto,
+                Cantidad = productoOrdenado.Cantidad,
+            };
+        }
     }
 }

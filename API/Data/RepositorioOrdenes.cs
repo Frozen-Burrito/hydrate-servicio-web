@@ -1,43 +1,179 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
+using System.Globalization;
+using System.Linq.Expressions;
 
 #nullable enable
 namespace ServicioHydrate.Data
 {
     public class RepositorioOrdenes : IServicioOrdenes
     {
-        public Task<ICollection<DTOOrden>> BuscarOrdenes(string? nombreDelUsuario, string? emailUsuario, DTOParamsPagina? paramsPagina, Guid? idOrden, EstadoOrden? estado = null)
+        private readonly ContextoDBSqlite _contexto;
+
+        public RepositorioOrdenes(IWebHostEnvironment env, ContextoDBSqlite contexto)
         {
-            throw new NotImplementedException();
+            this._contexto = contexto;
         }
 
-        public Task<ICollection<DTOOrden>> GetOrdenes(DTOParamsPagina? paramsPagina, Guid? idUsuario, DateTime? fechaInicio = null, DateTime? fechaFinal = null, EstadoOrden? estado = null)
+        public async Task<ICollection<DTOOrden>> GetOrdenes(DTOParamsPagina? paramsPagina, DTOParamsOrden paramsOrden)
         {
-            throw new NotImplementedException();
+            if (await _contexto.Ordenes.CountAsync() <= 0)
+            {
+                // Si no existe ningun comentario, retornar una lista vacia desde el principio.
+                return new List<DTOOrden>();
+            }
+
+            IQueryable<Orden> ordenes = _contexto.Ordenes
+                .Include(o => o.Cliente)
+                .AsQueryable();
+
+            if (paramsOrden.IdCliente is not null)
+            {
+                ordenes = ordenes.Where(o => o.Cliente.Id.Equals(paramsOrden.IdCliente));
+            }
+
+            if (paramsOrden.Estado is not null) 
+            {
+                ordenes = ordenes.Where(o => o.Estado.Equals(paramsOrden.Estado));
+            }
+
+            //TODO: encontrar una manera de comparar las fechas usando lambdas simples de un queryable.
+            // if (paramsOrden.Desde is not null)
+            // {
+            //     ordenes = ordenes.Where(o => DateTime.Parse(o.Fecha) >= paramsOrden.Desde);
+            // }
+
+            // if (paramsOrden.Hasta is not null)
+            // {
+            //     ordenes = ordenes.Where(o => DateTime.Parse(o.Fecha) <= paramsOrden.Hasta);
+            // }
+
+            ordenes = ordenes                
+                .Include(o => o.Cliente)
+                .Include(o => o.Productos)
+                .ThenInclude(o => o.Producto)
+                .AsSplitQuery()
+                .OrderByDescending(o => o.Fecha);
+                
+            IQueryable<DTOOrden> dtosOrdenes = ordenes.Select(o => o.ComoDTO());
+
+            var ordenesPaginadas = await ListaPaginada<DTOOrden>
+                .CrearAsync(dtosOrdenes, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return ordenesPaginadas;
         }
 
-        public Task<ICollection<DTOOrden>> GetOrdenesDeUsuario(Guid idUsuario, DTOParamsPagina? paramsPagina, EstadoOrden? estado = null)
+        public async Task<DTOOrden> GetOrdenPorId(Guid idOrden)
         {
-            throw new NotImplementedException();
+            if (await _contexto.Ordenes.CountAsync() <= 0) 
+            {
+                throw new ArgumentException("No existe una orden con el ID especificado");
+            }
+
+            // Orden? orden = await _contexto.Ordenes.FindAsync(idOrden);
+            Orden? orden = await _contexto.Ordenes
+                .Where(o => o.Id.Equals(idOrden))
+                .Include(o => o.Cliente)
+                .Include(o => o.Productos)
+                .FirstOrDefaultAsync();
+
+            if (orden is null) 
+            {
+                throw new ArgumentException("No existe una orden con el ID especificado");
+            }
+
+            return orden.ComoDTO();
         }
 
-        public Task<DTOOrden> GetOrdenPorId(Guid idOrden)
+        public async Task<DTOOrden> ModificarEstadoDeOrden(Guid idOrden, EstadoOrden nuevoEstado)
         {
-            throw new NotImplementedException();
+            if (await _contexto.Ordenes.CountAsync() <= 0) 
+            {
+                throw new ArgumentException("No existe una orden con el ID especificado");
+            }
+
+            // Orden? orden = await _contexto.Ordenes.FindAsync(idOrden);
+            Orden? orden = await _contexto.Ordenes
+                .Where(o => o.Id.Equals(idOrden))
+                .Include(o => o.Cliente)
+                .Include(o => o.Productos)
+                .ThenInclude(po => po.Producto)
+                .FirstOrDefaultAsync();
+
+            if (orden is null) 
+            {
+                throw new ArgumentException("No existe una orden con el ID especificado");
+            } else 
+            {
+                if (orden.Estado == EstadoOrden.CONCLUIDA || orden.Estado == EstadoOrden.CANCELADA)
+                {
+                    throw new InvalidOperationException("Intentando cambiar el estado de una orden concluida o cancelada");
+                }
+
+                orden.Estado = nuevoEstado;
+
+                _contexto.Entry(orden).State = EntityState.Modified;
+                await _contexto.SaveChangesAsync();
+
+                return orden.ComoDTO();
+            }
         }
 
-        public Task<DTOOrden> ModificarEstadoDeOrden(Guid idOrden, EstadoOrden nuevoEstado)
+        public async Task<DTOOrden> NuevaOrden(DTONuevaOrden nuevaOrden, Guid idCliente)
         {
-            throw new NotImplementedException();
-        }
+            Usuario? cliente = await _contexto.Usuarios.FindAsync(idCliente);
 
-        public Task<DTOOrden> NuevaOrden(DTONuevaOrden nuevaOrden, Guid idCliente)
-        {
-            throw new NotImplementedException();
+            if (cliente is null) 
+            {
+                throw new ArgumentException("El usuario cliente no es válido, imposible crear orden.");
+            }
+
+            IEnumerable<int> idsProductosOrdenados = nuevaOrden.Productos
+                .Select(p => p.IdProducto);
+
+            var productosExistentes = await _contexto.Productos
+                .Where(p => idsProductosOrdenados.Contains(p.Id))
+                .ToListAsync();
+
+            if (productosExistentes.Count != idsProductosOrdenados.Count())
+            {
+                throw new ArgumentException("Hay productos no válidos en la orden.");
+            }
+
+            Orden modeloOrden = nuevaOrden.ComoNuevoModelo(cliente);
+
+            _contexto.Add(modeloOrden);
+            await _contexto.SaveChangesAsync();
+
+            List<ProductosOrdenados> productosOrdenados = new List<ProductosOrdenados>();
+
+            foreach(var producto in productosExistentes)
+            {
+                int cantidad = nuevaOrden.Productos.ToList()
+                    .Find(p => p.IdProducto == producto.Id)?.Cantidad ?? 0;
+
+                var productoOrdenado = new ProductosOrdenados
+                {
+                    Cantidad = cantidad,
+                    IdProducto = producto.Id,
+                    Producto = producto,
+                    IdOrden = modeloOrden.Id,
+                    Orden = modeloOrden,
+                };
+
+                productosOrdenados.Add(productoOrdenado);
+            }
+
+            _contexto.AddRange(productosOrdenados);
+            await _contexto.SaveChangesAsync();
+
+            return modeloOrden.ComoDTO();
         }
     }
 }

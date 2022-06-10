@@ -12,9 +12,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioRecursos : IServicioRecursos
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioRecursos(ContextoDBMysql contexto)
+        public RepositorioRecursos(ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
@@ -72,7 +72,9 @@ namespace ServicioHydrate.Data
 
         public async Task<ICollection<DTORecursoInformativo>> GetRecursosAsync(DTOParamsPagina? paramsPagina)
         {
-            var recursos = _contexto.Recursos.Select(r => r.ComoDTO());
+            var recursos = _contexto.Recursos
+                .OrderByDescending(r => r.FechaPublicacion)
+                .Select(r => r.ComoDTO());
 
             var recursosPaginados = await ListaPaginada<DTORecursoInformativo>
                 .CrearAsync(recursos, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);

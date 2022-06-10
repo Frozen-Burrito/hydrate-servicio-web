@@ -20,9 +20,9 @@ namespace ServicioHydrate.Modelos.DTO
         public decimal MontoTotal { get; set; }
 
         // El usuario que realizó la orden.
-        public DTOUsuario Cliente { get; set; }
+        public Guid IdCliente { get; set; }
 
         // La lista de productos que el cliente compró en esta orden.
-        public List<DTOProducto> Productos { get; set; }
+        public List<DTOProductoCantidad> Productos { get; set; }
     }
 }

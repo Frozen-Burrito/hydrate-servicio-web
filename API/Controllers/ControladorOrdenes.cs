@@ -45,18 +45,16 @@ namespace ServicioHydrate.Controladores
         }
 
         /// <summary>
-        /// Retorna todas las ordenes creadas, segun filtros de fecha y estado.
+        /// Obtiene una colección de órdenes que cumplan con los filtros y parámetros.
         /// </summary>
-        /// <param name="desde">Especifica el inicio del rango de fechas.</param>
-        /// <param name="hasta">Especifica el final del rango de fechas</param>
-        /// <param name="estado">El estado de las ordenes retornadas.</param>
+        /// <param name="paramPagina">Los parámetros de paginado del resultado.</param>
+        /// <param name="paramsOrden">Los filtros de selección para la colección de órdenes.</param>
         /// <returns>Resultado HTTP</returns>
         [HttpGet]
-        [Authorize(Roles = "ADMIN_ORDENES,NINGUNO")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOrdenesConFiltros([FromQuery] DTOParamsPagina? paramsPagina, DateTime? desde, DateTime? hasta, EstadoOrden? estado)
+        public async Task<IActionResult> GetOrdenesConFiltros([FromQuery] DTOParamsPagina? paramsPagina, [FromQuery] DTOParamsOrden paramsOrden)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -65,16 +63,10 @@ namespace ServicioHydrate.Controladores
 
             try 
             {       
-                // Obtener el ID del usuario actual desde el JWT.
-                Guid idUsuarioActual = new Guid(this.User.Claims.First(i => i.Type == "id").Value);
-
                 // Obtener todas las ordenes, segun los filtros recibidos.
                 var ordenes = await _repositorioOrdenes.GetOrdenes(
                     paramsPagina,
-                    idUsuarioActual,
-                    fechaDesde: desde,
-                    fechaHasta: hasta, 
-                    estado: estado
+                    paramsOrden
                 );
 
                 int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
@@ -93,13 +85,13 @@ namespace ServicioHydrate.Controladores
             }
         }
 
-        [HttpGet("{idUsuario}")]
+        [HttpGet("usuario/{idUsuario?}")]
         [Authorize(Roles = "ADMIN_ORDENES,NINGUNO")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetOrdenesDeUsuario(Guid idUsuario, EstadoOrden? estado, [FromQuery] DTOParamsPagina? paramsPagina)
+        public async Task<IActionResult> GetOrdenesDeUsuario(Guid? idUsuario, [FromQuery] DTOParamsPagina? paramsPagina, [FromQuery] DTOParamsOrden paramsOrden)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
@@ -109,18 +101,30 @@ namespace ServicioHydrate.Controladores
 
             try
             {
-                // Obtener el rol y el ID del usuario actual desde el JWT.
-                Guid idUsuarioActual = new Guid(this.User.Claims.First(i => i.Type == "id").Value);
-                string rol = this.User.Claims.First(i => i.Type == ClaimTypes.Role).Value;
+                paramsOrden.IdCliente = idUsuario;
 
-                if (RolDeUsuario.ADMIN_ORDENES.ToString() != rol && idUsuario != idUsuarioActual) 
+                // Obtener el ID del usuario actual desde el JWT.
+                Guid idUsuarioActual = new Guid(this.User.Claims.First(i => i.Type == "id").Value);
+                string rolDeUsuario = this.User.Claims.First(c => c.Type.Equals(ClaimTypes.Role)).Value;
+                
+                bool usuarioEsAdmin = rolDeUsuario.Equals(RolDeUsuario.ADMIN_ORDENES);
+
+                if (!usuarioEsAdmin) 
                 { 
-                    // Si el usuario actual no es un administrador de órdenes y solicita
-                    // obtener órdenes de un usuario que no es él, retornar un No Autorizado.
-                    return Unauthorized();
+                    paramsOrden.IdCliente = idUsuarioActual;
+                    _logger.LogInformation("Usando ID del mismo usuario como cliente, no es admin");
+
+                    bool obteniendoOrdenesAjenas = idUsuario != idUsuarioActual || paramsOrden.IdCliente != idUsuarioActual;
+
+                    if (obteniendoOrdenesAjenas) 
+                    {
+                        // Si el usuario actual no es un administrador de órdenes y solicita
+                        // obtener órdenes de un usuario que no es él, retornar un No Autorizado.
+                        throw new UnauthorizedAccessException("Solo los administradores de órdenes pueden acceder a las órdenes de otros usuarios");
+                    }
                 }
 
-                var ordenes = await _repositorioOrdenes.GetOrdenesDeUsuario(idUsuario, paramsPagina, estado);
+                var ordenes = await _repositorioOrdenes.GetOrdenes(paramsPagina, paramsOrden);
 
                 int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
 
@@ -134,6 +138,10 @@ namespace ServicioHydrate.Controladores
                 // No existe un usuario con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
             }
+            catch (UnauthorizedAccessException e) 
+            {
+                return Unauthorized(e.Message);
+            }
             catch (Exception e)
             {
                 // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
@@ -144,6 +152,7 @@ namespace ServicioHydrate.Controladores
         }
 
         [HttpGet("{idOrden}")]
+        [Authorize(Roles = "ADMIN_ORDENES,NINGUNO")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOOrden))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -176,40 +185,6 @@ namespace ServicioHydrate.Controladores
             }
         }
 
-        [HttpGet("buscar")]
-        [Authorize(Roles = "ADMIN_ORDENES,NINGUNO")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> BuscarOrdenes(string nombre, string email, [FromQuery] DTOParamsPagina? paramsPagina, Guid idOrden, EstadoOrden? estado)
-        {
-            // Registrar un log de la peticion.
-            string strFecha = DateTime.Now.ToString("G");
-            string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value ?? "/";
-            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
-
-            try
-            {
-                var ordenes = await _repositorioOrdenes.BuscarOrdenes(nombre, email, paramsPagina, idOrden, estado);
-
-                int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
-
-                var resultado = DTOResultadoPaginado<DTOOrden>
-                                .DesdeColeccion(ordenes, numPagina, ruta);
-
-                return Ok(resultado);
-            }
-            catch (Exception e)
-            {
-                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
-                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
-
-                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
-            }
-        }
-
         /// <summary>
         /// Registra una nueva orden, con un estado por defecto de "Pendiente".
         /// </summary>
@@ -223,7 +198,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> CrearOrden(DTONuevaOrden nuevaOrden)
+        public async Task<IActionResult> CrearOrden([FromBody] DTONuevaOrden nuevaOrden)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -233,15 +208,21 @@ namespace ServicioHydrate.Controladores
             try 
             {
                 // Obtener el ID del usuario actual desde el JWT.
-                Guid idUsuarioActual = new Guid(this.User.Claims.First(i => i.Type == "id").Value);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
+                Guid idUsuarioActual = new Guid(idStr);
 
                 var ordenCreada = await _repositorioOrdenes.NuevaOrden(nuevaOrden, idUsuarioActual);
 
                 return CreatedAtAction(
                     nameof(GetOrdenPorId),
-                    new { idComentario = ordenCreada.Id },
+                    new { idOrden = ordenCreada.Id },
                     ordenCreada
                 );
+            }
+            catch (FormatException e) 
+            {
+                _logger.LogInformation("Usuario no autorizado");
+                return Unauthorized("El ID de usuario recibido en el JWT no es válido." + e.Message);
             }
             catch (DbUpdateException e)
             {
@@ -292,7 +273,7 @@ namespace ServicioHydrate.Controladores
             }
             catch (ArgumentException e)
             {
-                // No existe un comentario con el ID solicitado. Retorna 404.
+                // No existe una orden con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
             }
             catch (InvalidOperationException)

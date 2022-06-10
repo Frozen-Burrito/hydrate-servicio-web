@@ -5,6 +5,6 @@ namespace ServicioHydrate.Modelos
         PENDIENTE,
         EN_PROGRESO,
         CONCLUIDA,
-        ERROR,
+        CANCELADA,
     }
 }

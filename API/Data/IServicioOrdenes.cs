@@ -11,48 +11,23 @@ namespace ServicioHydrate.Data
     public interface IServicioOrdenes
     {
         /// <summary>
-        /// Obtiene una lista con todas las órdenes disponibles que cumplan con
-        /// los filtros recibidos.
+        /// Obtiene una lista paginada con todas las órdenes que cumplan con los parámetros y
+        /// los filtros especificados.
         /// </summary>
         /// <remarks>
-        /// Si el usuario es admin, idUsuario será nulo.  
-        /// Si idUsuario no es nulo, solo retornar ordenes del propio usuario (no de otros usuarios).
+        /// Es posible filtrar órdenes según el ID, email o nombre de un usuario, así como 
+        /// el ID, la fecha y el estado de la orden. 
         /// 
         /// Si fechaDesde es nulo, el rango de fechas abarca todas las órdenes antes de fechaHasta.
         /// Si fechaHasta es nulo, el rango de fechas abarca todas las órdenes después de fechaDesde.
-        /// Si ambas fechas son nulas, no aplicar filtro por fecha.
+        /// Si ambas fechas son nulas, no se aplica filtro por fecha.
         /// 
-        /// Si estado no es nulo, solo retornar las órdenes que estén en el estado recibido.
+        /// Si el estado no es nulo, solo retorna las órdenes que estén en el estado recibido.
         /// </remarks>
-        /// <param name="idUsuario">El Id del usuario que hace la petición.</param>
-        /// <param name="fechaDesde">La fecha de inicio del rango del filtro por fecha.</param>
-        /// <param name="fechaHasta">La fecha de término del rango del filtro por fecha.</param>
-        /// <param name="estado">El estado que debe tener una orden para ser retornada.</param>
-        /// <returns>La lista de órdenes filtradas, en forma de DTOs.</returns>
-        Task<ICollection<DTOOrden>> GetOrdenes(DTOParamsPagina? paramsPagina, Guid? idUsuario, DateTime? fechaDesde = null, DateTime? fechaHasta = null, EstadoOrden? estado = null);
-
-        /// <summary>
-        /// Obtiene de la BD una lista con todas las órdenes de un usuario específico.
-        /// </summary>
-        /// <param name="idUsuario">El Id del usuario.</param>
-        /// <param name="estado">El estado que deben tener las órdenes retornadas.</param>
-        /// <returns>Una lista de órdenes del usuario.</returns>
-        Task<ICollection<DTOOrden>> GetOrdenesDeUsuario(Guid idUsuario, DTOParamsPagina? paramsPagina, EstadoOrden? estado = null);
-        
-        /// <summary>
-        /// Obtiene una lista con todas las órdenes que cumplan con los 
-        /// criterios de búsqueda.
-        /// </summary>
-        /// <remarks>
-        /// En general, solo uno de los criterios y el estado estarán presentes. 
-        /// (el usuario introduce un nombre, o un email, o el Id de una orden).
-        /// </remarks>
-        /// <param name="nombreDelUsuario">El nombre con o sin apellido del usuario.</param>
-        /// <param name="emailUsuario">El correo electrónico del usuario.</param>
-        /// <param name="idOrden">El identificador de la orden, opcional.</param>
-        /// <param name="estado">El estado de las órdenes, opcional.</param>
-        /// <returns>Una lista de órdenes resultantes.</returns>
-        Task<ICollection<DTOOrden>> BuscarOrdenes(string? nombreDelUsuario, string? emailUsuario, DTOParamsPagina? paramsPagina, Guid? idOrden, EstadoOrden? estado = null);
+        /// <param name="paramsPagina">Los parámetros de paginado para las órdenes.</param>
+        /// <param name="paramsOrden">Los filtros aplicados a la búsqueda de órdenes.</param>
+        /// <returns>Una lista paginada de órdenes filtradas, en forma de DTOs.</returns>
+        Task<ICollection<DTOOrden>> GetOrdenes(DTOParamsPagina? paramsPagina, DTOParamsOrden paramsOrden);
 
         /// <summary>
         /// Busca una orden con un Id determinado.

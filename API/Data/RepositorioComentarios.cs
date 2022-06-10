@@ -14,9 +14,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioComentarios : IServicioComentarios
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBMysql contexto)
+        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
@@ -238,10 +238,10 @@ namespace ServicioHydrate.Data
                 .Include(r => r.Autor)
                 .FirstAsync();
 
-            bool rolesCoinciden = respuesta.Autor.RolDeUsuario.ToString().Equals(rolDeUsuario);
+            bool usuarioEsElAutor = idUsuario.Equals(respuesta.Autor.Id);
             bool usuarioEsModerador = rolDeUsuario.Equals(RolDeUsuario.MODERADOR_COMENTARIOS.ToString());
 
-            if (!rolesCoinciden || (!idUsuario.Equals(respuesta.Autor.Id) && !usuarioEsModerador))
+            if (!usuarioEsElAutor || !usuarioEsModerador)
             {
                 throw new InvalidOperationException("Solo el mismo autor o un moderador puede borrar una respuesta.");
             }
