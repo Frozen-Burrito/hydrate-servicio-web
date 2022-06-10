@@ -29,7 +29,7 @@ namespace ServicioHydrate.Data
 
 			int resultadosPorPagina = sizePagina ?? 25;
 
-			int paginasTotales = (int) Math.Ceiling(total / (double) sizePagina);
+			int paginasTotales = (int) Math.Ceiling(total / (double) resultadosPorPagina);
 
 			indicePagina = Math.Max(1, Math.Min(indicePagina, indicePagina));
 

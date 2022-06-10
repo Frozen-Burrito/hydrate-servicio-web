@@ -74,7 +74,10 @@ namespace ServicioHydrate.Data
         {
             var recursos = _contexto.Recursos.Select(r => r.ComoDTO());
 
-            return await recursos.ToListAsync();
+            var recursosPaginados = await ListaPaginada<DTORecursoInformativo>
+                .CrearAsync(recursos, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return recursosPaginados;
         }
     }
 }

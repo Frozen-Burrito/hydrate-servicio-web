@@ -169,11 +169,13 @@ namespace ServicioHydrate.Data
                 return new List<DTOUsuario>();
             }
 
-            List<DTOUsuario> usuarios = await _contexto.Usuarios
-                .Select(u => u.ComoDTO())
-                .ToListAsync();
+            var usuarios = _contexto.Usuarios
+                .Select(u => u.ComoDTO());
 
-            return usuarios;
+            var usuariosPaginados = await ListaPaginada<DTOUsuario>
+                .CrearAsync(usuarios, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return usuariosPaginados;
         }
 
         public async Task<DTOUsuario> RegistrarNuevoUsuario(DTOPeticionAutenticacion datosUsuario)

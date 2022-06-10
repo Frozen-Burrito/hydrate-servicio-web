@@ -153,6 +153,7 @@ namespace ServicioHydrate.Controladores
         /// </summary>
         /// <returns>Una colección con todas las cuentas de usuario.</returns>
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOUsuario>))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -191,6 +192,7 @@ namespace ServicioHydrate.Controladores
         /// <param name="nuevoRol">El nuevo rol de usuario.</param>
         /// <returns>204 - No Content</returns>
         [HttpPatch("{idUsuario}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
