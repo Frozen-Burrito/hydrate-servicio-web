@@ -6,7 +6,13 @@ import { StatusHttp } from "../../api/api";
 import * as api from "../../api/api_comentarios";
 import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
 
-import { TarjetaComentario, SearchBox } from "../";
+import { TarjetaComentario, SearchBox, ControlPaginas } from "../";
+
+ListaComentarios.defaultProps = {
+  idAutor: null,
+  pendientes: false,
+  conBusqueda: true,
+}
 
 export default function ListaComentarios({ idAutor, pendientes, conBusqueda }) {
 
@@ -22,6 +28,9 @@ export default function ListaComentarios({ idAutor, pendientes, conBusqueda }) {
   const [estaCargando, setEstaCargando] = useState(false);
   const [tieneError, setTieneError] = useState(false);
   const [buscando, setBuscando] = useState(false);
+
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [paginasTotales, setPaginasTotales] = useState(1);
 
   /**
    * Filtra los comentarios según un query, buscando coincidencias 
@@ -121,22 +130,31 @@ export default function ListaComentarios({ idAutor, pendientes, conBusqueda }) {
     async function obtenerComentarios() {
 
       const obtenerDeAutor = (idAutor != null && idAutor.length > 0)
-  
+    
       // Obtener todos los comentarios pendientes. Ya vienen ordenados por
       // fecha desde la API.
       const resultado = pendientes
-        ? await api.fetchComentariosPendientes(jwt)
+        ? await api.fetchComentariosPendientes(paginaActual, jwt)
         : (obtenerDeAutor 
-          ? await api.fetchComentariosDeAutor(idAutor, jwt)
-          : await api.fetchComentariosPublicados(jwt));
+          ? await api.fetchComentariosDeAutor(idAutor, paginaActual, jwt)
+          : await api.fetchComentariosPublicados(paginaActual, jwt));
   
-      if (resultado.ok && resultado.status === StatusHttp.Status200OK) {
+      if (resultado.status === StatusHttp.Status200OK) {
+
+        const resultadoPaginado = resultado.datos;
+
+        console.log(resultadoPaginado)
   
-        setComentarios(resultado.cuerpo);
+        setComentarios(resultadoPaginado.resultados);
+
+        setPaginaActual(resultadoPaginado.paginaActual);
+        setPaginasTotales(resultadoPaginado.paginasTotales);
   
         // Inicializar los comentarios filtrados con todos los comentarios
         // disponibles.
-        setComentariosFiltrados(resultado.cuerpo);
+        setComentariosFiltrados(resultadoPaginado.resultados);
+
+        setTieneError(false);
       } else {
         setTieneError(true)
       }
@@ -145,12 +163,12 @@ export default function ListaComentarios({ idAutor, pendientes, conBusqueda }) {
     async function obtenerMotivosDeComentariosRemovidos() {
   
       const idUsuario = getIdUsuarioDesdeJwt(jwt);
-  
-      const resultado = await api.fetchMotivosComentariosRetirados(idUsuario, jwt);
+
+      const resultado = await api.fetchMotivosComentariosRetirados(jwt, idUsuario, paginaActual);
   
       if (resultado.ok && resultado.status === StatusHttp.Status200OK) {
         
-        setMotivosDeRemovidos(resultado.cuerpo);
+        setMotivosDeRemovidos(resultado.datos.resultados);
   
       } else {
         setTieneError(true)
@@ -160,17 +178,20 @@ export default function ListaComentarios({ idAutor, pendientes, conBusqueda }) {
     async function obtenerDatosComentarios() {
       
       setEstaCargando(true);
+
+      const peticiones = [ obtenerComentarios() ];
+
+      if (!pendientes && jwt != null) {
+        peticiones.push(obtenerMotivosDeComentariosRemovidos());
+      }
       
-      await Promise.all([
-        obtenerComentarios(),
-        (!pendientes && obtenerMotivosDeComentariosRemovidos()),
-      ]);
+      await Promise.all(peticiones);
   
       setEstaCargando(false);
     }
 
     obtenerDatosComentarios();
-  }, [ jwt, pendientes, idAutor ]);
+  }, [ jwt, pendientes, idAutor, paginaActual ]);
 
   return (
     <div>
@@ -188,6 +209,15 @@ export default function ListaComentarios({ idAutor, pendientes, conBusqueda }) {
       </div>
       <div className="lista-comentarios">
         { renderListaComentarios() }
+      </div>
+
+      <div>
+        <ControlPaginas
+          paginasTotales={paginasTotales}
+          paginaInicial={paginaActual}
+          onAnterior={(e, nuevaPagina) => setPaginaActual(nuevaPagina)}
+          onSiguiente={(e, nuevaPagina) => setPaginaActual(nuevaPagina)}
+        />
       </div>
     </div>
   );

@@ -1,20 +1,12 @@
 import * as api from "./api";
 
-export const obtenerRecursos = async (jwt = "") => {
+export const fetchRecursos = async (numPagina = 1, jwt = "") => {
 
-  const url = `${api.urlBase}/recursos`;
+  const endpoint = "recursos";
 
-  const peticion = new Request(url, {
-    method: api.GET,
-    headers: new Headers({
-      // Incluir el JWT en el header de autorizacion.
-      'Authorization': jwt ? `Bearer ${jwt}` : "", 
-      // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json'
-    }),
-  });
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
   
-  return await api.hacerPeticion(peticion);
+  return resultados;
 }
 
 export const agregarRecurso = async (jwt, recurso) => {

@@ -21,9 +21,9 @@ export default function ControlPaginas(props) {
     nuevaPagina = Math.min(Math.max(parseInt(nuevaPagina), 1), paginasTotales);
 
     if (nuevaPagina < paginaActual) {
-      onAnterior(nuevaPagina);
+      onAnterior(e, nuevaPagina);
     } else {
-      onSiguiente(nuevaPagina);
+      onSiguiente(e, nuevaPagina);
     }
 
     setPaginaActual(nuevaPagina);

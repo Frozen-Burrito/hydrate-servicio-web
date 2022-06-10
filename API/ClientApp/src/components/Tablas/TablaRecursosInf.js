@@ -13,23 +13,27 @@ export const TablaRecursosInf = ({
 
   return (
     <table className="mt-5">
-      <tr className="separador-inf">
-        <th>Título</th>
-        <th>Fecha de Publicación</th>
-        <th>URL</th>
-        <th>Descripción</th>
-        <th>Acciones</th>
-      </tr>
-      { recursosInformativos.map((recurso, _) => {
-        return (
-          <FilaRecursoInformativo 
-            key={recurso.id}
-            recurso={recurso}
-            onEditar={() => onEditarRecurso(recurso.id)}
-            onEliminar={() => onEliminarRecurso(recurso.id)}
-          />
-        );
-      })}
+      <thead>
+        <tr className="separador-inf">
+          <th>Título</th>
+          <th>Fecha de Publicación</th>
+          <th>URL</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        { recursosInformativos.map((recurso, _) => {
+          return (
+            <FilaRecursoInformativo 
+              key={recurso.id}
+              recurso={recurso}
+              onEditar={() => onEditarRecurso(recurso.id)}
+              onEliminar={() => onEliminarRecurso(recurso.id)}
+            />
+          );
+        })}
+      </tbody>
     </table>
   );
 }

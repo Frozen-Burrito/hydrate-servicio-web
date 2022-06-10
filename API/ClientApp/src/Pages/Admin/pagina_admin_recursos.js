@@ -1,12 +1,14 @@
 import React, { useState, useEffect} from 'react';
 
-import { eliminarRecurso, obtenerRecursos } from '../../api/api_recursos';
+import { StatusHttp } from '../../api/api';
+import { eliminarRecurso, fetchRecursos } from '../../api/api_recursos';
 import useCookie from '../../utils/useCookie';
 import { 
   Layout, 
   DrawerAdmin,
   FormAgregarRecurso, 
-  TablaRecursosInf 
+  TablaRecursosInf,
+  ControlPaginas
 } from '../../components';
 
 export function PaginaAdminRecursos () {
@@ -14,6 +16,9 @@ export function PaginaAdminRecursos () {
   const { valor: jwt } = useCookie('jwt');
   
   const [recursosInformativos, setRecursosInformativos] = useState([]);
+
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [paginasTotales, setPaginasTotales] = useState(1);
 
   const [recursoSel, setRecursoSel] = useState(null);
 
@@ -83,19 +88,31 @@ export function PaginaAdminRecursos () {
     setEstaCargando(false);
   }
 
+  function manejarCambioPagina(e, nuevaPagina) {
+    if (nuevaPagina >= 1 && nuevaPagina < paginasTotales -1) {
+      setPaginaActual(nuevaPagina);
+    }
+  }
+
   useEffect(() => {
 
     async function obtenerDatos() {
       setEstaCargando(true);
       // Obtener todos los recursos informativos.
-      const resultado = await obtenerRecursos(jwt);
+      const resultado = await fetchRecursos(paginaActual, jwt);
 
-      if (resultado.ok && resultado.status === 200) {
+      if (resultado.status === StatusHttp.Status200OK) {
+
+        const resultadoPaginado = resultado.datos;
+
+        console.log(resultadoPaginado);
+
         // Si la peticion fue exitosa, actualizar la lista
         // de recursos informativos.
-        setRecursosInformativos(resultado.cuerpo);
+        setRecursosInformativos(resultadoPaginado.resultados);
 
-        console.log(resultado.cuerpo);
+        // setPaginaActual(resultadoPaginado.paginaActual);
+        setPaginasTotales(resultadoPaginado.paginasTotales);
 
       } else {
         setTieneError(true);
@@ -105,7 +122,7 @@ export function PaginaAdminRecursos () {
     }
     
     obtenerDatos();
-  }, [jwt]);
+  }, [jwt, paginaActual]);
 
   return (
     <Layout>
@@ -127,6 +144,15 @@ export function PaginaAdminRecursos () {
           estaCargando={estaCargando}
           tieneError={tieneError}
         />
+
+        <div className="mt-5">
+          <ControlPaginas
+            paginasTotales={paginasTotales}
+            paginaInicial={paginaActual}
+            onAnterior={manejarCambioPagina}
+            onSiguiente={manejarCambioPagina}
+          />
+        </div>
       </div>
     </Layout>
   )
