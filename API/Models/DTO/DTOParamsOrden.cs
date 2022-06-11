@@ -1,5 +1,7 @@
 using System;
 
+using ServicioHydrate.Modelos.Enums;
+
 #nullable enable
 namespace ServicioHydrate.Modelos.DTO
 {

@@ -1,4 +1,4 @@
-namespace ServicioHydrate.Modelos
+namespace ServicioHydrate.Modelos.Enums
 {
     public enum RolDeUsuario
     {

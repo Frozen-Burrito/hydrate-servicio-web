@@ -34,6 +34,12 @@ namespace ServicioHydrate.Data
         public DbSet<Producto> Productos { get; set; }
 
         public DbSet<ComentarioArchivado> ComentariosArchivados { get; set; }
+
+        public DbSet<Perfil> Perfiles { get; set; }
+
+        public DbSet<Pais> Paises { get; set; }
+
+        public DbSet<Entorno> Entornos { get; set; }
         
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
@@ -98,6 +104,11 @@ namespace ServicioHydrate.Data
                 .HasMany(p => p.OrdenesDelProducto)
                 .WithOne(po => po.Producto)
                 .HasForeignKey(po => po.IdProducto);
+
+            // Relación uno a muchos entre Pais y Perfil.
+            modelBuilder.Entity<Pais>()
+                .HasMany(pa => pa.Perfiles)
+                .WithOne(pe => pe.PaisDeResidencia);
         }
     }
 }

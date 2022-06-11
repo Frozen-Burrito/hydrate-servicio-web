@@ -1,6 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
+using ServicioHydrate.Modelos.Enums;
+
 namespace ServicioHydrate.Modelos.DTO
 {
     // Un objeto de transferencia de datos (DTO) para un Usuario.

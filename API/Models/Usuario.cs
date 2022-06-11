@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
+using ServicioHydrate.Modelos.Enums;
+
 namespace ServicioHydrate.Modelos
 {
     // Representa un Usuario en la base de datos.

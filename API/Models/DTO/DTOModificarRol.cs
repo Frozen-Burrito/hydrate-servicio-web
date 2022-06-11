@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+using ServicioHydrate.Modelos.Enums;
+
 namespace ServicioHydrate.Modelos.DTO
 {
     public class DTOModificarRol

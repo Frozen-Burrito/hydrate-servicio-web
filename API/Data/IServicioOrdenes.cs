@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
+using ServicioHydrate.Modelos.Enums;
 
 #nullable enable
 namespace ServicioHydrate.Data 

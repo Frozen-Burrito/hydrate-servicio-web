@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
 using System.Globalization;
-using ServicioHydrate.Modelos.DTO;
 using System.Collections.Generic;
 
+using ServicioHydrate.Modelos.DTO;
+using ServicioHydrate.Modelos.Enums;
 namespace ServicioHydrate.Modelos
 {
     /// Esta clase proporciona métodos de utilidad para facilitar la 

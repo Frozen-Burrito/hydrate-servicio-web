@@ -7,6 +7,7 @@ using BCryptNet = BCrypt.Net.BCrypt;
 
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
+using ServicioHydrate.Modelos.Enums;
 using ServicioHydrate.Autenticacion;
 
 #nullable enable

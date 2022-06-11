@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
+using ServicioHydrate.Modelos.Enums;
 
 #nullable enable
 namespace ServicioHydrate.Data

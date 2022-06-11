@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 
+using ServicioHydrate.Modelos.Enums;
+
 namespace ServicioHydrate.Modelos
 {
     public class Orden
