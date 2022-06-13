@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ServicioHydrate.Modelos.DTO;
 
 namespace ServicioHydrate.Modelos 
 {
@@ -9,5 +10,14 @@ namespace ServicioHydrate.Modelos
         public string Codigo { get; set; }
 
         public ICollection<Perfil> Perfiles { get; set; }
+
+        public DTOPais ComoDTO() 
+        {
+            return new DTOPais
+            {
+                Id = this.Id,
+                Codigo = this.Codigo
+            };
+        }
     }
 }

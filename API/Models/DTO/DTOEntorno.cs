@@ -1,20 +1,18 @@
-using ServicioHydrate.Modelos.DTO;
 
-namespace ServicioHydrate.Modelos
+namespace ServicioHydrate.Modelos.DTO 
 {
-    public class Entorno 
-    {
+	public class DTOEntorno 
+	{
         public int Id { get; set; }
 
         public string UrlImagen { get; set; }
 
         public int PrecioEnMonedas { get; set; }
 
-        public DTOEntorno ComoDTO() 
+        public Entorno ComoNuevoModelo() 
         {
-            return new DTOEntorno
+            return new Entorno
             {
-                Id = this.Id,
                 UrlImagen = this.UrlImagen,
                 PrecioEnMonedas = this.PrecioEnMonedas,
             };
