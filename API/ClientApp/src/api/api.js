@@ -41,7 +41,7 @@ export const hacerPeticion = async (peticion, respuestaConCuerpo = true) => {
   const resJson = respuestaConCuerpo && resultado.ok
     ? await resultado.json() 
     : null;
-
+    
   return {
     ok: resultado.ok,
     status: resultado.status,
@@ -58,28 +58,26 @@ export const hacerPeticion = async (peticion, respuestaConCuerpo = true) => {
  * @param {string} jwt El token de autenticación del usuario.
  * @returns Una respuesta con los resultados paginados, o un error.
  */
-export async function fetchPaginado(endpoint, numPagina = 1, elemsPorPagina = 25, jwt = "", incluirIdUsuario = false) {
-  let urlConParams = `${urlBase}/${endpoint}`;
+export async function fetchPaginado(endpoint, numPagina = 1, elemsPorPagina = 25, paramsExtra = null, jwt = "", incluirIdUsuario = false) {
+
+  const params = new URLSearchParams({
+    pagina: numPagina,
+    sizePagina: elemsPorPagina,
+  });
   
   if (incluirIdUsuario && jwt) {
     const idUsuario = getIdUsuarioDesdeJwt(jwt);
 
-    urlConParams = urlConParams.concat("?" + new URLSearchParams({
-      idUsuarioActual: idUsuario
-    }).toString());
+    params.set("idUsuarioActual", idUsuario);
+  }
+  
+  if (paramsExtra != null && typeof paramsExtra === "object") {
+    for (let [llave, valor] of paramsExtra.entries()) {
+      params.set(llave, valor);
+    }
   }
 
-  if (numPagina && elemsPorPagina) {
-
-    const parametros = "?" + new URLSearchParams({ 
-      pagina: numPagina,
-      sizePagina: elemsPorPagina,
-    }).toString();
-
-    urlConParams = urlConParams.concat(parametros);
-  }
-
-  console.log(urlConParams);
+  const urlConParams = `${urlBase}/${endpoint}?`.concat(params.toString());
 
   const peticion = new Request(urlConParams, {
     method: GET,
