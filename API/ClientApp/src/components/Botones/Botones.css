@@ -85,7 +85,13 @@
   justify-content: flex-start;
   align-items: center;
   gap: 0.6rem;
+  padding: 0.4rem 0.8rem;
   cursor: pointer;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  
+  transition: background-color .3s ease;
 }
 
 .btn-icono.desactivado {
@@ -96,4 +102,13 @@
 .btn-icono.seleccionado > span.material-icons,
 .btn-icono.seleccionado > p {
   color: var(--primario-claro);
+}
+
+.btn-secundario {
+  background-color: var(--secundario-claro);
+  color: #fff;
+}
+
+.btn-secundario:hover {
+  background-color: var(--variante-secundario-claro);
 }

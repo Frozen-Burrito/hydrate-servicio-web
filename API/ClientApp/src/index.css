@@ -148,6 +148,10 @@ h6 {
   font-size: 1rem!important;
 }
 
+.primario {
+  color: var(--primario-claro)!important;
+}
+
 .contraste-primario {
   color: var(--contraste-primario-claro)!important;
 }
@@ -241,6 +245,7 @@ ul {
 
 .stack.horizontal {
   flex-direction: row;
+  align-items: center;
   width: 100%;
 }
 

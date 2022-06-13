@@ -5,7 +5,8 @@ export { default as DrawerPerfil } from "./DrawerConfigurados/drawer_perfil";
 export { default as DrawerAdmin } from "./DrawerConfigurados/drawer_admin";
 export { default as Dropdown } from "./Dropdown/dropdown";
 export { default as Footer } from "./Footer/Footer";
-export { default as ListaComentarios } from "./ListaComentarios/lista_comentarios";
+export { default as ListaComentarios } from "./Listas/lista_comentarios";
+export { default as ListaProductos } from "./Listas/lista_productos";
 export { default as ControlPaginas } from "./ControlPaginas/control_paginas";
 
 /** Botones */
@@ -25,5 +26,6 @@ export { default as RutaProtegida } from "./RutaProtegida/RutaProtegida";
 export { default as SearchBox } from "./SearchBox/searchbox";
 export { TablaRecursosInf } from "./Tablas/TablaRecursosInf";
 export { FilaRecursoInformativo } from "./Tablas/FilaRecursoInformativo";
-export { default as Tarjeta } from "./Tarjeta/tarjeta";
-export { default as TarjetaComentario } from "./TarjetaComentario/tarjeta_comentario";
+export { default as Tarjeta } from "./Tarjetas/tarjeta";
+export { default as TarjetaComentario } from "./Tarjetas/tarjeta_comentario";
+export { default as TarjetaProducto } from "./Tarjetas/tarjeta_producto";
