@@ -58,6 +58,7 @@ h4 {
   color: var(--contraste-fondo-claro);
   font-weight: 500;
   font-size: 1.6rem;
+  text-transform: capitalize;
   line-height: 1.8rem;
 }
 
@@ -122,9 +123,28 @@ h6 {
   margin-right: 2.4rem;
 }
 
+.my-1 {
+  margin-top: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.my-2 {
+  margin-top: 1.6rem;
+  margin-bottom: 1.6rem;
+}
+
 .my-3 {
   margin-top: 2.4rem;
   margin-bottom: 2.4rem;
+}
+
+pt-5 {
+  padding-top: 4rem;
+}
+
+.py-2 {
+  padding-top: 1.6rem;
+  padding-bottom: 1.6rem;
 }
 
 .py-5 {
@@ -264,6 +284,10 @@ ul {
 
 .stack.justify-center {
   justify-content: center;
+}
+
+.stack.justify-end {
+  justify-content: flex-end;
 }
 
 .gap-1 {

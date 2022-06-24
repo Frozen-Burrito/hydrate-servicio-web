@@ -27,7 +27,7 @@ export default function TarjetaProducto({ producto, onComprar }) {
             label="Comprar"
             tipo="fill"
             disabled={producto.disponibles <= 0}
-            onClick={() => onComprar(producto.id)}
+            onClick={() => onComprar(producto)}
           />
         </div>
       }

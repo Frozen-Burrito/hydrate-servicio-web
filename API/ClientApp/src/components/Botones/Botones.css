@@ -104,6 +104,14 @@
   color: var(--primario-claro);
 }
 
+.btn-icono.icono-final {
+  justify-content: flex-end;
+}
+
+.btn-icono.icono-inicio {
+  justify-content: flex-start;
+}
+
 .btn-secundario {
   background-color: var(--secundario-claro);
   color: #fff;
@@ -111,4 +119,13 @@
 
 .btn-secundario:hover {
   background-color: var(--variante-secundario-claro);
+}
+
+.btn-gris {
+  background-color: var(--contraste-fondo-claro-sesenta);
+  color: #fff;
+}
+
+.btn-gris:hover {
+  background-color: var(--contraste-superficie-claro);
 }

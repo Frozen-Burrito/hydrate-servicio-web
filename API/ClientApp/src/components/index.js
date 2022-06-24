@@ -3,6 +3,7 @@ export { default as Drawer } from "./Drawer/Drawer";
 export { default as ElementoDrawer } from "./Drawer/ElementoDrawer";
 export { default as DrawerPerfil } from "./DrawerConfigurados/drawer_perfil";
 export { default as DrawerAdmin } from "./DrawerConfigurados/drawer_admin";
+export { default as DrawerCompra } from "./DrawerConfigurados/drawer_compra";
 export { default as Dropdown } from "./Dropdown/dropdown";
 export { default as Footer } from "./Footer/Footer";
 export { default as ListaComentarios } from "./Listas/lista_comentarios";

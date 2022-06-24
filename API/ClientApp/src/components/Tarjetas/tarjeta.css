@@ -4,11 +4,16 @@
   min-height: 8rem;
   max-height: 32rem;
   overflow: hidden;
+  flex: 1;
 
   background-color: var(--superficie-claro);
   color: var(--contraste-superficie-claro);
 
   transition: .4s background-color ease;
+}
+
+.tarjeta.elevacion-0 {
+  box-shadow: none;
 }
 
 .tarjeta.elevacion-1 {
@@ -68,4 +73,20 @@
 
 .tarjeta.con-accion:hover {
   background-color: #f0f0f0;
+}
+
+.tarjeta > .contenido > .cuerpo > .stat {
+  height: 8rem;
+}
+
+.tarjeta > .contenido > .cuerpo > .stat > h1 {
+  font-size: 3rem;
+  font-weight: 400;
+  color: var(--contraste-fondo-claro);
+}
+
+.tarjeta > .contenido > .cuerpo > .stat > h5 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--contraste-superficie-claro);
 }

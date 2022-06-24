@@ -1,24 +1,103 @@
 @import url("../../styles.css");
 
-.menu-drawer {
+.contenedor-drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* height: 100%;
+  width: 100%; */
+  overflow-x: hidden;
+
+  -webkit-transition: display ease .3s .3s;
+  transition: display .3s ease .3s; 
+}
+
+/* .contenedor-drawer.activo {
+  display: block;
+}
+
+.contenedor-drawer.escondido {
+  /* display: none; */
+
+.contenedor-drawer > .menu-drawer {
   height: 100vh;
-  width: 25vw;
+  min-width: 25%;
+  max-width: 30%;
   position: fixed;
+  z-index: 4;
   top: 0;
   padding: 0 0.8rem;
-  padding-top: 4.8rem;
-  background-color: var(--primario-claro);
-  color: var(--contraste-primario-claro);
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
+
+  -webkit-transition: left .3s ease-in-out, right .3s ease-in-out;
+  transition: left .3s ease-in-out, right .3s ease-in-out; 
+}
+
+.contenedor-drawer.activo.left > .menu-drawer {
+  left: 0%; 
+} 
+
+.contenedor-drawer.activo.right > .menu-drawer {
+  right: 0%; 
+} 
+
+.contenedor-drawer.escondido.left > .menu-drawer {
+  left: -50%; 
+} 
+ 
+.contenedor-drawer.escondido.right > .menu-drawer {
+  right: -50%; 
+} 
+
+.contenedor-drawer > .overlay-drawer {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: -100%;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+
+  background-color: transparent;
+  cursor: default;
+
+  -webkit-transition: background-color .3s ease, filter .3s ease-in-out;
+  transition: background-color .3s ease, filter .3s ease-in-out;
+}
+
+.contenedor-drawer.activo > .overlay-drawer {
+
+  left: 0;
+
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+
+  background-color: rgba(var(--contraste-superficie-rgb), 0.24);
+}
+
+.menu-drawer.primario {
+  background-color: var(--primario-claro);
+  color: var(--contraste-primario-claro)!important;
+}
+
+.menu-drawer.secundario {
+  background-color: var(--secundario-claro);
+  color: var(--contraste-secundario-claro)!important;
+}
+
+.menu-drawer.superficie {
+  background-color: var(--superficie-claro);
+  color: var(--contraste-superficie-claro)!important;
 }
 
 .menu-drawer > .drawer-superior,
 .menu-drawer > .drawer-inferior {
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -31,6 +110,16 @@
   font-weight: 500;
   text-align: start;
   font-size: 1.8rem;
+}
+
+.menu-drawer > .drawer-superior > .contenido-drawer {
+  max-width: 100%;
+}
+
+.menu-drawer > .drawer-superior > .contenido-drawer > img {
+  max-width: 100%;
+  max-height: 40%;
+  object-fit: cover;
 }
 
 .menu-drawer > .drawer-superior > a.elemento-drawer,

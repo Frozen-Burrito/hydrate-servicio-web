@@ -5,7 +5,9 @@ import { fetchProductos } from '../../api/api_productos';
 
 import { TarjetaProducto, ControlPaginas } from "../";
 
-export default function ListaProductos({ onProductoSeleccionado }) {
+export default function ListaProductos(props) {
+
+  const { onComprarProducto } = props;
 
   const [productos, setProductos] = useState([]);
 
@@ -85,7 +87,7 @@ export default function ListaProductos({ onProductoSeleccionado }) {
             <TarjetaProducto 
               key={producto.id} 
               producto={producto}
-              onComprar={onProductoSeleccionado}
+              onComprar={onComprarProducto}
             />
           );
         });
