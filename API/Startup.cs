@@ -14,6 +14,7 @@ using Swashbuckle.AspNetCore.Filters;
 using ServicioHydrate.Data;
 using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Utilidades;
+using Stripe;
 
 namespace ServicioHydrate
 {
@@ -124,6 +125,9 @@ namespace ServicioHydrate
         // Este método es llamado por el runtime. Usa este método para configurar el pipeline de peticiones HTTP.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Configurar llave de API de Stripe
+            StripeConfiguration.ApiKey = Configuration.GetSection("AppConfig:StripeApiKey").Value;
+            
             if (env.IsDevelopment())
             {
                 // Utilizar página de error detallada.

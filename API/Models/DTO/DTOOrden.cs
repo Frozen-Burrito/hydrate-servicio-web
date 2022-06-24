@@ -24,5 +24,10 @@ namespace ServicioHydrate.Modelos.DTO
 
         // La lista de productos que el cliente compró en esta orden.
         public List<DTOProductoCantidad> Productos { get; set; }
+
+        public long MontoTotalEnCentavos 
+        { 
+            get { return (long) (MontoTotal * 100); }
+        }
     }
 }

@@ -1,23 +1,24 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
+using Stripe;
 
 using ServicioHydrate.Data;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 #nullable enable
 namespace ServicioHydrate.Controladores
 {
     [ApiController]
-    [Authorize(Roles = "ADMIN_ORDENES")]
+    // [Authorize(Roles = "ADMIN_ORDENES")]
     [Route("api/v1/ordenes")]
     [Produces("application/json")]
     [Consumes("application/json")]
@@ -186,11 +187,11 @@ namespace ServicioHydrate.Controladores
         }
 
         /// <summary>
-        /// Registra una nueva orden, con un estado por defecto de "Pendiente".
+        /// Registra una nueva orden pendiente y comienza un PaymentIntent de Stripe.
         /// </summary>
-        /// <param name="nuevaOrden">Los productos y cantidades de la nueva orden.</param>
-        /// <returns></returns>
-        [HttpPost]
+        /// <param name="nuevaOrden">Una lista de IDs de productos, cada uno con su cantidad.</param>
+        /// <returns>El ID de la orden y el secreto de cliente de Stripe</returns>
+        [HttpPost("payment-intent")]
         [Authorize(Roles = "NINGUNO")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -198,25 +199,50 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> CrearOrden([FromBody] DTONuevaOrden nuevaOrden)
+        public async Task<IActionResult> CrearIntentDePago([FromBody] DTONuevaOrden productosOrden)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
             string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
-
+            
             try 
             {
                 // Obtener el ID del usuario actual desde el JWT.
                 string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
                 Guid idUsuarioActual = new Guid(idStr);
 
-                var ordenCreada = await _repositorioOrdenes.NuevaOrden(nuevaOrden, idUsuarioActual);
+                // Crear una nueva orden pendiente.
+                DTOOrden ordenCreada = await _repositorioOrdenes.NuevaOrden(productosOrden, idUsuarioActual);
 
+                // Iniciar el proceso de pago con Stripe.
+                var servicioPaymentIntent = new PaymentIntentService();
+                var intentDePago = servicioPaymentIntent.Create(new PaymentIntentCreateOptions
+                {
+                    Amount = ordenCreada.MontoTotalEnCentavos,
+                    Currency = "mxn",
+                    AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                    {
+                        Enabled = true
+                    },
+                });
+
+                // Retornar resultado de proceso de pedido.
                 return CreatedAtAction(
                     nameof(GetOrdenPorId),
                     new { idOrden = ordenCreada.Id },
-                    ordenCreada
+                    new {
+                        clientSecret = intentDePago.ClientSecret,
+                        orden = ordenCreada,
+                    }
+                );
+            }
+            catch (StripeException e) 
+            {
+                _logger.LogError($"Error de Stripe: {e.Message}");
+                return Problem(
+                    "Ocurrió un error al procesar el pago. Intenta más tarde.",
+                    statusCode: StatusCodes.Status503ServiceUnavailable
                 );
             }
             catch (FormatException e) 
@@ -259,6 +285,68 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ModificarEstadoDeOrden(Guid idOrden, EstadoOrden nuevoEstado)
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {                
+                await _repositorioOrdenes.ModificarEstadoDeOrden(idOrden, nuevoEstado);
+
+                return NoContent();
+            }
+            catch (ArgumentException e)
+            {
+                // No existe una orden con el ID solicitado. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (InvalidOperationException)
+            {
+                // Se solicito un cambio de estado no soportado. Retorna 405.
+                return Problem(
+                    "No es posible actualizar el estado de la orden con el nuevo estado recibido.",
+                    statusCode: StatusCodes.Status405MethodNotAllowed
+                );
+            }
+            catch (DbUpdateException e)
+            {
+                // Hubo un error de base de datos. Enviarlo a los logs y retornar 503.
+                _logger.LogError(e, $"Error de actualizacion de DB en {metodo} - {ruta}");
+
+                return Problem(
+                    "Ocurrió un error al procesar la petición. Intente más tarde.", 
+                    statusCode: StatusCodes.Status503ServiceUnavailable
+                );
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }    
+        }
+
+        /// <summary>
+        /// Es invocado por Stripe cuando hay cambios en el estado de pago de 
+        /// la orden.
+        /// </summary>
+        /// <remarks>
+        /// Por el momento, solo cambia el estado de orden:
+        /// PENDIENTE -> EN_PROGRESO.
+        /// Cuando el pago fue confirmado por Stripe.
+        /// </remarks>
+        /// <param name="idOrden">La orden que se va a actualizar.</param>
+        /// <param name="nuevoEstado">El nuevo estado para la orden.</param>
+        /// <returns>Resultado HTTP</returns>
+        [HttpPatch("{idOrden}/stripe-hook")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ActualizarOrdenConStripe(Guid idOrden, EstadoOrden nuevoEstado)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
