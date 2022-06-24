@@ -41,6 +41,8 @@ export const hacerPeticion = async (peticion, respuestaConCuerpo = true) => {
   const resJson = respuestaConCuerpo && resultado.ok
     ? await resultado.json() 
     : null;
+
+    console.log(resJson)
     
   return {
     ok: resultado.ok,

@@ -53,7 +53,7 @@ export default function Tarjeta(props) {
       
       <div className="contenedor-img">
         { mediaUrl != null && mediaUrl.length > 0 && (
-          <img src={mediaUrl} al="Imagen del producto" />
+          <img src={mediaUrl} alt="Imagen del producto" />
         )}
       </div>
 

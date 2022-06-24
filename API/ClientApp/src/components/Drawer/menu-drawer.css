@@ -104,12 +104,11 @@
   align-items: flex-start;
 }
 
-.menu-drawer > .drawer-superior > h5 {
-  margin-top: 2.4rem;
+h5.subtitulo-drawer {
   margin-bottom: 1.6rem;
+  color: var(--contraste-superficie-claro)!important;
   font-weight: 500;
-  text-align: start;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
 }
 
 .menu-drawer > .drawer-superior > .contenido-drawer {

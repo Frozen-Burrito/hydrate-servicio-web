@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 
 import useCookie from "../../utils/useCookie";
-import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
+import { crearPaymentIntent } from "../../api/api_productos";
 
-import { Drawer, BotonIcono } from "..";
+import { Drawer, BotonIcono, FormStripeCheckout } from "..";
 
 DrawerCompra.defaultProps = {
   mostrar: false,
@@ -12,6 +14,8 @@ DrawerCompra.defaultProps = {
   onCancelarCompra: null,
   lado: "izquierda",
 };
+
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_TEST_PK);
 
 export default function DrawerCompra(props) {
 
@@ -22,9 +26,8 @@ export default function DrawerCompra(props) {
   const [cantidad, setCantidad] = useState(1);
   const [etapaPago, setEtapaPago] = useState(1);
 
-  const history = useHistory();
-
-  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+  const [secretoCliente, setSecretoCliente] = useState("");
+  const [orden, setOrden] = useState(null);
 
   function handleCambioCantidad(e) {
 
@@ -36,18 +39,34 @@ export default function DrawerCompra(props) {
     setEtapaPago(nuevaEtapa);
   }
 
+  useEffect(() => {
+
+    async function generarIntentDePago() {
+      
+      const { secretoCliente, orden: ordenCreada } = await crearPaymentIntent([{
+        idProducto: producto.id,
+        cantidad,
+      }], jwt);
+
+      console.log(ordenCreada);
+      setOrden(ordenCreada);
+
+      if (secretoCliente != null) { 
+        setSecretoCliente(secretoCliente);
+      } else {
+        console.log("Error generando intent de pago");
+      }
+    }
+
+    if (etapaPago === 2 && secretoCliente.length <= 0) {
+      generarIntentDePago();
+    }
+
+  }, [etapaPago, jwt, cantidad, producto, secretoCliente]);
+
   const formularioCantidad = producto != null 
   ? (
-    <div className="contenido-drawer stack vertical justify-between gap-2 py-2">
-      <BotonIcono 
-        icono="clear"
-        tipo="texto"
-        iconoAlFinal={true}
-        onClick={onCancelarCompra}
-      />
-
-      <h4 className="center-text">{ producto.nombre }</h4>
-
+    <>
       <img src={ producto.urlImagen } alt="Imagen del producto" />
 
       <p>
@@ -79,7 +98,7 @@ export default function DrawerCompra(props) {
         </h4>
       </div>
 
-      <div className="stack horizontal justify-between gap-2 py-2">
+      <div className="stack horizontal justify-between gap-1 my-2">
 
         <button 
           className={`btn btn-gris`}
@@ -96,15 +115,53 @@ export default function DrawerCompra(props) {
           Continuar
         </button>
       </div>
-    </div>
-  ) : <p>No hay datos del producto.</p>;
+    </>
+  ) : <p>Ningún producto seleccionado.</p>;
+
+  const aparienciaPago = {
+    theme: "stripe",
+  };
+
+  const opciones = {
+    clientSecret: secretoCliente,
+    appearance: aparienciaPago
+  }
+
+  const stripeCheckout = secretoCliente && (
+    <Elements options={opciones} stripe={stripePromise}>
+      <FormStripeCheckout 
+        total={orden != null ? orden.montoTotal : 0.0 } 
+        onCancelarCompra={onCancelarCompra} 
+      />
+    </Elements>
+  );
+
+  const etapasFormulario = [
+    formularioCantidad,
+    stripeCheckout,
+  ];
 
   function renderElementosDrawer() {
-    switch (etapaPago) {
-      case 1:
-        return formularioCantidad;
-      case 2: 
-        return formularioCantidad;
+
+    const componenteFormulario = etapasFormulario[etapaPago - 1];
+
+    if (producto != null) {
+      return (
+        <div className="contenido-drawer stack vertical justify-between gap-1 py-2 px-1">
+          <BotonIcono 
+            icono="clear"
+            tipo="texto"
+            iconoAlFinal={true}
+            onClick={onCancelarCompra}
+          />
+  
+          <h4 className="center-text">{ producto.nombre }</h4>
+  
+          { componenteFormulario }
+        </div>
+      );
+    } else {
+      return <p>Error obteniendo proceso de pago.</p>
     }
   }
 

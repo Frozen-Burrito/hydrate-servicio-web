@@ -19,6 +19,7 @@ export { default as FormAgregarRecurso } from "./formularios/FormAgregarRecurso"
 export { default as FormCrearCuenta } from "./formularios/FormCrearCuenta";
 export { default as FormIniciarSesion } from "./formularios/FormInicioSesion";
 export { default as FormPublicarComentario } from "./formularios/form_publicar_comentario";
+export { default as FormStripeCheckout } from "./formularios/form_stripe_checkout";
 
 export { default as Layout } from "./Layout/Layout";
 export { default as ListItem } from "./ListItemExpandible/list_item_expandible";
