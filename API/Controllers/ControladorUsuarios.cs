@@ -10,6 +10,7 @@ using ServicioHydrate.Data;
 using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
+using System.Linq;
 
 namespace ServicioHydrate.Controladores 
 {
@@ -176,6 +177,49 @@ namespace ServicioHydrate.Controladores
                 return Ok(resultado);
             }
             catch (Exception e) 
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Obtiene los datos de usuario (nombre y correo) del usuario autenticado
+        /// que hace la petición.
+        /// </summary>
+        /// <returns>El nombre de usuario y correo del usuario actual.</returns>
+        [HttpGet("datos")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOUsuario))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetUsuarioPorId()
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value;
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                // Obtener el ID del usuario actual desde el JWT.
+                string strIdUsuario = this.User.Claims.FirstOrDefault(c => c.Type.Equals("id"))?.Value ?? "";
+                Guid idUsuarioActual = new Guid(strIdUsuario);
+                
+                // Obtener los demás datos del usuario.
+                DTOUsuario usuario = await _repoUsuarios.GetUsuarioPorId(idUsuarioActual);
+
+                return Ok(usuario);
+            }
+            catch (ArgumentException e)
+            {
+                // No existe un usuario con el ID solicitado. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
             {
                 // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
                 _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");

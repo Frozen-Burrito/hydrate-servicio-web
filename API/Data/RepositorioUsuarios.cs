@@ -149,7 +149,7 @@ namespace ServicioHydrate.Data
         public async Task<DTOUsuario> GetUsuarioPorId(Guid id)
         {
             // Buscar un usuario en la base de datos con el id recibido.
-            var usuario = await _contexto.Usuarios.FindAsync(id);
+            Usuario? usuario = await _contexto.Usuarios.FindAsync(id);
 
             if (usuario is null)
             {
