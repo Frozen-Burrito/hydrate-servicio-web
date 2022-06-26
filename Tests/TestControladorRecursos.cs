@@ -37,15 +37,22 @@ namespace ServicioHydrate.Tests
 
             var stubRepositorio = new Mock<IServicioRecursos>();
             
-            stubRepositorio.Setup(repo => repo.GetRecursosAsync())
+            stubRepositorio.Setup(repo => repo.GetRecursosAsync(It.IsAny<DTOParamsPagina>()))
                 .ReturnsAsync(coleccionRecursos);
 
             var stubLogger = new Mock<ILogger<ControladorRecursosInformativos>>();
 
             var controlador = new ControladorRecursosInformativos(stubRepositorio.Object, stubLogger.Object);
 
+            var parametros = new DTOParamsPagina
+            {
+                Pagina = 1,
+                Query = "",
+                SizePagina = 100,
+            };
+
             // Cuando
-            var resultadoHttp = await controlador.GetRecursosInformativos(); 
+            var resultadoHttp = await controlador.GetRecursosInformativos(parametros); 
         
             // Entonces
             Assert.NotNull(resultadoHttp);
@@ -54,8 +61,14 @@ namespace ServicioHydrate.Tests
 
             if (resultado is not null) 
             {
-                Assert.IsType<List<DTORecursoInformativo>>(resultado.Value);
-                Assert.Empty(resultado.Value as List<DTORecursoInformativo>);
+                Assert.IsType<DTOResultadoPaginado<DTORecursoInformativo>>(resultado.Value);
+
+                var resultadoPaginado = resultado.Value as DTOResultadoPaginado<DTORecursoInformativo>;
+
+                if (resultadoPaginado is not null)
+                {
+                    Assert.Empty(resultadoPaginado.Resultados);
+                }
             }
         }
 
@@ -71,25 +84,39 @@ namespace ServicioHydrate.Tests
 
             var stubRepositorio = new Mock<IServicioRecursos>();
             
-            stubRepositorio.Setup(repo => repo.GetRecursosAsync())
+            stubRepositorio.Setup(repo => repo.GetRecursosAsync(It.IsAny<DTOParamsPagina>()))
                 .ReturnsAsync(coleccionRecursos);
 
             var stubLogger = new Mock<ILogger<ControladorRecursosInformativos>>();
 
             var controlador = new ControladorRecursosInformativos(stubRepositorio.Object, stubLogger.Object);
             
+            var parametros = new DTOParamsPagina
+            {
+                Pagina = 1,
+                Query = "",
+                SizePagina = 100,
+            };
+
             // Act
-            var resultadoHttp = await controlador.GetRecursosInformativos();
+            var resultadoHttp = await controlador.GetRecursosInformativos(parametros);
 
             // Assert
             Assert.NotNull(resultadoHttp);
-
+ 
             var resultado = resultadoHttp as ObjectResult;
 
             if (resultado is not null) 
             {
-                Assert.IsType<List<DTORecursoInformativo>>(resultado.Value);
-                Assert.Equal(coleccionRecursos, resultado.Value);
+                Assert.IsType<DTOResultadoPaginado<DTORecursoInformativo>>(resultado.Value);
+                
+                var resultadoPaginado = resultado.Value as DTOResultadoPaginado<DTORecursoInformativo>;
+
+                if (resultadoPaginado is not null)
+                {
+                     Assert.Equal(coleccionRecursos, resultadoPaginado.Resultados);
+                }
+               
             }
         }
 
