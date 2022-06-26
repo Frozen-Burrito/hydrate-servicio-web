@@ -1,3 +1,4 @@
+import { formarTokenAuth } from "../utils/formato_token_auth";
 import * as api from "./api";
 
 export const fetchProductos = async (
@@ -44,6 +45,25 @@ export const fetchOrdenes = async (numPagina = 1, jwt = "", {
   return resultados;
 }
 
+export const fetchResumenDeOrdenes = async (jwt) => {
+
+  const url = `${api.urlBase}/ordenes/stats`;
+
+  const peticion = new Request(url, {
+    method: api.GET,
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      'Authorization': formarTokenAuth(jwt),
+      // Utiliza JSON para el cuerpo.
+      'Content-Type': 'application/json',
+    }),
+  });
+  
+  const resultado = await api.hacerPeticion(peticion); 
+
+  return resultado;
+}
+
 export const crearPaymentIntent = async (
   productos,
   jwt
@@ -62,9 +82,7 @@ export const crearPaymentIntent = async (
     }),
   });
   
-  const resultado = await api.hacerPeticion(peticion); 
-
-  console.log(resultado);
+  const resultado = await api.hacerPeticion(peticion);
 
   return {
     secretoCliente: resultado.ok ? resultado.cuerpo.clientSecret : "",
