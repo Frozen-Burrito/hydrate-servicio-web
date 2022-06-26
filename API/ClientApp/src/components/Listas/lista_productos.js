@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { StatusHttp } from '../../api/api';
+import { StatusHttp, SIZE_PAGINA_DEFAULT } from '../../api/api';
 import { fetchProductos } from '../../api/api_productos';
 
 import { TarjetaProducto, ControlPaginas } from "../";
@@ -30,13 +30,11 @@ export default function ListaProductos(props) {
 
       const filtros = { 
         query: query, 
+        sizePagina: SIZE_PAGINA_DEFAULT,
         soloDisponibles: soloDisponibles 
       };
 
       const resultado = await fetchProductos(paginaActual, filtros);
-
-      console.log(resultado);
-
 
       if (resultado.status === StatusHttp.Status200OK) {
 

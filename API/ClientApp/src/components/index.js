@@ -26,8 +26,14 @@ export { default as ListItem } from "./ListItemExpandible/list_item_expandible";
 export { default as Navbar } from "./Navbar/Navbar";
 export { default as RutaProtegida } from "./RutaProtegida/RutaProtegida";
 export { default as SearchBox } from "./SearchBox/searchbox";
+
 export { TablaRecursosInf } from "./Tablas/TablaRecursosInf";
 export { FilaRecursoInformativo } from "./Tablas/FilaRecursoInformativo";
+export { default as Tabla } from "./Tablas/Tabla";
+export { default as FilaTabla } from "./Tablas/FilaTabla";
+export { default as EncabezadoColumna } from "./Tablas/EncabezadoColumna";
+export { default as TablaOrdenes } from "./Tablas/tabla_ordenes";
+
 export { default as Tarjeta } from "./Tarjetas/tarjeta";
 export { default as TarjetaComentario } from "./Tarjetas/tarjeta_comentario";
 export { default as TarjetaProducto } from "./Tarjetas/tarjeta_producto";

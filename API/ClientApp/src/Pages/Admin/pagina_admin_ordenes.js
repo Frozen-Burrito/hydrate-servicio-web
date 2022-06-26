@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 
 import useCookie from "../../utils/useCookie";
-import { fetchResumenDeOrdenes } from "../../api/api_productos";
+import { fetchResumenDeOrdenes, fetchOrdenes } from "../../api/api_productos";
 
-import { Layout, SearchBox, Tarjeta, DrawerAdmin } from "../../components";
+import { 
+  Layout, 
+  Tarjeta, 
+  DrawerAdmin, 
+  TablaOrdenes
+} from "../../components";
 
 export function PaginaAdminOrdenes () {
 
   const { valor: jwt } = useCookie('jwt');
 
+  // Valores de estadísticas de órdenes.
   const [ordCompletadas, setOrdCompletadas] = useState(null);
   const [ordEnProgreso, setOrdEnProgreso] = useState(null);
   const [ventasTotales, setVentasTotales] = useState(null);
@@ -19,10 +25,12 @@ export function PaginaAdminOrdenes () {
     "Ventas totales (MXN)"
   ]);
 
-  function filtrarOrdenes() {
-
-  }
-
+  /**
+   * Mapea la posición de la estadística con su valor.
+   * 
+   * @param {number} indice El índice de la estadística de ordenes
+   * @returns El valor de la estadística.
+   */
   function obtenerValorDeStat(indice) {
     switch (indice) {
       case 0: return ordCompletadas;
@@ -70,8 +78,8 @@ export function PaginaAdminOrdenes () {
 
       <DrawerAdmin />
 
-      <div className="panel-contenido ancho-max-70">
-        <h3>Órdenes de Clientes</h3>
+      <section className='contenedor full-page py-5'>
+        <h3 className="mt-3">Órdenes de Clientes</h3>
 
         <div className="stack horizontal justify-center gap-2 my-3">
           { labelsStats.map((label, indice) => {
@@ -91,17 +99,8 @@ export function PaginaAdminOrdenes () {
           })}
         </div>
 
-        <div className="stack horizontal justify-end gap-2 my-2">
-          <SearchBox 
-            icono="search" 
-            iconoSufijo="clear"
-            label="Busca órdenes por Id, nombre o email" 
-            onBusqueda={filtrarOrdenes}
-          />
-        </div>
-
-        
-      </div>
+        <TablaOrdenes />
+      </section>
     </Layout>
   )
 }
