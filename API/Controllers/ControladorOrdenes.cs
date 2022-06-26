@@ -20,7 +20,7 @@ using System.Collections.Generic;
 namespace ServicioHydrate.Controladores
 {
     [ApiController]
-    // [Authorize(Roles = "ADMIN_ORDENES")]
+    [Authorize(Roles = "ADMIN_ORDENES")]
     [Route("api/v1/ordenes")]
     [Produces("application/json")]
     [Consumes("application/json")]
@@ -178,6 +178,34 @@ namespace ServicioHydrate.Controladores
             {
                 // No existe una orden con el ID solicitado. Retorna 404.
                 return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        [HttpGet("stats")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOStatsOrdenes))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetEstadisticasOrdenes()
+        {
+            // Registrar un log de la peticion.
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                var resumenOrdenes = await _repositorioOrdenes.GetStatsOrdenes();
+
+                return Ok(resumenOrdenes);
             }
             catch (Exception e)
             {

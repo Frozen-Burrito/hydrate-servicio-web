@@ -91,6 +91,41 @@ namespace ServicioHydrate.Data
             return orden.ComoDTO();
         }
 
+        public async Task<DTOStatsOrdenes> GetStatsOrdenes()
+        {
+            if (await _contexto.Ordenes.CountAsync() <= 0) 
+            {
+                return new DTOStatsOrdenes();
+            }
+
+            IQueryable<Orden> todasLasOrdenes = _contexto.Ordenes.AsQueryable();
+
+            int numOrdenesCompletadas = await todasLasOrdenes
+                .Where(o => o.Estado == EstadoOrden.CONCLUIDA)
+                .CountAsync();
+
+            int numOrdenesEnProgreso = await todasLasOrdenes
+                .Where(o => o.Estado.Equals(EstadoOrden.EN_PROGRESO))
+                .CountAsync();
+
+            List<DTOOrden> dtosOrdenes = await todasLasOrdenes
+                .Include(o => o.Cliente)
+                .Include(o => o.Productos)
+                .ThenInclude(o => o.Producto)
+                .Select(o => o.ComoDTO())
+                .ToListAsync();
+
+            decimal ventasTotales = dtosOrdenes
+                .Sum(oDTO => oDTO.MontoTotal);
+            
+            return new DTOStatsOrdenes
+            {
+                OrdenesCompletadas = numOrdenesCompletadas,
+                OrdenesEnProgreso = numOrdenesEnProgreso,
+                VentasTotalesMXN = ventasTotales,
+            };
+        }
+
         public async Task<DTOOrden> ModificarEstadoDeOrden(Guid idOrden, EstadoOrden nuevoEstado)
         {
             if (await _contexto.Ordenes.CountAsync() <= 0) 

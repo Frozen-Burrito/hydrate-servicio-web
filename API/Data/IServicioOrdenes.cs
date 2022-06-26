@@ -37,8 +37,21 @@ namespace ServicioHydrate.Data
         /// recibido.
         /// </remarks>
         /// <param name="idOrden">El Id de la orden.</param>
-        /// <returns>La orden con </returns>
+        /// <returns>La orden con el ID solicitado.</returns>
         Task<DTOOrden> GetOrdenPorId(Guid idOrden);
+
+        /// <summary>
+        /// Obtiene estadísticas generales de órdenes de compra.
+        /// </summary>
+        /// <remarks>
+        /// Las estadísticas incluyen:
+        /// 
+        /// - El número de órdenes completadas.
+        /// - El número de órdenes en progreso.
+        /// - Las ventas totales, en MXN.
+        /// </remarks>
+        /// <returns>Un resumen estadístico de todas las órdenes.</returns>
+        Task<DTOStatsOrdenes> GetStatsOrdenes();
 
         /// <summary>
         /// Registra una nueva orden.
