@@ -41,8 +41,6 @@ export const hacerPeticion = async (peticion, respuestaConCuerpo = true) => {
   const resJson = respuestaConCuerpo && resultado.ok
     ? await resultado.json() 
     : null;
-
-    console.log(resJson)
     
   return {
     ok: resultado.ok,
@@ -64,8 +62,9 @@ export async function fetchPaginado(endpoint, numPagina = 1, elemsPorPagina = 25
 
   const params = new URLSearchParams({
     pagina: numPagina,
-    sizePagina: elemsPorPagina,
   });
+
+  if (elemsPorPagina != null) params.set("sizePagina", elemsPorPagina);
   
   if (incluirIdUsuario && jwt) {
     const idUsuario = getIdUsuarioDesdeJwt(jwt);
