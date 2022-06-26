@@ -13,6 +13,8 @@ using Stripe;
 using ServicioHydrate.Data;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
+using System.IO;
+using System.Collections.Generic;
 
 #nullable enable
 namespace ServicioHydrate.Controladores
@@ -221,9 +223,13 @@ namespace ServicioHydrate.Controladores
                 {
                     Amount = ordenCreada.MontoTotalEnCentavos,
                     Currency = "mxn",
-                    AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                    PaymentMethodTypes = new List<string>
                     {
-                        Enabled = true
+                        "card",
+                    },
+                    Metadata = new Dictionary<string, string>
+                    {
+                        { "IdOrden", ordenCreada.Id.ToString() },
                     },
                 });
 
@@ -341,51 +347,68 @@ namespace ServicioHydrate.Controladores
         /// <param name="idOrden">La orden que se va a actualizar.</param>
         /// <param name="nuevoEstado">El nuevo estado para la orden.</param>
         /// <returns>Resultado HTTP</returns>
-        [HttpPatch("{idOrden}/stripe-hook")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [HttpPatch("webhooks/pagos-stripe")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ActualizarOrdenConStripe(Guid idOrden, EstadoOrden nuevoEstado)
+        public async Task<IActionResult> ActualizarOrdenConStripe()
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
             string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
+            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+            const string secretoEndpoint = "secreto-webhook-pruebas";
+
             try
-            {                
-                await _repositorioOrdenes.ModificarEstadoDeOrden(idOrden, nuevoEstado);
+            {           
+                var eventoStripe = EventUtility.ParseEvent(json);
+                var headerFirma = Request.Headers["Stripe-Signature"];
 
-                return NoContent();
-            }
-            catch (ArgumentException e)
-            {
-                // No existe una orden con el ID solicitado. Retorna 404.
-                return NotFound(e.Message);
-            }
-            catch (InvalidOperationException)
-            {
-                // Se solicito un cambio de estado no soportado. Retorna 405.
-                return Problem(
-                    "No es posible actualizar el estado de la orden con el nuevo estado recibido.",
-                    statusCode: StatusCodes.Status405MethodNotAllowed
-                );
-            }
-            catch (DbUpdateException e)
-            {
-                // Hubo un error de base de datos. Enviarlo a los logs y retornar 503.
-                _logger.LogError(e, $"Error de actualizacion de DB en {metodo} - {ruta}");
+                eventoStripe = EventUtility.ConstructEvent(json, headerFirma, secretoEndpoint);
 
-                return Problem(
-                    "Ocurrió un error al procesar la petición. Intente más tarde.", 
-                    statusCode: StatusCodes.Status503ServiceUnavailable
-                );
+                if (eventoStripe.Type == Events.PaymentIntentSucceeded) 
+                {
+                    var intentDePago = eventoStripe.Data.Object as PaymentIntent;
+
+                    if (intentDePago is not null)
+                    {
+                        // Obtener el ID de la orden de los metadatos del PaymentIntent.
+                        Guid idOrden = new Guid(intentDePago.Metadata["IdOrden"]);
+
+                        _logger.LogInformation($"Pago exitoso por ${intentDePago.Amount}, ID de la orden: {idOrden}");
+
+                        // Método para manejar el evento de Stripe.
+                        _repositorioOrdenes.ModificarEstadoDeOrden(idOrden, EstadoOrden.EN_PROGRESO);
+                    }
+                } 
+                else if (eventoStripe.Type == Events.PaymentMethodAttached)
+                {
+                    var metodoDePago = eventoStripe.Data.Object as PaymentMethod;
+
+                    _logger.LogInformation("Evento de metodo de pago recibido de Stripe.");
+                }
+                else 
+                {
+                    _logger.LogWarning($"Tipo de evento no manejado: {eventoStripe.Type}");
+                }
+
+                return Ok();
+            }
+            catch (StripeException e)
+            {
+                // Hubo un error en el proceso de pago de Stripe, retorna 400.
+                _logger.LogWarning($"Error de Stripe al procesar webhook: {e.Message}");
+
+                return BadRequest();
             }
             catch (Exception e)
             {
                 // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
-                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+                _logger.LogError(e, $"{metodo} - {ruta}: Ocurrió un error inesperado en un webhook de Stripe, {e.Message}");
 
                 return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
             }    

@@ -107,7 +107,7 @@ export default function FormStripeCheckout(props) {
       elements: elementos,
       confirmParams: {
         // La URL de la página de pago completado.
-        return_url: `https://localhost:5001/perfil/${idUsuario}`,
+        return_url: `https://servicio-web-hydrate.azurewebsites.net/perfil/${idUsuario}`,
         receipt_email: emailUsuario
       }
     });
