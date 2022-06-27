@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 import { StatusHttp } from "../../api/api";
-import { fetchOrdenes, fetchProductos } from "../../api/api_productos";
+import { fetchOrdenes, fetchProductos, cambiarEstadoOrden } from "../../api/api_productos";
 import useCookie from "../../utils/useCookie";
 
 import { 
-  SearchBox, 
   Tabla, 
   FilaTabla,
+  FiltrosParaOrdenes,
   EncabezadoColumna, 
   ControlPaginas,
   Dropdown,
@@ -16,10 +16,12 @@ import {
 
 export default function TablaOrdenes() {
 
-  const { valor: jwt } = useCookie('jwt');
+  const { valor: jwt } = useCookie("jwt");
 
   // Colección de órdenes de la página, para ser mostradas en la tabla. 
   const [ordenes, setOrdenes] = useState([]);
+
+  const [filtrosOrdenes, setFiltrosOrdenes] = useState({});
 
   // Un mapa con todos los productos, donde las llaves son el ID de cada producto.
   const [productos, setProductos] = useState(new Map());
@@ -27,18 +29,6 @@ export default function TablaOrdenes() {
   // Estados de carga y error de la tabla.
   const [estaCargando, setEstaCargando] = useState(false);
   const [tieneError, setTieneError] = useState(false);
-
-  // Queries de búsqueda según el ID de la orden y los datos del cliente.
-  const [queryDeOrdenes, setQueryDeOrdenes] = useState({
-    idOrden: null,
-    nombre: null,
-    email: null,
-  });
-
-  // Filtros por fecha y estado de orden.
-  const [filtroPorEstado, setFiltroPorEstado] = useState(null);
-  const [filtroPorFechaInicial, setFiltroPorFechaInicial] = useState(null);
-  const [filtroPorFechaFinal, setFiltroPorFechaFinal] = useState(null);
 
   // Control de resultados paginados.
   const [paginaActual, setPaginaActual] = useState(1);
@@ -66,63 +56,37 @@ export default function TablaOrdenes() {
     "Concluida",
     "Cancelada"
   ];
- 
-  /**
-   * Actualiza el el query de órdenes.
-   * @param {string} query El string de búsqueda del SearchBox.
-   */
-  function cambiarQueryOrdenes(query) {
 
-    const queryStr = query.trim();
+  const opcionesExportar = [
+    ".csv"
+  ];
 
-    if (queryStr.includes("@") && !queryStr.includes(" ")) {
-      // El query es el email de un cliente.
-      console.log("Filtrando por email: ", queryStr);
-      setQueryDeOrdenes({
-        idOrden: null,
-        nombre: null,
-        email: queryStr,
-      });
+  async function onCambioEstadoOrden(idOrden, indNuevoEstado) {
 
-    } else if (queryStr.includes("-") && !queryStr.includes(" ")) {
-      // El query es el ID de una orden.
-      console.log("Filtrando por ID de orden: ", queryStr);
-      setQueryDeOrdenes({
-        idOrden: queryStr,
-        nombre: null,
-        email: null,
-      });
+    const resultado = await cambiarEstadoOrden(idOrden, indNuevoEstado, jwt);
 
-    } else {
-      // El query es el nombre de un cliente.
-      console.log("Filtrando por nombre de cliente: ", queryStr);
-      setQueryDeOrdenes({
-        idOrden: null,
-        nombre: queryStr,
-        email: null,
-      });
+    if (resultado.ok && resultado.status === StatusHttp.Status204SinContenido) {
+
+      setOrdenes(prev => prev.map((orden, i) => {
+        if (orden.id === idOrden) {
+          orden.estado = indNuevoEstado;
+        }
+
+        return orden;
+      }));
     }
   }
 
-  function onCambioEstadoOrden(indiceNuevoEstado) {
-
+  async function onExportarOrdenes(formato) {
+    console.log("Exportando ordenes...");
   }
 
   useEffect(() => {
 
     async function obtenerOrdenes() {
 
-      const params = {
-        query: null,
-        idCliente: null,
-        nombreCliente: queryDeOrdenes.nombre, 
-        email: queryDeOrdenes.email, 
-        idOrden: queryDeOrdenes.idOrden,
-        estadoOrden: filtroPorEstado,
-      };
-
       const resultado = await fetchOrdenes(
-        params,
+        filtrosOrdenes,
         jwt, 
         paginaActual,
       );
@@ -176,7 +140,7 @@ export default function TablaOrdenes() {
 
     obtenerDatos();
     
-  }, [jwt, paginaActual, queryDeOrdenes, filtroPorEstado]);
+  }, [jwt, paginaActual, filtrosOrdenes]);
   
   const renderDropdownEstado = (orden) => (
     <Dropdown 
@@ -193,8 +157,41 @@ export default function TablaOrdenes() {
       items={(
         <>
           { estadoDeOrden.map((estado, indice) => (
-            <button key={indice} className ="elemento-dropdown" onClick={() => onCambioEstadoOrden(indice)}>
+            <button 
+              key={indice} 
+              className ="elemento-dropdown" 
+              onClick={() => onCambioEstadoOrden(orden.id, indice)}
+            >
               { estado }
+            </button>
+          ))}
+        </>
+      )}
+    />
+  );
+
+  const renderDropdownExportar = () => (
+    <Dropdown 
+      onColor="superficie"
+      boton={(
+        <BotonIcono 
+          icono="file_download"
+          iconoSufijo="arrow_drop_down"
+          elevacion={1}
+          label="Exportar"
+          color="fondo"
+          tipo="dropdown"
+        />
+      )}
+      items={(
+        <>
+          { opcionesExportar.map((opcion, i) => (
+            <button 
+              key={i} 
+              className ="elemento-dropdown" 
+              onClick={() => onExportarOrdenes(opcion)}
+            >
+              { opcion }
             </button>
           ))}
         </>
@@ -274,13 +271,12 @@ export default function TablaOrdenes() {
 
   return (
     <>
-      <div className="stack horizontal justify-end gap-2 my-2">
-        <SearchBox 
-          icono="search" 
-          iconoSufijo="clear"
-          label="Busca órdenes por Id, nombre o email" 
-          buscarEnOnChange={false}
-          onBusqueda={cambiarQueryOrdenes}
+      <div className="stack horizontal justify-end gap-1 mt-1">
+        { renderDropdownExportar() }
+      </div>
+      <div className="stack horizontal justify-end gap-2 mt-2">
+        <FiltrosParaOrdenes 
+          onCambioEnFiltros={setFiltrosOrdenes}
         />
       </div>
 

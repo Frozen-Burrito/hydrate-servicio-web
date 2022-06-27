@@ -44,6 +44,10 @@ export const fetchOrdenes = async (paramsOrdenes, jwt, numPagina = 1) => {
     email = null, 
     idOrden = null,
     estadoOrden = null,
+    rangoFechas = {
+      inicio: null,
+      fin: null,
+    }
   } = paramsOrdenes;
 
   const endpoint = "ordenes";
@@ -52,10 +56,18 @@ export const fetchOrdenes = async (paramsOrdenes, jwt, numPagina = 1) => {
 
   if (query != null) paramsUrl.set("query", query);
   if (idCliente != null) paramsUrl.set("idCliente", idCliente);
+
+  // Filtros por atributos de orden.
   if (nombreCliente != null) paramsUrl.set("nombreCliente", nombreCliente);
   if (email != null) paramsUrl.set("emailCliente", email);
   if (idOrden != null) paramsUrl.set("idOrden", idOrden);
+
+  // Filtros por estado de la orden.
   if (estadoOrden != null) paramsUrl.set("estado", estadoOrden);
+
+  // Filtros por rango de fechas.
+  if (rangoFechas.inicio != null) paramsUrl.set("desde", rangoFechas.inicio);
+  if (rangoFechas.fin != null) paramsUrl.set("hasta", rangoFechas.fin);
 
   const resultados = await api.fetchPaginado(
     endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, paramsUrl, jwt
@@ -107,4 +119,25 @@ export const crearPaymentIntent = async (
     secretoCliente: resultado.ok ? resultado.cuerpo.clientSecret : "",
     orden: resultado.ok ? resultado.cuerpo.orden : null,
   }
+}
+
+export const cambiarEstadoOrden = async (idOrden, indiceNuevoEstado, jwt) => {
+  
+  const params = new URLSearchParams({
+    nuevoEstado: indiceNuevoEstado
+  });
+
+  const endpoint = `${api.urlBase}/ordenes/${idOrden}/actualizar?`.concat(params.toString());
+
+  const peticion = new Request(endpoint, {
+    method: api.PATCH,
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      'Authorization': formarTokenAuth(jwt), 
+      // Utiliza JSON para el cuerpo.
+      'Content-Type': 'application/json'
+    }),
+  });
+  
+  return await api.hacerPeticion(peticion, false);
 }

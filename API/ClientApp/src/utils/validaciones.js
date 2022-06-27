@@ -86,6 +86,25 @@ export class ErrorDeComentario {
   }
 };
 
+export class ErrorDeFecha {
+  static ninguno = new ErrorDeFecha("ninguno");
+  static errFormato = new ErrorDeFecha("errFormato");
+  static errMayorQueOtra = new ErrorDeFecha("errMayorQueOtra");
+  static errRangoNoCoincide = new ErrorDeFecha("errRangoNoCoincide");
+
+  constructor(error) {
+    this.error = error;
+  }
+
+  valores() {
+    return Object.keys(this);
+  }
+
+  toString() {
+    return `ErrorDeFecha.${this.error}`;
+  }
+};
+
 const regexCorreo = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const regexNombreUsuario = /^[a-z0-9_-]{4,20}$/;
@@ -183,6 +202,19 @@ export const validarContenidoComentario = (contenido, longitudMax) => {
     return ErrorDeComentario.errContenidoVacio;
   } else if (contenido.length > longitudMax) {
     return ErrorDeComentario.errContenidoVacio;
+  } else {
+    return null;
+  }
+}
+
+export const validarRangoFechas = (fechaInicio, fechaFinal) => {
+
+  if (fechaInicio > fechaFinal) {
+    return ErrorDeFecha.errRangoNoCoincide;
+  }
+
+  if (fechaInicio > new Date()) {
+    return ErrorDeFecha.errMayorQueOtra;
   } else {
     return null;
   }

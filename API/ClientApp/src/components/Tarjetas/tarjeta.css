@@ -12,14 +12,6 @@
   transition: .4s background-color ease;
 }
 
-.tarjeta.elevacion-0 {
-  box-shadow: none;
-}
-
-.tarjeta.elevacion-1 {
-  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
-}
-
 .tarjeta > .contenedor-img {
   overflow: hidden;
   max-width: 100%;

@@ -7,6 +7,7 @@ export default function BotonIcono(props) {
 		iconoSufijo,
 		label, 
 		tipo, 
+		elevacion,
 		disabled,
 		color, 
 		seleccionado, 
@@ -19,6 +20,7 @@ export default function BotonIcono(props) {
 
 	const claseTipoBtn = `btn-${tipo}`;
 	const claseColor = color != null ? `btn-${color}` : "";
+  const claseElevacion = `elevacion-${elevacion}`;
 	const claseDisabled = disabled ? "desactivado" : "";
 	const claseAlignIcono = iconoAlFinal ? "icono-final" : "icono-inicio";
 	const claseSeleccionado = seleccionado && !disabled ? "seleccionado" : ""; 
@@ -66,7 +68,7 @@ export default function BotonIcono(props) {
 
 	return (
 		<div 
-			className={`btn-icono ${tieneLabel ? "con-label" : ""} ${claseTipoBtn} ${claseColor} ${claseDisabled} ${claseSeleccionado} ${claseAlignIcono}`} 
+			className={`btn-icono ${tieneLabel ? "con-label" : ""} ${claseElevacion} ${claseTipoBtn} ${claseColor} ${claseDisabled} ${claseSeleccionado} ${claseAlignIcono}`} 
 			onClick={handleClick}
 		>
 			{ renderContenido() }				
@@ -84,5 +86,6 @@ BotonIcono.defaultProps = {
     esDeError: false,
     disabled: false,
     seleccionado: false,
+		elevacion: 0,
     onClick: () => {},
 };
