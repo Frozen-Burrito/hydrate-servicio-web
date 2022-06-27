@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import useCookie from "../../utils/useCookie";
-import { fetchResumenDeOrdenes, fetchOrdenes } from "../../api/api_productos";
+import { fetchResumenDeOrdenes } from "../../api/api_productos";
 
 import { 
   Layout, 
@@ -13,6 +13,8 @@ import {
 export function PaginaAdminOrdenes () {
 
   const { valor: jwt } = useCookie('jwt');
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   // Valores de estadísticas de órdenes.
   const [ordCompletadas, setOrdCompletadas] = useState(null);
@@ -71,12 +73,25 @@ export function PaginaAdminOrdenes () {
     obtenerEstadisticas();
 
   }, [jwt])
-  
+
+  /**
+   * Muestra o esconde el menú drawer.
+   * 
+   * @param {bool} mostrar Si el drawer debe ser visible o no.
+   */
+  function manejarToggleDrawer(mostrar) {
+    setDrawerVisible(mostrar);
+  }
 
   return (
     <Layout>
 
-      <DrawerAdmin />
+      <DrawerAdmin 
+        lado="izquierda"
+        mostrar={drawerVisible} 
+        indiceItemActivo={1}
+        onToggle={manejarToggleDrawer}
+      />
 
       <section className='contenedor full-page py-5'>
         <h3 className="mt-3">Órdenes de Clientes</h3>

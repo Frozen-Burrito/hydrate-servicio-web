@@ -25,6 +25,8 @@ export function PaginaAdminRecursos () {
   const [estaCargando, setEstaCargando] = useState(false);
   const [tieneError, setTieneError] = useState(false);
 
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
   // Es invocada cuando el usuario realiza un cambio con un recurso,
   // puede ser creación o modificación.
   // Si fue creado, agrega el nuevo recurso a la colección.
@@ -127,10 +129,15 @@ export function PaginaAdminRecursos () {
   return (
     <Layout>
 
-      <DrawerAdmin />
+      <DrawerAdmin 
+        lado="izquierda"
+        mostrar={drawerVisible} 
+        indiceItemActivo={3}
+        onToggle={() => setDrawerVisible(!drawerVisible)}
+      />
 
-      <div className='panel-contenido'>
-        <h3>Recursos Informativos</h3>
+      <section className='contenedor full-page py-5'>
+        <h3 className="mt-3">Recursos Informativos</h3>
 
         <FormAgregarRecurso 
           recursoActual={recursoSel} 
@@ -153,7 +160,7 @@ export function PaginaAdminRecursos () {
             onSiguiente={manejarCambioPagina}
           />
         </div>
-      </div>
+      </section>
     </Layout>
   )
 }

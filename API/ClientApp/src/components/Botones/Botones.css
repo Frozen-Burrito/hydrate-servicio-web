@@ -85,13 +85,17 @@
   justify-content: flex-start;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.4rem 0.8rem;
+  padding: 0.8rem;
   cursor: pointer;
   border-radius: 10px;
   outline: none;
   border: none;
   
   transition: background-color .3s ease;
+}
+
+.btn-icono.con-label {
+  padding: 0.4rem 0.8rem;
 }
 
 .btn-icono.desactivado {
@@ -110,6 +114,15 @@
 
 .btn-icono.icono-inicio {
   justify-content: flex-start;
+}
+
+.btn-primario {
+  background-color: var(--primario-claro);
+  color: var(--contraste-primario-claro);
+}
+
+.btn-primario:hover {
+  background-color: var(--variante-primario-claro);
 }
 
 .btn-secundario {

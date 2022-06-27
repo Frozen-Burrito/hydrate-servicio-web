@@ -10,6 +10,7 @@ Drawer.defaultProps = {
   lado: "left",
   mostrar: false,
   conFondo: false,
+  btnCerrarExterno: null,
 };
 
 export default function Drawer(props) {
@@ -23,7 +24,8 @@ export default function Drawer(props) {
     lado, 
     conNavbar,
     conFondo, 
-    colorFondo
+    colorFondo,
+    btnCerrarExterno,
   } = props;
 
   const claseColor = colorFondo;
@@ -49,10 +51,16 @@ export default function Drawer(props) {
           onClick={onCerrar} 
         /> 
       }
+
+      { btnCerrarExterno && 
+        <div className="wrap-btn-cerrar-drawer">
+          { btnCerrarExterno }
+        </div> 
+      }
       
       <div className={`menu-drawer ${claseColor} ${clasePadNavbar}`}>
         <div className="drawer-superior">
-          { encabezado != null && <h5>{ encabezado }</h5>}
+          { encabezado != null && <h5 className="encabezado-drawer">{ encabezado }</h5>}
 
           <>
             {elementos}

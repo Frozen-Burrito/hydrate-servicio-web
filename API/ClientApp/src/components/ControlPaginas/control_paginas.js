@@ -18,6 +18,8 @@ export default function ControlPaginas(props) {
 
   const handleCambioPagina = (e, nuevaPagina) => {
 
+    e.preventDefault();
+
     nuevaPagina = Math.min(Math.max(parseInt(nuevaPagina), 1), paginasTotales);
 
     if (nuevaPagina < paginaActual) {

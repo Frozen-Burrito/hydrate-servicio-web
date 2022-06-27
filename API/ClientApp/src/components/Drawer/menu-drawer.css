@@ -21,8 +21,7 @@
 
 .contenedor-drawer > .menu-drawer {
   height: 100vh;
-  min-width: 25%;
-  max-width: 30%;
+  width: 25vw;
   position: fixed;
   z-index: 4;
   top: 0;
@@ -52,6 +51,31 @@
  
 .contenedor-drawer.escondido.right > .menu-drawer {
   right: -50%; 
+}
+
+.wrap-btn-cerrar-drawer {
+  position: fixed;
+  z-index: 4;
+  top: 4.8rem;
+
+  -webkit-transition: left .3s ease-in-out, right .3s ease-in-out;
+  transition: left .3s ease-in-out, right .3s ease-in-out; 
+}
+
+.contenedor-drawer.activo.left > .wrap-btn-cerrar-drawer {
+  left: 26vw; 
+} 
+
+.contenedor-drawer.activo.right > .wrap-btn-cerrar-drawer {
+  right: 26vw; 
+} 
+
+.contenedor-drawer.escondido.left > .wrap-btn-cerrar-drawer {
+  left: 1vw; 
+} 
+ 
+.contenedor-drawer.escondido.right > .wrap-btn-cerrar-drawer {
+  right: 1vw; 
 } 
 
 .contenedor-drawer > .overlay-drawer {
@@ -102,6 +126,12 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+}
+
+h5.encabezado-drawer {
+  margin: 1.6rem 0;
+  font-weight: 500;
+  font-size: 1.8rem;
 }
 
 h5.subtitulo-drawer {

@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 FilaTabla.defaultProps = {
   children: <td>No hay registros en la fila.</td>,

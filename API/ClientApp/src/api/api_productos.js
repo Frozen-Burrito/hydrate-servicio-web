@@ -56,7 +56,7 @@ export const fetchOrdenes = async (paramsOrdenes, jwt, numPagina = 1) => {
   if (email != null) paramsUrl.set("emailCliente", email);
   if (idOrden != null) paramsUrl.set("idOrden", idOrden);
   if (estadoOrden != null) paramsUrl.set("estado", estadoOrden);
-  
+
   const resultados = await api.fetchPaginado(
     endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, paramsUrl, jwt
   );

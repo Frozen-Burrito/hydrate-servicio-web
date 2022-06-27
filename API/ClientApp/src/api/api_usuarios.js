@@ -27,6 +27,6 @@ export const getUsernameYCorreo = async (jwt) => {
 
     return { nombreUsuario, email };
   } else {
-    throw "Error obteniendo datos de usuario, status: " + resultado.status;
+    throw new Error(`Error obteniendo datos de usuario, status: ${resultado.status}`);
   }
 }

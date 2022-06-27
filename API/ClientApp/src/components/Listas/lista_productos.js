@@ -12,14 +12,14 @@ export default function ListaProductos(props) {
   const [productos, setProductos] = useState([]);
 
   // Filtros
-  const [query, setQuery] = useState("");
-  const [soloDisponibles, setSoloDisponibles] = useState(false);
+  const [query] = useState("");
+  const [soloDisponibles] = useState(false);
 
   const [paginaActual, setPaginaActual] = useState(1);
   const [paginasTotales, setPaginasTotales] = useState(1);
 
   const [estaCargando, setEstaCargando] = useState(false);
-  const [buscando, setBuscando] = useState(false);
+  const [buscando] = useState(false);
   const [tieneError, setTieneError] = useState(false);
 
   useEffect(() => {

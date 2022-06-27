@@ -45,7 +45,7 @@ export default function TablaOrdenes() {
   const [paginasTotales, setPaginasTotales] = useState(1);
 
   function manejarCambioPagina(e, nuevaPagina) {
-    if (nuevaPagina >= 1 && nuevaPagina < paginasTotales -1) {
+    if ((nuevaPagina >= 1 && nuevaPagina <= paginasTotales) || paginasTotales == null) {
       setPaginaActual(nuevaPagina);
     }
   }
@@ -154,8 +154,6 @@ export default function TablaOrdenes() {
 
         const mapaProductos = new Map(datosPaginados.resultados.map(producto => [producto.id, producto]));
 
-        console.log(mapaProductos);
-
         setProductos(mapaProductos);
         setTieneError(false);
         
@@ -167,6 +165,8 @@ export default function TablaOrdenes() {
     async function obtenerDatos() {
       
       setEstaCargando(true);
+
+      console.log("Obteniendo ordenes...");
 
       const peticiones = [ obtenerOrdenes(), obtenerProductos() ];
       
@@ -246,15 +246,14 @@ export default function TablaOrdenes() {
                 <td>{ orden.fecha.substring(0, 10) }</td>
                 <td>{ orden.idCliente }</td> 
                 <td>${ orden.montoTotal.toFixed(2) } MXN</td> 
-
-                { orden.productos.map(productoOrden => {
-
-                  return (
-                    <td key={productoOrden.idProducto}>
-                      x{productoOrden.cantidad} - { productos.get(productoOrden.idProducto).nombre }
-                    </td> 
-                  );
-                })}
+                
+                <td className="stack vertical justify-start gap-1">
+                  { orden.productos.map(productoOrden => {
+                    return (
+                      <p>x{productoOrden.cantidad} - { productos.get(productoOrden.idProducto).nombre }</p>  
+                    );
+                  })}
+                </td>
                 
                 <td>
                   { renderDropdownEstado(orden) }

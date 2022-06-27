@@ -1,44 +1,74 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
 import useCookie from "../../utils/useCookie";
-
-import { Drawer, ElementoDrawer } from "../";
 import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
 
+import { Drawer, ElementoDrawer, BotonIcono } from "../";
+
 DrawerPerfil.defaultProps = {
+  mostrar: false,
+  lado: "izquierda",
   indiceItemActivo: 0,
+  onToggle: null,
 };
 
-export default function DrawerPerfil({ indiceItemActivo }) {
+const elementos = [
+  { icono: "account_circle", texto: "Mi Cuenta", url: "" },
+  { icono: "dashboard", texto: "Tablero", url: "/tablero" },
+  { icono: "forum", texto: "Mis Comentarios", url: "/comentarios" },
+];
+
+export default function DrawerPerfil(props) {
+
+  const { mostrar, lado, indiceItemActivo, onToggle } = props;
 
   const { valor: jwt, eliminarCookie: cerrarSesion } = useCookie("jwt");
 
+  const [idUsuario, setIdUsuario] = useState(null);
+
   const history = useHistory();
 
-  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+  function getIconoBtnCerrar() {
 
-  const elementosMenu = (
-    <>
-      <ElementoDrawer
-        icono='account_circle'
-        texto="Mi Cuenta"
-        url={`/perfil/${idUsuario}`}
-        seleccionado={indiceItemActivo === 0}
-      />
-      <ElementoDrawer
-        icono='dashboard'
-        texto="Tablero"
-        url={`/perfil/${idUsuario}/tablero`}
-        seleccionado={indiceItemActivo === 1}
-      />
-      <ElementoDrawer
-        icono='forum'
-        texto="Mis Comentarios"
-        url={`/perfil/${idUsuario}/comentarios`}
-        seleccionado={indiceItemActivo === 2}
-      />
-    </>
+    if (mostrar) {
+      if (lado === "izquierda") {
+        return "keyboard_arrow_left";
+      } else {
+        return "keyboard_arrow_right";
+      }
+    } else {
+      if (lado === "izquierda") {
+        return "keyboard_arrow_right";
+      } else {
+        return "keyboard_arrow_left";
+      }
+    }
+  }
+
+  useEffect(() => {
+
+    setIdUsuario(getIdUsuarioDesdeJwt(jwt));
+
+  }, [jwt]);
+
+  const elementosMenu = elementos.map((item, indice) => (
+    <ElementoDrawer
+      key={indice}
+      icono={item.icono}
+      texto={item.texto}
+      url={`/perfil/${idUsuario}${item.url}`}
+      seleccionado={indiceItemActivo === indice}
+    />
+  ));
+
+  const btnToggleDrawer = (
+    <BotonIcono
+      icono={getIconoBtnCerrar()}
+      color="primario"
+      tipo="fill"
+      onClick={() => onToggle(!mostrar)}
+    />
   );
 
   const elementoCuenta = (
@@ -65,9 +95,15 @@ export default function DrawerPerfil({ indiceItemActivo }) {
 
   return (
     <Drawer
-      encabezado='Perfil'
+      encabezado="Perfil"
+      colorFondo="primario"
+      lado={lado}
+      mostrar={mostrar}
+      conFondo
+      onCerrar={() => onToggle(false)}
       elementos={elementosMenu}
       elementoFinal={elementoCuenta}
+      btnCerrarExterno={btnToggleDrawer}
     />
   );
 }

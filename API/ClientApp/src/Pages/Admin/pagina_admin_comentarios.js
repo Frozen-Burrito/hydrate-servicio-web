@@ -1,22 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Layout, ListaComentarios, DrawerAdmin } from '../../components';
 
 export function PaginaAdminComentarios () {
 
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
   return (
     <Layout>
-      <DrawerAdmin indiceItemActivo={2} />
+      <DrawerAdmin 
+        lado="izquierda"
+        mostrar={drawerVisible} 
+        indiceItemActivo={2}
+        onToggle={() => setDrawerVisible(!drawerVisible)}
+      />
 
-      <div className="panel-contenido ancho-max-70">
+      <section className='contenedor full-page py-5'>
         <div className="stack horizontal justify-between gap-2 my-3">
-          <h2>Comentarios Pendientes de Revisión</h2>
+          <h3>Comentarios Pendientes de Revisión</h3>
 
           <h4>Ordenar</h4>
         </div>
 
         <ListaComentarios pendientes conBusqueda={false}/>
-      </div>
+      </section>
     </Layout>
   )
 }

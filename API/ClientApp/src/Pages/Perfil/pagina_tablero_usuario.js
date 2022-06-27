@@ -1,21 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Layout, Avatar, DrawerPerfil } from "../../components";
 
 export function PaginaTableroPerfil() {
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
   return (
     <Layout>
-      <DrawerPerfil indiceItemActivo={1}/>
+      <DrawerPerfil 
+        lado="izquierda"
+        mostrar={drawerVisible} 
+        indiceItemActivo={1}
+        onToggle={() => setDrawerVisible(!drawerVisible)}
+      />
 
-      <div className="panel-contenido">
+      <section className='contenedor full-page py-5'>
         <div className="stack horizontal justify-between gap-2 my-3">
-          <h2>Tablero</h2>
+          <h3>Tablero</h3>
 
           <div style={{ display: "flex" }}>
             <Avatar alt="Juan Perez" />
           </div>
         </div>
-      </div>
+      </section>
     </Layout>
   );
 }
