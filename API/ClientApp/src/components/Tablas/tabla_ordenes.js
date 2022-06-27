@@ -73,12 +73,11 @@ export default function TablaOrdenes() {
    */
   function cambiarQueryOrdenes(query) {
 
-    console.log(query);
-
     const queryStr = query.trim();
 
     if (queryStr.includes("@") && !queryStr.includes(" ")) {
       // El query es el email de un cliente.
+      console.log("Filtrando por email: ", queryStr);
       setQueryDeOrdenes({
         idOrden: null,
         nombre: null,
@@ -87,6 +86,7 @@ export default function TablaOrdenes() {
 
     } else if (queryStr.includes("-") && !queryStr.includes(" ")) {
       // El query es el ID de una orden.
+      console.log("Filtrando por ID de orden: ", queryStr);
       setQueryDeOrdenes({
         idOrden: queryStr,
         nombre: null,
@@ -95,6 +95,7 @@ export default function TablaOrdenes() {
 
     } else {
       // El query es el nombre de un cliente.
+      console.log("Filtrando por nombre de cliente: ", queryStr);
       setQueryDeOrdenes({
         idOrden: null,
         nombre: queryStr,
@@ -166,8 +167,6 @@ export default function TablaOrdenes() {
       
       setEstaCargando(true);
 
-      console.log("Obteniendo ordenes...");
-
       const peticiones = [ obtenerOrdenes(), obtenerProductos() ];
       
       await Promise.all(peticiones);
@@ -185,8 +184,10 @@ export default function TablaOrdenes() {
       boton={(
         <BotonIcono 
           icono="pending_actions"
+          iconoSufijo="arrow_drop_down"
           label={ estadoDeOrden[orden.estado] }
-          tipo="texto"
+          color="fondo"
+          tipo="dropdown"
         />
       )}
       items={(
@@ -250,7 +251,9 @@ export default function TablaOrdenes() {
                 <td className="stack vertical justify-start gap-1">
                   { orden.productos.map(productoOrden => {
                     return (
-                      <p>x{productoOrden.cantidad} - { productos.get(productoOrden.idProducto).nombre }</p>  
+                      <p key={(productoOrden.idProducto)}>
+                        x{productoOrden.cantidad} - { productos.get(productoOrden.idProducto).nombre }
+                      </p>  
                     );
                   })}
                 </td>

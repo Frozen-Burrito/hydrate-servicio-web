@@ -33,7 +33,6 @@ export default function SearchBox(props) {
     }
 
     const handleCambioQuery = (e) => {
-        console.log("buscando...");
         setQuery(e.target.value);
 
         if (buscarEnOnChange) {
@@ -44,8 +43,6 @@ export default function SearchBox(props) {
     const handleBorrarQuery = (e) => {
 
         const queryVacio = "";
-
-        console.log("Query borrado");
 
         setQuery(queryVacio);
         onBusqueda(queryVacio);

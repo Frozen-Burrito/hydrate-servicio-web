@@ -4,6 +4,7 @@ export default function BotonIcono(props) {
 
 	const { 
 		icono, 
+		iconoSufijo,
 		label, 
 		tipo, 
 		disabled,
@@ -46,13 +47,21 @@ export default function BotonIcono(props) {
 			</>
 		)
 		: (
-			<>
-				<span className={`material-icons ${claseColorError}`}>
-					{ icono }
-				</span>
+			<div className="stack horizontal justify-between gap-1">
+				<div className="stack horizontal justify-start gap-1">
+					<span className={`material-icons ${claseColorError}`}>
+						{ icono }
+					</span>
 
-				{ renderLabelBtn() }
-			</>
+					{ renderLabelBtn() }
+				</div>
+
+				{ iconoSufijo && 
+					<span className={`material-icons ${claseColorError}`}>
+						{ iconoSufijo }
+					</span>
+				}
+			</div>
 		);
 
 	return (
@@ -67,6 +76,7 @@ export default function BotonIcono(props) {
 
 BotonIcono.defaultProps = {
     icono: null,
+		iconoSufijo: null,
     label: "",
     tipo: "fill",
 		color: null,

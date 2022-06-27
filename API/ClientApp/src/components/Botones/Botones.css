@@ -116,6 +116,11 @@
   justify-content: flex-start;
 }
 
+.btn-fondo {
+  background-color: var(--fondo-claro);
+  color: var(--contraste-fondo-claro);
+}
+
 .btn-primario {
   background-color: var(--primario-claro);
   color: var(--contraste-primario-claro);
