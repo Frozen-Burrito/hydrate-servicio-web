@@ -30,6 +30,17 @@ namespace ServicioHydrate.Data
         Task<ICollection<DTOOrden>> GetOrdenes(DTOParamsPagina? paramsPagina, DTOParamsOrden paramsOrden);
 
         /// <summary>
+        /// Genera un CSV con los datos de todos los órdenes creadas.
+        /// </summary>
+        /// <remarks>
+        /// Lanza un ArgumentException si no existe una orden con el idOrden
+        /// recibido.
+        /// </remarks>
+        /// <param name="idOrden">El Id de la orden.</param>
+        /// <returns>La orden con el ID solicitado.</returns>
+        Task<IEnumerable<DTOOrden>> ExportarTodasLasOrdenes();
+
+        /// <summary>
         /// Busca una orden con un Id determinado.
         /// </summary>
         /// <remarks>

@@ -69,6 +69,25 @@ namespace ServicioHydrate.Data
             return ordenesPaginadas;
         }
 
+        public async Task<IEnumerable<DTOOrden>> ExportarTodasLasOrdenes()
+        {
+            if (await _contexto.Ordenes.CountAsync() <= 0)
+            {
+                return new List<DTOOrden>();
+            }
+
+            IEnumerable<DTOOrden> ordenes = await _contexto.Ordenes
+                .Include(o => o.Cliente)
+                .Include(o => o.Productos)
+                .ThenInclude(o => o.Producto)
+                .AsSplitQuery()
+                .OrderByDescending(o => o.Fecha)
+                .Select(o => o.ComoDTO())
+                .ToListAsync();
+
+            return ordenes;
+        }
+
         public async Task<DTOOrden> GetOrdenPorId(Guid idOrden)
         {
             if (await _contexto.Ordenes.CountAsync() <= 0) 

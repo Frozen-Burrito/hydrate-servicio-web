@@ -11,10 +11,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
+using Stripe;
+
 using ServicioHydrate.Data;
 using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Utilidades;
-using Stripe;
+using ServicioHydrate.Formatters;
+using Microsoft.Net.Http.Headers;
 
 namespace ServicioHydrate
 {
@@ -86,6 +89,12 @@ namespace ServicioHydrate
                         ValidateAudience = false,
                     };
                 });
+
+            services.AddMvc(opciones => 
+            {
+                opciones.OutputFormatters.Add(new CsvMediaFormatter());
+                opciones.FormatterMappings.SetMediaTypeMappingForFormat("csv", MediaTypeHeaderValue.Parse("text/csv"));
+            });
 
             // Agrega los controladores puros (de la API).
             services.AddControllers();

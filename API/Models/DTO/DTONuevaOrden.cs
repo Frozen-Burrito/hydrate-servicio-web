@@ -14,5 +14,10 @@ namespace ServicioHydrate.Modelos.DTO
     {
         public int IdProducto { get; set; }
         public int Cantidad { get; set; }
+
+        public override string ToString()
+        {
+            return $"ID del Producto: {IdProducto}, Cantidad: {Cantidad}";
+        }
     }
 }

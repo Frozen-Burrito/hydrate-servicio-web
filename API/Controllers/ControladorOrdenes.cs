@@ -217,6 +217,39 @@ namespace ServicioHydrate.Controladores
         }
 
         /// <summary>
+        /// Obtiene una colección de órdenes que cumplan con los filtros y parámetros.
+        /// </summary>
+        /// <param name="paramPagina">Los parámetros de paginado del resultado.</param>
+        /// <param name="paramsOrden">Los filtros de selección para la colección de órdenes.</param>
+        /// <returns>Resultado HTTP</returns>
+        [HttpPost("exportar/ordenes.csv")]
+        [Produces("text/csv")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ExportarOrdenesComoCSV()
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try 
+            {       
+                var ordenes = await _repositorioOrdenes.ExportarTodasLasOrdenes();
+
+                return Ok(ordenes);
+            }
+            catch (Exception e) 
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
         /// Registra una nueva orden pendiente y comienza un PaymentIntent de Stripe.
         /// </summary>
         /// <param name="nuevaOrden">Una lista de IDs de productos, cada uno con su cantidad.</param>
