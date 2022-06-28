@@ -310,3 +310,7 @@ ul {
 .gap-2 {
   gap: 1.6rem;
 }
+
+.escondido {
+  display: none;
+}

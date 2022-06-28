@@ -15,6 +15,9 @@ using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
+using Microsoft.AspNetCore.Http.Features;
+using System.Reflection;
 
 #nullable enable
 namespace ServicioHydrate.Controladores
@@ -222,8 +225,8 @@ namespace ServicioHydrate.Controladores
         /// <param name="paramPagina">Los parámetros de paginado del resultado.</param>
         /// <param name="paramsOrden">Los filtros de selección para la colección de órdenes.</param>
         /// <returns>Resultado HTTP</returns>
-        [HttpPost("exportar/ordenes.csv")]
-        [Produces("text/csv")]
+        [HttpGet("exportar/csv")]
+        // [Produces("text/csv")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -238,7 +241,42 @@ namespace ServicioHydrate.Controladores
             {       
                 var ordenes = await _repositorioOrdenes.ExportarTodasLasOrdenes();
 
-                return Ok(ordenes);
+                // // TEMPORAL: Un workaround para evitar un error con Writes síncronos.
+                // var featureSyncIO = Response.HttpContext.Features.Get<IHttpBodyControlFeature>();
+                // if (featureSyncIO is not null)
+                // {
+                //     featureSyncIO.AllowSynchronousIO = true;
+                // }
+
+                // Obtener el tipo y el tipo de los elementos de la colección.
+                Type tipo = ordenes.GetType();
+                Type tipoDeElemento;
+
+                if (tipo.GetGenericArguments().Length > 0) 
+                {
+                    tipoDeElemento = tipo.GetGenericArguments()[0];
+                } else 
+                {
+                    tipoDeElemento = tipo.GetElementType();
+                }
+
+			    PropertyInfo[] propiedades = tipoDeElemento.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                
+                Stream stream = new MemoryStream();
+
+                // Usar un StreamWriter para generar el cuerpo de la respuesta HTTP.
+                var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+
+                // Escribir los datos en formato CSV en el stream de la respuesta.
+                await ordenes.ComoCSV(streamWriter, propiedades, true);
+
+                await streamWriter.FlushAsync();
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                string nombreArchivo = $"{DateTime.Now.ToString("o").Substring(0, 16)}_ordenes.csv";
+
+                return File(stream, "text/csv", nombreArchivo);
             }
             catch (Exception e) 
             {

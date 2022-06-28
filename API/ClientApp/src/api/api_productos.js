@@ -1,3 +1,5 @@
+import { saveAs } from "file-saver";
+
 import { formarTokenAuth } from "../utils/formato_token_auth";
 import * as api from "./api";
 
@@ -84,9 +86,9 @@ export const fetchResumenDeOrdenes = async (jwt) => {
     method: api.GET,
     headers: new Headers({
       // Incluir el JWT en el header de autorizacion.
-      'Authorization': formarTokenAuth(jwt),
+      "Authorization": formarTokenAuth(jwt),
       // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     }),
   });
   
@@ -107,9 +109,9 @@ export const crearPaymentIntent = async (
     body: JSON.stringify({ productos }),
     headers: new Headers({
       // Incluir el JWT en el header de autorizacion.
-      'Authorization': `Bearer ${jwt}`,
+      "Authorization": `Bearer ${jwt}`,
       // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     }),
   });
   
@@ -133,11 +135,63 @@ export const cambiarEstadoOrden = async (idOrden, indiceNuevoEstado, jwt) => {
     method: api.PATCH,
     headers: new Headers({
       // Incluir el JWT en el header de autorizacion.
-      'Authorization': formarTokenAuth(jwt), 
+      "Authorization": formarTokenAuth(jwt), 
       // Utiliza JSON para el cuerpo.
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json"
     }),
   });
   
   return await api.hacerPeticion(peticion, false);
+}
+
+/**
+ * Exporta todas las ordenes en un archivo con formato especifico.
+ * 
+ * @param {string} formato El formato del archivo exportado (como "csv").
+ * @param {string} jwt El token de autenticacion del usuario.
+ * @returns Descarga un archivo
+ */
+export const exportarOrdenesConFormato = async (formato, jwt) => {
+
+  // Formar un string de formato (es algo como "csv", "pdf" o "xlsx").
+  const strFormato = formato.replace(".", "");
+
+  // Hacer peticion a endpoint de descarga de archivo con ordenes.
+  const endpoint = `${api.urlBase}/ordenes/exportar/${strFormato}`;
+
+  const peticion = new Request(endpoint, {
+    method: api.GET,
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      "Authorization": formarTokenAuth(jwt)
+    }),
+  });
+  
+  const respuesta = await fetch(peticion);
+
+  // Obtener el nombre del archivo, a partir del header "content-disposition" de 
+  // la respuesta, si no es encontrado, usar "ordenes.csv".
+  let nombreArchivo = "ordenes.csv";
+
+  const headerContentDisp =  respuesta.headers.get("content-disposition");
+
+  const partesHeader = headerContentDisp.split(";");
+
+  partesHeader.forEach(parte => {
+    // Buscar el valor de "filename" en el valor del header.
+    if (parte.trim().startsWith("filename=")) {
+      nombreArchivo = parte.split("=")[1].replace(/\"/g, "");
+    }
+  });
+
+  // Obtener contenido del archivo como un blob.
+  const blob = await respuesta.blob();
+
+  // Guardar el blob, con el nombre especificado, usando saveAs().
+  saveAs(blob, nombreArchivo);
+
+  return {
+    ok: respuesta.ok,
+    status: respuesta.status,
+  };
 }

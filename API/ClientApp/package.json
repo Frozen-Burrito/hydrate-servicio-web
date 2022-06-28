@@ -10,6 +10,7 @@
     "@fortawesome/react-fontawesome": "^0.1.18",
     "@stripe/react-stripe-js": "^1.8.1",
     "@stripe/stripe-js": "^1.31.0",
+    "file-saver": "^2.0.5",
     "jquery": "^3.6.0",
     "js-cookie": "^3.0.1",
     "merge": "^1.2.1",

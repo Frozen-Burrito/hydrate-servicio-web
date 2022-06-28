@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 
 import { StatusHttp } from "../../api/api";
-import { fetchOrdenes, fetchProductos, cambiarEstadoOrden } from "../../api/api_productos";
+import { 
+  fetchOrdenes, 
+  fetchProductos, 
+  cambiarEstadoOrden,
+  exportarOrdenesConFormato 
+} from "../../api/api_productos";
 import useCookie from "../../utils/useCookie";
 
 import { 
@@ -78,7 +83,13 @@ export default function TablaOrdenes() {
   }
 
   async function onExportarOrdenes(formato) {
-    console.log("Exportando ordenes...");
+    
+    const resultado = await exportarOrdenesConFormato(formato, jwt);
+
+    console.log("Resultado de exportar: ", resultado);
+
+    if (resultado.ok) {
+    }
   }
 
   useEffect(() => {
