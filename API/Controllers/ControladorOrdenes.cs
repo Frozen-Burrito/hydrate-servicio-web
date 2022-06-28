@@ -23,7 +23,7 @@ using System.Reflection;
 namespace ServicioHydrate.Controladores
 {
     [ApiController]
-    [Authorize(Roles = "ADMIN_ORDENES")]
+    // [Authorize(Roles = "ADMIN_ORDENES")]
     [Route("api/v1/ordenes")]
     [Produces("application/json")]
     [Consumes("application/json")]

@@ -20,6 +20,8 @@ export default function FormStripeCheckout(props) {
   const [idUsuario, setIdUsuario] = useState(null);
   const [emailUsuario, setEmailUsuario] = useState(null);
 
+  const [debeEnviarEmail, setDebeEnviarEmail] = useState(false);
+
   const [mensaje, setMensaje] = useState(null);
   const [estaCargando, setEstaCargando] = useState(false);
 
@@ -103,13 +105,17 @@ export default function FormStripeCheckout(props) {
 
     setEstaCargando(true);
 
+    let confirmParams = {
+      // La URL de la página de pago completado.
+      return_url: `https://servicio-web-hydrate.azurewebsites.net/perfil/${idUsuario}`,
+    };
+
+    // Si el usuario lo desea, enviarle un correo de confirmacion.
+    if (debeEnviarEmail) confirmParams.receipt_email = emailUsuario;
+
     const { error } = await stripe.confirmPayment({
       elements: elementos,
-      confirmParams: {
-        // La URL de la página de pago completado.
-        return_url: `https://servicio-web-hydrate.azurewebsites.net/perfil/${idUsuario}`,
-        receipt_email: emailUsuario
-      }
+      confirmParams
     });
 
     // Esta parte del código solo se ejecuta cuando confirmPayment()
@@ -130,7 +136,15 @@ export default function FormStripeCheckout(props) {
       <form id="payment-form" onSubmit={handleSubmit}>
         <PaymentElement id="payment-element" />
 
-        <p className="mt-1">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aliquam ad debitis cumque quas quaerat dolor magni.</p>
+        <div className="stack horizontal gap-2 justify-start mt-1">
+          <input 
+            type="checkbox" 
+            checked={debeEnviarEmail} 
+            onChange={() => setDebeEnviarEmail(!debeEnviarEmail)} 
+          />
+
+          <p>Enviar un correo con el comprobante de pago.</p>
+        </div>
 
         <div className="stack horizontal justify-end gap-2 py-2">
           <div className="end-text">
