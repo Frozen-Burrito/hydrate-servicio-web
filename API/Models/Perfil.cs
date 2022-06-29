@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using ServicioHydrate.Modelos.Enums;
 using ServicioHydrate.Modelos.DTO;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using ServicioHydrate.Modelos.Datos;
 
 namespace ServicioHydrate.Modelos 
 {
@@ -27,7 +29,10 @@ namespace ServicioHydrate.Modelos
 
 		public SexoUsuario SexoUsuario { get; set; }
 
+		[Range(0.5, 3.5)]
 		public double Estatura { get; set; }
+
+		[Range(20, 200)]
 		public double Peso { get; set; }
 
 		public Ocupacion Ocupacion { get; set; }
@@ -40,6 +45,15 @@ namespace ServicioHydrate.Modelos
 
 		public int IdEntornoSeleccionado { get; set; }
 		public ICollection<Entorno> EntornosDesbloqueados { get; set; }
+
+		// Datos asociados al perfil.
+		public virtual ICollection<ActividadFisica> RegistrosDeActFisica { get; set; }
+		public virtual ICollection<DatosMedicos> RegistrosMedicos { get; set; }
+		public virtual ICollection<Etiqueta> Etiquetas { get; set; }
+		public virtual ICollection<HabitosSemanales> ReportesSemanales { get; set; }
+		public virtual ICollection<Meta> Metas { get; set; }
+		public virtual ICollection<RegistroDeHidratacion> RegistrosDeHidratacion { get; set; }
+		public virtual ICollection<Rutina> Rutinas { get; set; }
 
 		public DTOPerfil ComoDTO() 
 		{
