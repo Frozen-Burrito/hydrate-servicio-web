@@ -58,6 +58,7 @@ h4 {
   color: var(--contraste-fondo-claro);
   font-weight: 500;
   font-size: 1.6rem;
+  text-transform: capitalize;
   line-height: 1.8rem;
 }
 
@@ -122,9 +123,33 @@ h6 {
   margin-right: 2.4rem;
 }
 
+.my-1 {
+  margin-top: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.my-2 {
+  margin-top: 1.6rem;
+  margin-bottom: 1.6rem;
+}
+
 .my-3 {
   margin-top: 2.4rem;
   margin-bottom: 2.4rem;
+}
+
+pt-5 {
+  padding-top: 4rem;
+}
+
+.px-1 {
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+
+.py-2 {
+  padding-top: 1.6rem;
+  padding-bottom: 1.6rem;
 }
 
 .py-5 {
@@ -148,6 +173,10 @@ h6 {
   font-size: 1rem!important;
 }
 
+.primario {
+  color: var(--primario-claro)!important;
+}
+
 .contraste-primario {
   color: var(--contraste-primario-claro)!important;
 }
@@ -158,6 +187,14 @@ h6 {
 
 .contraste-superficie { 
   color: var(--contraste-superficie-claro)!important;
+}
+
+.elevacion-0 {
+  box-shadow: none;
+}
+
+.elevacion-1 {
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
 }
 
 section.contenedor {
@@ -241,6 +278,7 @@ ul {
 
 .stack.horizontal {
   flex-direction: row;
+  align-items: center;
   width: 100%;
 }
 
@@ -261,10 +299,18 @@ ul {
   justify-content: center;
 }
 
+.stack.justify-end {
+  justify-content: flex-end;
+}
+
 .gap-1 {
   gap: 0.4rem;
 }
 
 .gap-2 {
   gap: 1.6rem;
+}
+
+.escondido {
+  display: none;
 }

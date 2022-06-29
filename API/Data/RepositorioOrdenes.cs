@@ -33,14 +33,30 @@ namespace ServicioHydrate.Data
                 .Include(o => o.Cliente)
                 .AsQueryable();
 
-            if (paramsOrden.IdCliente is not null)
+            if (paramsOrden.IdCliente is not null && ordenes.Count() > 0)
             {
                 ordenes = ordenes.Where(o => o.Cliente.Id.Equals(paramsOrden.IdCliente));
             }
 
-            if (paramsOrden.Estado is not null) 
+            if (paramsOrden.Estado is not null && ordenes.Count() > 0) 
             {
                 ordenes = ordenes.Where(o => o.Estado.Equals(paramsOrden.Estado));
+            }
+
+            if (paramsOrden.EmailCliente is not null && ordenes.Count() > 0)
+            {
+                ordenes = ordenes.Where(o => o.Cliente.Email.Contains(paramsOrden.EmailCliente));
+            }
+
+            if (paramsOrden.NombreCliente is not null && ordenes.Count() > 0)
+            {
+                //TODO: usar nombre asociado al perfil.
+                ordenes = ordenes.Where(o => o.Cliente.NombreUsuario.Contains(paramsOrden.NombreCliente));
+            }
+
+            if (paramsOrden.IdOrden is not null && ordenes.Count() > 0)
+            {
+                ordenes = ordenes.Where(o => o.Id.Equals(paramsOrden.IdOrden));
             }
 
             //TODO: encontrar una manera de comparar las fechas usando lambdas simples de un queryable.
@@ -69,6 +85,25 @@ namespace ServicioHydrate.Data
             return ordenesPaginadas;
         }
 
+        public async Task<IEnumerable<DTOOrden>> ExportarTodasLasOrdenes()
+        {
+            if (await _contexto.Ordenes.CountAsync() <= 0)
+            {
+                return new List<DTOOrden>();
+            }
+
+            IEnumerable<DTOOrden> ordenes = await _contexto.Ordenes
+                .Include(o => o.Cliente)
+                .Include(o => o.Productos)
+                .ThenInclude(o => o.Producto)
+                .AsSplitQuery()
+                .OrderByDescending(o => o.Fecha)
+                .Select(o => o.ComoDTO())
+                .ToListAsync();
+
+            return ordenes;
+        }
+
         public async Task<DTOOrden> GetOrdenPorId(Guid idOrden)
         {
             if (await _contexto.Ordenes.CountAsync() <= 0) 
@@ -89,6 +124,41 @@ namespace ServicioHydrate.Data
             }
 
             return orden.ComoDTO();
+        }
+
+        public async Task<DTOStatsOrdenes> GetStatsOrdenes()
+        {
+            if (await _contexto.Ordenes.CountAsync() <= 0) 
+            {
+                return new DTOStatsOrdenes();
+            }
+
+            IQueryable<Orden> todasLasOrdenes = _contexto.Ordenes.AsQueryable();
+
+            int numOrdenesCompletadas = await todasLasOrdenes
+                .Where(o => o.Estado == EstadoOrden.CONCLUIDA)
+                .CountAsync();
+
+            int numOrdenesEnProgreso = await todasLasOrdenes
+                .Where(o => o.Estado.Equals(EstadoOrden.EN_PROGRESO))
+                .CountAsync();
+
+            List<DTOOrden> dtosOrdenes = await todasLasOrdenes
+                .Include(o => o.Cliente)
+                .Include(o => o.Productos)
+                .ThenInclude(o => o.Producto)
+                .Select(o => o.ComoDTO())
+                .ToListAsync();
+
+            decimal ventasTotales = dtosOrdenes
+                .Sum(oDTO => oDTO.MontoTotal);
+            
+            return new DTOStatsOrdenes
+            {
+                OrdenesCompletadas = numOrdenesCompletadas,
+                OrdenesEnProgreso = numOrdenesEnProgreso,
+                VentasTotalesMXN = ventasTotales,
+            };
         }
 
         public async Task<DTOOrden> ModificarEstadoDeOrden(Guid idOrden, EstadoOrden nuevoEstado)

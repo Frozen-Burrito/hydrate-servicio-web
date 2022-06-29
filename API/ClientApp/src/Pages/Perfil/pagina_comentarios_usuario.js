@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Layout, DrawerPerfil, ListaComentarios } from "../../components";
@@ -7,11 +7,18 @@ export function PaginaComentariosPerfil() {
 
   const { idUsuario } = useParams();
 
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
   return (
     <Layout>
-      <DrawerPerfil indiceItemActivo={2}/>
+      <DrawerPerfil 
+        lado="izquierda"
+        mostrar={drawerVisible} 
+        indiceItemActivo={2}
+        onToggle={() => setDrawerVisible(!drawerVisible)}
+      />
       
-      <div className="panel-contenido">
+      <section className='contenedor full-page py-5'>
         <div className="stack horizontal justify-between gap-2 my-3">
           <h2>Comentarios Que Has Escrito</h2>
 
@@ -19,7 +26,7 @@ export function PaginaComentariosPerfil() {
         </div>
 
         <ListaComentarios idAutor={idUsuario} conBusqueda={false}/>
-      </div>
+      </section>
     </Layout>
   );
 }

@@ -79,7 +79,7 @@ form > .form-fields > .form-group {
 }
 
 form > .form-fields > .form-group > .campo, .campo {
-  width: 100%;
+  /* width: 100%; */
   display: flex;
   flex-direction: column;
   align-items: flex-start;

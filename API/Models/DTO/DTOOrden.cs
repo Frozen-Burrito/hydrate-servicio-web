@@ -21,8 +21,18 @@ namespace ServicioHydrate.Modelos.DTO
         [Range(0.0, 1000000.0)]
         public decimal MontoTotal { get; set; }
 
+        [Range(0, 100000000)]
+        public long MontoTotalEnCentavos 
+        { 
+            get { return (long) (MontoTotal * 100); }
+        }
+
         // El usuario que realizó la orden.
         public Guid IdCliente { get; set; }
+
+        public string NombreCliente { get; set; }
+
+        public string EmailCliente { get; set; }
 
         // La lista de productos que el cliente compró en esta orden.
         public List<DTOProductoCantidad> Productos { get; set; }

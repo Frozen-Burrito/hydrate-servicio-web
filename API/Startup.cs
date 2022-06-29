@@ -11,9 +11,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
+using Stripe;
+
 using ServicioHydrate.Data;
 using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Utilidades;
+using ServicioHydrate.Formatters;
+using Microsoft.Net.Http.Headers;
 
 namespace ServicioHydrate
 {
@@ -88,6 +92,12 @@ namespace ServicioHydrate
                     };
                 });
 
+            services.AddMvc(opciones => 
+            {
+                opciones.OutputFormatters.Add(new CsvMediaFormatter());
+                opciones.FormatterMappings.SetMediaTypeMappingForFormat("csv", MediaTypeHeaderValue.Parse("text/csv"));
+            });
+
             // Agrega los controladores puros (de la API).
             services.AddControllers();
 
@@ -126,6 +136,9 @@ namespace ServicioHydrate
         // Este método es llamado por el runtime. Usa este método para configurar el pipeline de peticiones HTTP.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Configurar llave de API de Stripe
+            StripeConfiguration.ApiKey = Configuration.GetSection("AppConfig:StripeApiKey").Value;
+            
             if (env.IsDevelopment())
             {
                 // Utilizar página de error detallada.

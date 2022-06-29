@@ -6,7 +6,7 @@ import { StatusHttp } from "../../api/api";
 import * as api from "../../api/api_comentarios";
 import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
 
-import { TarjetaComentario, SearchBox, ControlPaginas } from "../";
+import { TarjetaComentario, SearchBox, ControlPaginas } from "..";
 
 ListaComentarios.defaultProps = {
   idAutor: null,

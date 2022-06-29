@@ -1,6 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using System.IO;
+using System.Collections.Generic;
+using System.Text;
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +12,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
+using Stripe;
+
 using ServicioHydrate.Data;
+using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.Enums;
 
@@ -16,7 +23,7 @@ using ServicioHydrate.Modelos.Enums;
 namespace ServicioHydrate.Controladores
 {
     [ApiController]
-    [Authorize(Roles = "ADMIN_ORDENES")]
+    // [Authorize(Roles = "ADMIN_ORDENES")]
     [Route("api/v1/ordenes")]
     [Produces("application/json")]
     [Consumes("application/json")]
@@ -62,6 +69,8 @@ namespace ServicioHydrate.Controladores
 
             try 
             {       
+                // _logger.LogInformation(paramsOrden.IdCliente + ", " + paramsOrden.EmailCliente);
+
                 // Obtener todas las ordenes, segun los filtros recibidos.
                 var ordenes = await _repositorioOrdenes.GetOrdenes(
                     paramsPagina,
@@ -184,20 +193,46 @@ namespace ServicioHydrate.Controladores
             }
         }
 
-        /// <summary>
-        /// Registra una nueva orden, con un estado por defecto de "Pendiente".
-        /// </summary>
-        /// <param name="nuevaOrden">Los productos y cantidades de la nueva orden.</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Authorize(Roles = "NINGUNO")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [HttpGet("stats")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOStatsOrdenes))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> CrearOrden([FromBody] DTONuevaOrden nuevaOrden)
+        public async Task<IActionResult> GetEstadisticasOrdenes()
+        {
+            // Registrar un log de la peticion.
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                var resumenOrdenes = await _repositorioOrdenes.GetStatsOrdenes();
+
+                return Ok(resumenOrdenes);
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Obtiene una colección de órdenes que cumplan con los filtros y parámetros.
+        /// </summary>
+        /// <param name="paramPagina">Los parámetros de paginado del resultado.</param>
+        /// <param name="paramsOrden">Los filtros de selección para la colección de órdenes.</param>
+        /// <returns>Resultado HTTP</returns>
+        [HttpGet("exportar/csv")]
+        // [Produces("text/csv")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOOrden>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ExportarOrdenesComoCSV()
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -205,17 +240,116 @@ namespace ServicioHydrate.Controladores
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
+            {       
+                var ordenes = await _repositorioOrdenes.ExportarTodasLasOrdenes();
+
+                // // TEMPORAL: Un workaround para evitar un error con Writes síncronos.
+                // var featureSyncIO = Response.HttpContext.Features.Get<IHttpBodyControlFeature>();
+                // if (featureSyncIO is not null)
+                // {
+                //     featureSyncIO.AllowSynchronousIO = true;
+                // }
+
+                // Obtener el tipo y el tipo de los elementos de la colección.
+                Type tipo = ordenes.GetType();
+                Type tipoDeElemento;
+
+                if (tipo.GetGenericArguments().Length > 0) 
+                {
+                    tipoDeElemento = tipo.GetGenericArguments()[0];
+                } else 
+                {
+                    tipoDeElemento = tipo.GetElementType();
+                }
+
+			    PropertyInfo[] propiedades = tipoDeElemento.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                
+                Stream stream = new MemoryStream();
+
+                // Usar un StreamWriter para generar el cuerpo de la respuesta HTTP.
+                var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+
+                // Escribir los datos en formato CSV en el stream de la respuesta.
+                await ordenes.ComoCSV(streamWriter, propiedades, true);
+
+                await streamWriter.FlushAsync();
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                string nombreArchivo = $"{DateTime.Now.ToString("o").Substring(0, 16)}_ordenes.csv";
+
+                return File(stream, "text/csv", nombreArchivo);
+            }
+            catch (Exception e) 
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Registra una nueva orden pendiente y comienza un PaymentIntent de Stripe.
+        /// </summary>
+        /// <param name="nuevaOrden">Una lista de IDs de productos, cada uno con su cantidad.</param>
+        /// <returns>El ID de la orden y el secreto de cliente de Stripe</returns>
+        [HttpPost("payment-intent")]
+        [Authorize(Roles = "NINGUNO")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> CrearIntentDePago([FromBody] DTONuevaOrden productosOrden)
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+            
+            try 
             {
                 // Obtener el ID del usuario actual desde el JWT.
                 string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
                 Guid idUsuarioActual = new Guid(idStr);
 
-                var ordenCreada = await _repositorioOrdenes.NuevaOrden(nuevaOrden, idUsuarioActual);
+                // Crear una nueva orden pendiente.
+                DTOOrden ordenCreada = await _repositorioOrdenes.NuevaOrden(productosOrden, idUsuarioActual);
 
+                // Iniciar el proceso de pago con Stripe.
+                var servicioPaymentIntent = new PaymentIntentService();
+                var intentDePago = servicioPaymentIntent.Create(new PaymentIntentCreateOptions
+                {
+                    Amount = ordenCreada.MontoTotalEnCentavos,
+                    Currency = "mxn",
+                    PaymentMethodTypes = new List<string>
+                    {
+                        "card",
+                    },
+                    Metadata = new Dictionary<string, string>
+                    {
+                        { "IdOrden", ordenCreada.Id.ToString() },
+                    },
+                });
+
+                // Retornar resultado de proceso de pedido.
                 return CreatedAtAction(
                     nameof(GetOrdenPorId),
                     new { idOrden = ordenCreada.Id },
-                    ordenCreada
+                    new {
+                        clientSecret = intentDePago.ClientSecret,
+                        orden = ordenCreada,
+                    }
+                );
+            }
+            catch (StripeException e) 
+            {
+                _logger.LogError($"Error de Stripe: {e.Message}");
+                return Problem(
+                    "Ocurrió un error al procesar el pago. Intenta más tarde.",
+                    statusCode: StatusCodes.Status503ServiceUnavailable
                 );
             }
             catch (FormatException e) 
@@ -297,6 +431,85 @@ namespace ServicioHydrate.Controladores
             {
                 // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
                 _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }    
+        }
+
+        /// <summary>
+        /// Es invocado por Stripe cuando hay cambios en el estado de pago de 
+        /// la orden.
+        /// </summary>
+        /// <remarks>
+        /// Por el momento, solo cambia el estado de orden:
+        /// PENDIENTE -> EN_PROGRESO.
+        /// Cuando el pago fue confirmado por Stripe.
+        /// </remarks>
+        /// <param name="idOrden">La orden que se va a actualizar.</param>
+        /// <param name="nuevoEstado">El nuevo estado para la orden.</param>
+        /// <returns>Resultado HTTP</returns>
+        [HttpPatch("webhooks/pagos-stripe")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ActualizarOrdenConStripe()
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+            const string secretoEndpoint = "secreto-webhook-pruebas";
+
+            try
+            {           
+                var eventoStripe = EventUtility.ParseEvent(json);
+                var headerFirma = Request.Headers["Stripe-Signature"];
+
+                eventoStripe = EventUtility.ConstructEvent(json, headerFirma, secretoEndpoint);
+
+                if (eventoStripe.Type == Events.PaymentIntentSucceeded) 
+                {
+                    var intentDePago = eventoStripe.Data.Object as PaymentIntent;
+
+                    if (intentDePago is not null)
+                    {
+                        // Obtener el ID de la orden de los metadatos del PaymentIntent.
+                        Guid idOrden = new Guid(intentDePago.Metadata["IdOrden"]);
+
+                        _logger.LogInformation($"Pago exitoso por ${intentDePago.Amount}, ID de la orden: {idOrden}");
+
+                        // Método para manejar el evento de Stripe.
+                        _repositorioOrdenes.ModificarEstadoDeOrden(idOrden, EstadoOrden.EN_PROGRESO);
+                    }
+                } 
+                else if (eventoStripe.Type == Events.PaymentMethodAttached)
+                {
+                    var metodoDePago = eventoStripe.Data.Object as PaymentMethod;
+
+                    _logger.LogInformation("Evento de metodo de pago recibido de Stripe.");
+                }
+                else 
+                {
+                    _logger.LogWarning($"Tipo de evento no manejado: {eventoStripe.Type}");
+                }
+
+                return Ok();
+            }
+            catch (StripeException e)
+            {
+                // Hubo un error en el proceso de pago de Stripe, retorna 400.
+                _logger.LogWarning($"Error de Stripe al procesar webhook: {e.Message}");
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"{metodo} - {ruta}: Ocurrió un error inesperado en un webhook de Stripe, {e.Message}");
 
                 return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
             }    

@@ -9,8 +9,8 @@ import { RolesAutorizacion } from "../../api/api_auth";
 
 import * as api from "../../api/api_comentarios";
 
-import { Avatar, Dropdown, BotonIcono } from "../";
-import Tarjeta, { onClickAccion } from "../Tarjeta/tarjeta";
+import { Avatar, Dropdown, BotonIcono } from "..";
+import Tarjeta, { onClickAccion } from "./tarjeta";
 
 TarjetaComentario.defaultProps = {
 	idComentarioPadre: -1,

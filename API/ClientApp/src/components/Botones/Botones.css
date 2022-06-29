@@ -85,7 +85,17 @@
   justify-content: flex-start;
   align-items: center;
   gap: 0.6rem;
+  padding: 0.8rem;
   cursor: pointer;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+  
+  transition: background-color .3s ease;
+}
+
+.btn-icono.con-label {
+  padding: 0.4rem 0.8rem;
 }
 
 .btn-icono.desactivado {
@@ -96,4 +106,44 @@
 .btn-icono.seleccionado > span.material-icons,
 .btn-icono.seleccionado > p {
   color: var(--primario-claro);
+}
+
+.btn-icono.icono-final {
+  justify-content: flex-end;
+}
+
+.btn-icono.icono-inicio {
+  justify-content: flex-start;
+}
+
+.btn-fondo {
+  background-color: var(--fondo-claro);
+  color: var(--contraste-fondo-claro);
+}
+
+.btn-primario {
+  background-color: var(--primario-claro);
+  color: var(--contraste-primario-claro);
+}
+
+.btn-primario:hover {
+  background-color: var(--variante-primario-claro);
+}
+
+.btn-secundario {
+  background-color: var(--secundario-claro);
+  color: #fff;
+}
+
+.btn-secundario:hover {
+  background-color: var(--variante-secundario-claro);
+}
+
+.btn-gris {
+  background-color: var(--contraste-fondo-claro-sesenta);
+  color: #fff;
+}
+
+.btn-gris:hover {
+  background-color: var(--contraste-superficie-claro);
 }

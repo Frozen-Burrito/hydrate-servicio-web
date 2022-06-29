@@ -4,9 +4,12 @@ export default function BotonIcono(props) {
 
 	const { 
 		icono, 
+		iconoSufijo,
 		label, 
 		tipo, 
-		disabled, 
+		elevacion,
+		disabled,
+		color, 
 		seleccionado, 
 		iconoAlFinal,
 		esDeError, 
@@ -16,7 +19,10 @@ export default function BotonIcono(props) {
 	const tieneLabel = label && label.length > 0;
 
 	const claseTipoBtn = `btn-${tipo}`;
+	const claseColor = color != null ? `btn-${color}` : "";
+  const claseElevacion = `elevacion-${elevacion}`;
 	const claseDisabled = disabled ? "desactivado" : "";
+	const claseAlignIcono = iconoAlFinal ? "icono-final" : "icono-inicio";
 	const claseSeleccionado = seleccionado && !disabled ? "seleccionado" : ""; 
 	const claseColorError = seleccionado && esDeError ? "error" : "";
 
@@ -35,24 +41,34 @@ export default function BotonIcono(props) {
 			<>
 				{ renderLabelBtn() }
 
-				<span className={`material-icons ${claseColorError}`}>
-					{ icono }
-				</span>
+				{ icono && 
+					<span className={`material-icons ${claseColorError}`}>
+						{ icono }
+					</span>
+				}
 			</>
 		)
 		: (
-			<>
-				<span className={`material-icons ${claseColorError}`}>
-					{ icono }
-				</span>
+			<div className="stack horizontal justify-between gap-1">
+				<div className="stack horizontal justify-start gap-1">
+					<span className={`material-icons ${claseColorError}`}>
+						{ icono }
+					</span>
 
-				{ renderLabelBtn() }
-			</>
+					{ renderLabelBtn() }
+				</div>
+
+				{ iconoSufijo && 
+					<span className={`material-icons ${claseColorError}`}>
+						{ iconoSufijo }
+					</span>
+				}
+			</div>
 		);
 
 	return (
 		<div 
-			className={`btn-icono ${claseTipoBtn} ${claseDisabled} ${claseSeleccionado}`} 
+			className={`btn-icono ${tieneLabel ? "con-label" : ""} ${claseElevacion} ${claseTipoBtn} ${claseColor} ${claseDisabled} ${claseSeleccionado} ${claseAlignIcono}`} 
 			onClick={handleClick}
 		>
 			{ renderContenido() }				
@@ -61,12 +77,15 @@ export default function BotonIcono(props) {
 }
 
 BotonIcono.defaultProps = {
-    icono: "add",
+    icono: null,
+		iconoSufijo: null,
     label: "",
     tipo: "fill",
+		color: null,
     iconoAlFinal: false,
     esDeError: false,
     disabled: false,
     seleccionado: false,
+		elevacion: 0,
     onClick: () => {},
 };

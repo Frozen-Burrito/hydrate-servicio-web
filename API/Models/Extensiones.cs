@@ -2,6 +2,11 @@ using System;
 using System.Linq;
 using System.Globalization;
 using System.Collections.Generic;
+using System.Collections;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.Enums;
@@ -325,5 +330,131 @@ namespace ServicioHydrate.Modelos
                 Cantidad = productoOrdenado.Cantidad,
             };
         }
+
+#nullable enable
+        public static async Task ComoCSV(
+            this IEnumerable datos, 
+            StreamWriter output, 
+            PropertyInfo[] propiedades, 
+            bool incluirFilaHeader = false
+        )
+        {
+            await GenerarCSV(datos, output, propiedades, incluirFilaHeader);
+        }
+
+        /// <summary>
+        /// Convierte una colección enumerable de datos en un stream con formato CSV. 
+        /// </summary>
+        /// <remarks>
+        /// El stream producido puede ser enviado al stream del cuerpo de una respuesta HTTP. 
+        /// </remarks>
+        /// <param name="datos">La colección de datos.</param>
+        /// <param name="output"></param>
+        /// <param name="propiedades">Las propiedades de un elemento de los datos, usados para los encabezados.</param>
+        /// <param name="incluirFilaHeader">Si es true, la primera fila tendrá los nombres de las propiedades.</param>
+        /// <returns></returns>
+        public static async Task GenerarCSV(
+            IEnumerable datos, 
+            StreamWriter output, 
+            PropertyInfo[] propiedades,
+            bool incluirFilaHeader = false
+        )
+        {
+            const string separador = ",";
+
+            if (incluirFilaHeader) 
+            {
+                StringBuilder sbPropiedades = new StringBuilder();
+
+                foreach (var propiedad in propiedades)
+                {
+                    string nombreColumna = propiedad.Name;
+
+                    // Agregar comillas al nombre de la columna, si contiene
+                    // el separador.
+                    if (nombreColumna.Contains(separador))
+                    {
+                        nombreColumna = $"\"{nombreColumna}\"";
+                    }
+
+                    sbPropiedades.Append(nombreColumna);
+                    sbPropiedades.Append(separador);
+                }
+
+                await output.WriteLineAsync(sbPropiedades.ToString());
+            }
+
+            foreach (var elemento in datos)
+            {
+                var valoresFila = elemento.GetType().GetProperties()
+                    .Select(t => new 
+                    {
+                        Valor = t.GetValue(elemento, null),
+                        TipoDePropiedad = t.PropertyType,
+                    });
+
+                StringBuilder sb = new StringBuilder();
+
+                foreach (var celda in valoresFila)
+                {
+                    string valorCelda = string.Empty;
+
+                    if (celda.Valor is not null)
+                    {   
+                        if (celda.TipoDePropiedad.IsNonStringEnumerable())
+                        {
+                            var sbColeccion = new StringBuilder();
+
+                            var valoresDeColeccion = celda.Valor as IEnumerable;
+
+                            if (valoresDeColeccion is not null)
+                            {
+                                foreach (object? elemColeccion in valoresDeColeccion)
+                                {
+                                    string strValorCelda = elemColeccion.ToString() ?? string.Empty;
+
+                                    sbColeccion.AppendFormat("{0} | ", strValorCelda);
+                                }
+                            }
+
+
+                            valorCelda = string.Concat("\"", sbColeccion.ToString(), "\"");
+                        } else 
+                        {
+                            valorCelda = celda.Valor.ToString() ?? string.Empty;
+
+                            valorCelda = valorCelda.Replace("\n", " ");
+                            valorCelda = valorCelda.Replace("\r", " ");
+
+                            // Agregar comillas al valor de la celda, si el valor
+                            // incluye el caracter delimitador del csv (,).
+                            if(valorCelda.Contains(separador))
+                            {
+                                valorCelda = string.Concat('\"', valorCelda, '\"');
+                            }
+                        }
+                    }
+
+                    sb.Append(valorCelda);
+                    sb.Append(separador);
+                }
+
+                string filaSinDelimitadorFinal = sb.ToString().TrimEnd(separador.ToCharArray());
+
+                await output.WriteLineAsync(filaSinDelimitadorFinal);
+            } 
+        }
+
+        public static bool IsNonStringEnumerable(this Type tipo)
+        {
+            if (tipo is null || tipo == typeof(string))
+            {
+                return false;
+            }
+
+            return typeof(IEnumerable).IsAssignableFrom(tipo);
+        }
+
+#nullable disable
     }
 }
