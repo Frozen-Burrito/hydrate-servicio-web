@@ -32,16 +32,12 @@ namespace ServicioHydrate.Controladores
 
         public ControladorPerfiles(
             IServicioPerfil servicioPerfil,
+            IServicioUsuarios servicioUsuarios,
             ILogger<ControladorPerfiles> logger
         )
         {
-            // Asegurar que el controlador recibe una instancia del repositorio.
-            if (servicioPerfil is null) 
-            {
-                throw new ArgumentNullException(nameof(servicioPerfil));
-            }
-
             this._repoPerfiles = servicioPerfil;
+            this._repoUsuarios = servicioUsuarios;
             this._logger = logger;
         }
 

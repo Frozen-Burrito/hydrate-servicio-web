@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using ServicioHydrate.Modelos.Enums;
 using ServicioHydrate.Modelos.DTO;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ServicioHydrate.Modelos 
 {
@@ -13,8 +14,14 @@ namespace ServicioHydrate.Modelos
 
 		public Guid IdCuentaUsuario { get; set; }
 
+		[ForeignKey("IdCuentaUsuario")]
+		public Usuario Cuenta { get; set; }
+
 		public string Nombre { get; set; }
 		public string Apellido { get; set; }
+
+		[NotMapped]
+		public string NombreCompleto { get => $"{Nombre} {Apellido}"; }
 
 		public string FechaNacimiento { get; set; }
 
@@ -47,6 +54,7 @@ namespace ServicioHydrate.Modelos
 				Estatura = this.Estatura,
 				Peso = this.Peso,
 				Ocupacion = this.Ocupacion,
+				CondicionMedica = this.CondicionMedica,
 				PaisDeResidencia = this.PaisDeResidencia.ComoDTO(),
 				CantidadMonedas = this.CantidadMonedas,
 				NumModificaciones = this.NumModificaciones,
@@ -65,6 +73,7 @@ namespace ServicioHydrate.Modelos
 			Peso = cambios.Peso;
 			Ocupacion = cambios.Ocupacion;
 			PaisDeResidencia = paisModificado;
+			CondicionMedica = cambios.CondicionMedica;
 			CantidadMonedas = cambios.CantidadMonedas;
 			NumModificaciones = cambios.NumModificaciones;
 			IdEntornoSeleccionado = cambios.IdEntornoSeleccionado;

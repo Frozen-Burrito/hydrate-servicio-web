@@ -31,6 +31,7 @@ namespace ServicioHydrate.Data
 
             IQueryable<Orden> ordenes = _contexto.Ordenes
                 .Include(o => o.Cliente)
+                .ThenInclude(c => c.PerfilDeUsuario)
                 .AsQueryable();
 
             if (paramsOrden.IdCliente is not null && ordenes.Count() > 0)
@@ -51,7 +52,10 @@ namespace ServicioHydrate.Data
             if (paramsOrden.NombreCliente is not null && ordenes.Count() > 0)
             {
                 //TODO: usar nombre asociado al perfil.
-                ordenes = ordenes.Where(o => o.Cliente.NombreUsuario.Contains(paramsOrden.NombreCliente));
+                ordenes = ordenes.Where(o => 
+                    o.Cliente.PerfilDeUsuario.NombreCompleto
+                        .Contains(paramsOrden.NombreCliente)
+                );
             }
 
             if (paramsOrden.IdOrden is not null && ordenes.Count() > 0)
@@ -72,6 +76,7 @@ namespace ServicioHydrate.Data
 
             ordenes = ordenes                
                 .Include(o => o.Cliente)
+                .ThenInclude(c => c.PerfilDeUsuario)
                 .Include(o => o.Productos)
                 .ThenInclude(o => o.Producto)
                 .AsSplitQuery()
@@ -94,6 +99,7 @@ namespace ServicioHydrate.Data
 
             IEnumerable<DTOOrden> ordenes = await _contexto.Ordenes
                 .Include(o => o.Cliente)
+                .ThenInclude(c => c.PerfilDeUsuario)
                 .Include(o => o.Productos)
                 .ThenInclude(o => o.Producto)
                 .AsSplitQuery()
@@ -115,6 +121,7 @@ namespace ServicioHydrate.Data
             Orden? orden = await _contexto.Ordenes
                 .Where(o => o.Id.Equals(idOrden))
                 .Include(o => o.Cliente)
+                .ThenInclude(c => c.PerfilDeUsuario)
                 .Include(o => o.Productos)
                 .FirstOrDefaultAsync();
 
@@ -172,6 +179,7 @@ namespace ServicioHydrate.Data
             Orden? orden = await _contexto.Ordenes
                 .Where(o => o.Id.Equals(idOrden))
                 .Include(o => o.Cliente)
+                .ThenInclude(c => c.PerfilDeUsuario)
                 .Include(o => o.Productos)
                 .ThenInclude(po => po.Producto)
                 .FirstOrDefaultAsync();
@@ -197,7 +205,10 @@ namespace ServicioHydrate.Data
 
         public async Task<DTOOrden> NuevaOrden(DTONuevaOrden nuevaOrden, Guid idCliente)
         {
-            Usuario? cliente = await _contexto.Usuarios.FindAsync(idCliente);
+            Usuario? cliente = await _contexto.Usuarios
+                .Where(u => u.Id.Equals(idCliente))
+                .Include(u => u.PerfilDeUsuario)
+                .FirstOrDefaultAsync();
 
             if (cliente is null) 
             {

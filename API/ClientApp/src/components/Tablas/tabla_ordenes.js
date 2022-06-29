@@ -253,7 +253,9 @@ export default function TablaOrdenes() {
                 onEditar={() => console.log("TODO: editar orden")}>
                 <td>{ orden.id }</td>
                 <td>{ orden.fecha.substring(0, 10) }</td>
-                <td>{ orden.idCliente }</td> 
+                <td>
+                  <a href={`mailto:${orden.emailCliente}`}>{ orden.nombreCliente }</a>
+                </td> 
                 <td>${ orden.montoTotal.toFixed(2) } MXN</td> 
                 
                 <td className="stack vertical justify-start gap-1">

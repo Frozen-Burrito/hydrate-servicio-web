@@ -25,6 +25,8 @@ namespace ServicioHydrate.Modelos
 
         public RolDeUsuario RolDeUsuario { get; set; }
 
+        public Perfil PerfilDeUsuario { get; set; }
+
         public virtual ICollection<Orden> Ordenes { get; set; }
 
         public virtual ICollection<Comentario> Comentarios { get; set; }

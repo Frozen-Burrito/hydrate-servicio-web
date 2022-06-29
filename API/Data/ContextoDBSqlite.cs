@@ -109,6 +109,16 @@ namespace ServicioHydrate.Data
             modelBuilder.Entity<Pais>()
                 .HasMany(pa => pa.Perfiles)
                 .WithOne(pe => pe.PaisDeResidencia);
+
+            modelBuilder.Entity<Perfil>()
+                .HasOne(p => p.Cuenta)
+                .WithOne(u => u.PerfilDeUsuario)
+                .HasForeignKey<Perfil>(p => p.IdCuentaUsuario);
+
+            // modelBuilder.Entity<Usuario>()
+            //     .HasOne(u => u.PerfilDeUsuario)
+            //     .WithOne(p => p.Cuenta)
+            //     .HasForeignKey<Usuario>(u => u.Id);
         }
     }
 }

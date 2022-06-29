@@ -74,8 +74,6 @@ export const fetchOrdenes = async (paramsOrdenes, jwt, numPagina = 1) => {
   if (rangoFechas.inicio != null) paramsUrl.set("desde", rangoFechas.inicio);
   if (rangoFechas.fin != null) paramsUrl.set("hasta", rangoFechas.fin);
 
-  console.log(paramsUrl.toString());
-
   const resultados = await api.fetchPaginado(
     endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, paramsUrl, jwt
   );

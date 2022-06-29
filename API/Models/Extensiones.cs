@@ -45,6 +45,7 @@ namespace ServicioHydrate.Modelos
                 NombreUsuario = usuario.NombreUsuario,
                 Email = usuario.Email,
                 Password = hashContrasenia,
+                PerfilDeUsuario = new Perfil(),
             };
         }
 
@@ -274,6 +275,10 @@ namespace ServicioHydrate.Modelos
                 .Select(po => po.ComoProductoConCantidad())
                 .ToList();
 
+            string nombre = orden.Cliente.PerfilDeUsuario is not null 
+                ? orden.Cliente.PerfilDeUsuario.NombreCompleto 
+                : orden.Cliente.NombreUsuario;
+
             return new DTOOrden
             {
                 Id = orden.Id,
@@ -281,6 +286,8 @@ namespace ServicioHydrate.Modelos
                 Fecha = VerificarStrISO8601(orden.Fecha),
                 MontoTotal = montoTotal,
                 IdCliente = orden.Cliente.Id,
+                NombreCliente = nombre,
+                EmailCliente = orden.Cliente.Email,
                 Productos = productosOrden,
             };
         }
