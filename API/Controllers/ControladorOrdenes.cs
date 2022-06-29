@@ -16,7 +16,6 @@ using ServicioHydrate.Modelos.DTO;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.AspNetCore.Http.Features;
 using System.Reflection;
 
 #nullable enable
@@ -69,6 +68,8 @@ namespace ServicioHydrate.Controladores
 
             try 
             {       
+                // _logger.LogInformation(paramsOrden.IdCliente + ", " + paramsOrden.EmailCliente);
+
                 // Obtener todas las ordenes, segun los filtros recibidos.
                 var ordenes = await _repositorioOrdenes.GetOrdenes(
                     paramsPagina,

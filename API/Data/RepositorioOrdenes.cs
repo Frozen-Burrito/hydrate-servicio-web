@@ -33,14 +33,30 @@ namespace ServicioHydrate.Data
                 .Include(o => o.Cliente)
                 .AsQueryable();
 
-            if (paramsOrden.IdCliente is not null)
+            if (paramsOrden.IdCliente is not null && ordenes.Count() > 0)
             {
                 ordenes = ordenes.Where(o => o.Cliente.Id.Equals(paramsOrden.IdCliente));
             }
 
-            if (paramsOrden.Estado is not null) 
+            if (paramsOrden.Estado is not null && ordenes.Count() > 0) 
             {
                 ordenes = ordenes.Where(o => o.Estado.Equals(paramsOrden.Estado));
+            }
+
+            if (paramsOrden.EmailCliente is not null && ordenes.Count() > 0)
+            {
+                ordenes = ordenes.Where(o => o.Cliente.Email.Contains(paramsOrden.EmailCliente));
+            }
+
+            if (paramsOrden.NombreCliente is not null && ordenes.Count() > 0)
+            {
+                //TODO: usar nombre asociado al perfil.
+                ordenes = ordenes.Where(o => o.Cliente.NombreUsuario.Contains(paramsOrden.NombreCliente));
+            }
+
+            if (paramsOrden.IdOrden is not null && ordenes.Count() > 0)
+            {
+                ordenes = ordenes.Where(o => o.Id.Equals(paramsOrden.IdOrden));
             }
 
             //TODO: encontrar una manera de comparar las fechas usando lambdas simples de un queryable.
