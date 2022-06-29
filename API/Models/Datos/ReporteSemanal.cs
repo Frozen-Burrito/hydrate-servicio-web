@@ -5,7 +5,7 @@ using ServicioHydrate.Modelos.DTO.Datos;
 
 namespace ServicioHydrate.Modelos.Datos 
 {
-    public class HabitosSemanales 
+    public class ReporteSemanal 
     {
         public int Id { get; set; }
 
@@ -25,5 +25,19 @@ namespace ServicioHydrate.Modelos.Datos
         public double TemperaturaMaxima { get; set; }
 
         public DateTime Fecha { get; set; }
+
+        public DTOReporteSemanal ComoDTO()
+        {
+            return new DTOReporteSemanal()
+            {
+                Id = this.Id,
+                IdPerfil = this.IdPerfil,
+                HorasDeSuenio = this.HorasDeSuenio,
+                HorasDeActividadFisica = this.HorasDeActividadFisica,
+                HorasDeOcupacion = this.HorasDeOcupacion,
+                TemperaturaMaxima = this.TemperaturaMaxima,
+                Fecha = this.Fecha.ToString("o"),
+            };
+        }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using ServicioHydrate.Modelos.DTO.Datos;
 using ServicioHydrate.Modelos.Enums;
 
@@ -34,5 +35,21 @@ namespace ServicioHydrate.Modelos.Datos
         public string Notas { get; set; }
 
         public virtual ICollection<Etiqueta> Etiquetas { get; set; }
+
+        public DTOMeta ComoDTO() 
+        {
+            return new DTOMeta()
+            {
+                Id = this.Id,
+                IdPerfil = this.IdPerfil,
+                Plazo = this.Plazo,
+                FechaInicio = this.FechaInicio.ToString("o"),
+                FechaTermino = this.FechaTermino.ToString("o"),
+                RecompensaDeMonedas = this.RecompensaDeMonedas,
+                CantidadEnMl = this.CantidadEnMl,
+                Notas = this.Notas,
+                Etiquetas = this.Etiquetas.Select(e => e.ComoDTO()).ToList(),
+            };
+        }
     }
 }

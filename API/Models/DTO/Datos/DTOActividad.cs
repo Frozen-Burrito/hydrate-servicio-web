@@ -1,22 +1,21 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using ServicioHydrate.Modelos.Datos;
 
-using ServicioHydrate.Modelos.DTO.Datos; 
-
-namespace ServicioHydrate.Modelos.Datos
+namespace ServicioHydrate.Modelos.DTO.Datos
 {
-    public class ActividadFisica 
+    public class DTOActividad 
     {
         public int Id { get; set; }
 
-        [Required]
         public int IdPerfil { get; set; }
-        public Perfil PerfilDeUsuario { get; set; }
 
         [MaxLength(40)]
         public string Titulo { get; set; }
 
-        public DateTime Fecha { get; set; }
+        [MaxLength(33)]
+        public string Fecha { get; set; }
 
         /// La duración en minutos del registro de actividad física.
         [Range(1, 480)]
@@ -31,24 +30,33 @@ namespace ServicioHydrate.Modelos.Datos
     
         public bool FueAlAireLibre { get; set; }
 
-        public DatosDeActividad DatosActividad { get; set; }
+        public DTODatosActividad DatosDeActividad { get; set; }
 
-        public Rutina Rutina { get; set; }
+        public DTORutina Rutina { get; set; }
 
-        public DTOActividad ComoDTO() 
+        public ActividadFisica ComoNuevoModelo(DatosDeActividad datosDeActividad, Rutina rutina) 
         {
-            return new DTOActividad
+            DateTime fecha;
+
+            bool strISO8601Valido = DateTime
+                .TryParse(this.Fecha, CultureInfo.InvariantCulture, DateTimeStyles.None, out fecha);
+
+            if (!strISO8601Valido)
             {
-                Id = this.Id,
+                throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
+            }
+
+            return new ActividadFisica
+            {
                 IdPerfil = this.IdPerfil,
                 Titulo = this.Titulo,
-                Fecha = this.Fecha.ToString("o"),
+                Fecha = fecha,
                 Duracion = this.Duracion,
                 Distancia = this.Distancia,
                 KcalQuemadas = this.KcalQuemadas,
                 FueAlAireLibre = this.FueAlAireLibre,
-                DatosDeActividad = this.DatosActividad.ComoDTO(),
-                Rutina = this.Rutina.ComoDTO(),
+                DatosActividad = datosDeActividad,
+                Rutina = rutina,
             };
         }
     }

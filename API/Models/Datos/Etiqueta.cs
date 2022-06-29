@@ -16,5 +16,15 @@ namespace ServicioHydrate.Modelos.Datos
         public string Valor { get; set; }
 
         public virtual ICollection<Meta> Metas { get; set; }
+
+        public DTOEtiqueta ComoDTO()
+        {
+            return new DTOEtiqueta
+            {
+                Id = this.Id,
+                IdPerfil = this.IdPerfil,
+                Valor = this.Valor,
+            };
+        }
     }
 }

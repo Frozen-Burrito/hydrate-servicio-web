@@ -1,15 +1,15 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using ServicioHydrate.Modelos.Datos;
 
-using ServicioHydrate.Modelos.DTO.Datos;
-
-namespace ServicioHydrate.Modelos.Datos
+namespace ServicioHydrate.Modelos.DTO.Datos
 {
-    public class DatosMedicos 
+    public class DTORegistroMedico
     {
         public int Id { get; set; }
 
         public int IdPerfil { get; set; }
-        public Perfil PerfilDeUsuario { get; set; }
 
         public float Hipervolemia { get; set; }
 
@@ -23,13 +23,23 @@ namespace ServicioHydrate.Modelos.Datos
 
         public float GananciaReal { get; set; }
 
-        public DateTime FechaProxCita { get; set; }
+        [MaxLength(33)]
+        public string FechaProxCita { get; set; }
 
-        public DTORegistroMedico ComoDTO() 
+        public DatosMedicos ComoNuevoModelo()
         {
-            return new DTORegistroMedico()
+            DateTime fecha;
+
+            bool strISO8601Valido = DateTime
+                .TryParse(this.FechaProxCita, CultureInfo.InvariantCulture, DateTimeStyles.None, out fecha);
+
+            if (!strISO8601Valido)
             {
-                Id = this.Id,
+                throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
+            }
+
+            return new DatosMedicos()
+            {
                 IdPerfil = this.IdPerfil,
                 Hipervolemia = this.Hipervolemia,
                 PesoPostDialisis = this.PesoPostDialisis,
@@ -37,7 +47,7 @@ namespace ServicioHydrate.Modelos.Datos
                 Normovolemia = this.Normovolemia,
                 GananciaRegistrada = this.GananciaRegistrada,
                 GananciaReal = this.GananciaReal,
-                FechaProxCita = this.FechaProxCita.ToString("o"),
+                FechaProxCita = fecha,
             };
         }
     }

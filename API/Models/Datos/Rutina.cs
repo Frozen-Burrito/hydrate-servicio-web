@@ -22,5 +22,17 @@ namespace ServicioHydrate.Modelos.Datos
 		[Column("id_actividad")]
         public int IdActividad { get; set; }
         public ActividadFisica RegistroDeActividad { get; set; }
+
+        public DTORutina ComoDTO()
+        {
+            return new DTORutina
+            {
+                Id = this.Id,
+                IdPerfil = this.IdPerfil,
+                Dias = this.Dias,
+                Hora = this.Hora.ToString("o"),
+                IdActividad = this.IdActividad,
+            };
+        }
     }
 }

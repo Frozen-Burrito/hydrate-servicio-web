@@ -13,5 +13,15 @@ namespace ServicioHydrate.Modelos.Datos
 
         [Range(0.0, 50.0)]
         public double VelocidadPromedioKMH { get; set; }
+
+        public DTODatosActividad ComoDTO()
+        {
+            return new DTODatosActividad
+            {
+                Id = this.Id,
+                METs = this.METs,
+                VelocidadPromedioKMH = this.VelocidadPromedioKMH,
+            };
+        }
     }
 }

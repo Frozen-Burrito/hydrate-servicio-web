@@ -138,7 +138,7 @@ namespace ServicioHydrate.Data
             modelBuilder.Entity<Etiqueta>()
                 .HasKey(e => new { e.Id, e.IdPerfil });
 
-            modelBuilder.Entity<HabitosSemanales>()
+            modelBuilder.Entity<ReporteSemanal>()
                 .HasKey(hs => new { hs.Id, hs.IdPerfil });
 
             modelBuilder.Entity<Meta>()
@@ -163,7 +163,7 @@ namespace ServicioHydrate.Data
                 .HasOne(e => e.PerfilDeUsuario)
                 .WithMany(p => p.Etiquetas);
 
-            modelBuilder.Entity<HabitosSemanales>()
+            modelBuilder.Entity<ReporteSemanal>()
                 .HasOne(hs => hs.PerfilDeUsuario)
                 .WithMany(p => p.ReportesSemanales);
 

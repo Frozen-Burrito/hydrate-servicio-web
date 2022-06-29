@@ -50,7 +50,7 @@ namespace ServicioHydrate.Modelos
 		public virtual ICollection<ActividadFisica> RegistrosDeActFisica { get; set; }
 		public virtual ICollection<DatosMedicos> RegistrosMedicos { get; set; }
 		public virtual ICollection<Etiqueta> Etiquetas { get; set; }
-		public virtual ICollection<HabitosSemanales> ReportesSemanales { get; set; }
+		public virtual ICollection<ReporteSemanal> ReportesSemanales { get; set; }
 		public virtual ICollection<Meta> Metas { get; set; }
 		public virtual ICollection<RegistroDeHidratacion> RegistrosDeHidratacion { get; set; }
 		public virtual ICollection<Rutina> Rutinas { get; set; }

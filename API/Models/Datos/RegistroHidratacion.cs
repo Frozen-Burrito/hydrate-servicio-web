@@ -22,6 +22,8 @@ namespace ServicioHydrate.Modelos.Datos
 
 		public DateTime Fecha { get; set; }
 
+		public bool EsInformacionAbierta { get; set; }
+
 		public DTORegistroDeHidratacion ComoDTO() 
 		{
 			return new DTORegistroDeHidratacion 
