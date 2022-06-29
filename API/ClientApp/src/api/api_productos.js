@@ -61,7 +61,10 @@ export const fetchOrdenes = async (paramsOrdenes, jwt, numPagina = 1) => {
 
   // Filtros por atributos de orden.
   if (nombreCliente != null) paramsUrl.set("nombreCliente", nombreCliente);
-  if (email != null) paramsUrl.set("emailCliente", email);
+  if (email != null) {
+    console.log(email);
+    paramsUrl.set("emailCliente", email);
+  }
   if (idOrden != null) paramsUrl.set("idOrden", idOrden);
 
   // Filtros por estado de la orden.
@@ -70,6 +73,8 @@ export const fetchOrdenes = async (paramsOrdenes, jwt, numPagina = 1) => {
   // Filtros por rango de fechas.
   if (rangoFechas.inicio != null) paramsUrl.set("desde", rangoFechas.inicio);
   if (rangoFechas.fin != null) paramsUrl.set("hasta", rangoFechas.fin);
+
+  console.log(paramsUrl.toString());
 
   const resultados = await api.fetchPaginado(
     endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, paramsUrl, jwt

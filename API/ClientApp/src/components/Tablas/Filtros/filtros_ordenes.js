@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { validarRangoFechas } from "../../../utils/validaciones";
 
@@ -75,8 +75,6 @@ export default function FiltrosParaOrdenes(props) {
         email: null,
       });
     }
-    
-    onCambioEnFiltros(filtros);
   }
 
   function onChangeFiltroEstado(indiceEstadoOrden) {
@@ -85,8 +83,6 @@ export default function FiltrosParaOrdenes(props) {
       ...filtros,
       estadoOrden: indiceEstadoOrden
     });
-
-    onCambioEnFiltros(filtros);
   }
 
   function onChangeFechaInicial(e) {
@@ -104,10 +100,6 @@ export default function FiltrosParaOrdenes(props) {
     });
 
     const resultadoVal = validarRangoFechas(fechaIntroducida, filtros.rangoFechas.fin);
-
-    if (resultadoVal === null) {
-      onCambioEnFiltros(filtros);
-    } 
     // else {
     //   if (resultadoVal.error === ErrorDeRecurso.errFechaNoValida.error) {
     //     setErrFechaInicial("La fecha de publicación del recurso debe ser anterior a la fecha actual.");
@@ -130,16 +122,16 @@ export default function FiltrosParaOrdenes(props) {
     });
 
     const resultadoVal = validarRangoFechas(filtros.rangoFechas.inicio, fechaIntroducida);
-
-    if (resultadoVal === null) {
-      onCambioEnFiltros(filtros);
-    } 
     // else {
     //   if (resultadoVal.error === ErrorDeFecha.errRangoNoCoincide.error) {
     //     setErrFechaInicial("La fecha de fin del rango debe ser posterior a la fecha de inicio.");
     //   }
     // }
   }
+
+  useEffect(() => {
+    onCambioEnFiltros(filtros);
+  }, [filtros]);
 
   const renderDropdownFiltroEstado = () => (
     <Dropdown 
