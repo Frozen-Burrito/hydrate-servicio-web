@@ -1,20 +1,27 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.DTO.Datos;
 using ServicioHydrate.Modelos.Enums;
 
+#nullable enable
 namespace ServicioHydrate.Data 
 {
     public interface IServicioDatosAbiertos 
     {
         /// <summary>
-        /// Obtiene todos los registros de hidratación que cumplan con los filtros, para 
-        /// que puedan ser visualizados en una gráfica.
+        /// Obtiene todos los registros de hidratación que cumplan con los filtros.
         /// </summary>
+        /// <remarks>
+        /// Si [paramsPagina] no es nulo, el resultado será paginado. Para obtener todos 
+        /// los registros, sin importar la cantidad, [paramsPagina] debe ser nulo. 
+        /// </remarks>
         /// <param name="filtros">Parámetros que determinan los datos del resultado.</param>
-        /// <returns>Datos de hidratación, en un formato para gráficas.</returns>
-        Task<DTOResultadoGrafico<int>> GetDatosDeHidratacion(DTOFiltrosPorPerfil filtros);
+        /// <returns>Los datos abiertos de hidratación.</returns>
+        Task<ICollection<DTORegistroDeHidratacion>> GetDatosDeHidratacion(
+            FiltrosPorPerfil filtros,
+            DTOParamsPagina? paramsPagina 
+        );
 
         /// <summary>
         /// Incluye los registros de hidratación recibidos en la colección
@@ -24,12 +31,18 @@ namespace ServicioHydrate.Data
         Task AportarDatosDeHidratacion(IEnumerable<DTORegistroDeHidratacion> datos);
 
         /// <summary>
-        /// Obtiene todos los registros de actividad física que cumplan con los filtros, para 
-        /// que puedan ser visualizados en una gráfica.
+        /// Obtiene todos los registros de actividad física que cumplan con los filtros.
         /// </summary>
+        /// <remarks>
+        /// Si [paramsPagina] no es nulo, el resultado será paginado. Para obtener todos 
+        /// los registros, sin importar la cantidad, [paramsPagina] debe ser nulo. 
+        /// </remarks>
         /// <param name="filtros">Los parámetros que determinan los datos del resultado.</param>
-        /// <returns>Datos de actividad físicas, en un formato para gráficas.</returns>
-        Task<DTOResultadoGrafico<int>> GetDatosDeActividad(DTOFiltrosPorPerfil filtros);
+        /// <returns>Datos de actividad física.</returns>
+        Task<ICollection<DTOActividad>> GetDatosDeActividad(
+            FiltrosPorPerfil filtros,
+            DTOParamsPagina? paramsPagina
+        );
 
         /// <summary>
         /// Incluye los registros de actividad física de [datos] en la colección
@@ -47,7 +60,8 @@ namespace ServicioHydrate.Data
         /// <returns>La colección de datos abiertos especificada.</returns>
         Task<IEnumerable<object>> ExportarDatosAbiertos(
             TipoDeDatosAbiertos tipoDeDatos, 
-            DTOFiltrosPorPerfil filtros
+            FiltrosPorPerfil filtros
         );
     }
 }
+#nullable disable

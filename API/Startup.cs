@@ -79,6 +79,8 @@ namespace ServicioHydrate
 
             services.AddScoped<IServicioPerfil, RepositorioPerfiles>();
 
+            services.AddScoped<IServicioDatosAbiertos, RepositorioDatosAbiertos>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new TokenValidationParameters

@@ -34,7 +34,13 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
         public DTORutina Rutina { get; set; }
 
-        public ActividadFisica ComoNuevoModelo(DatosDeActividad datosDeActividad, Rutina rutina) 
+        public bool EsInformacionAbierta { get; set; }
+
+        public ActividadFisica ComoNuevoModelo(
+            DatosDeActividad datosDeActividad, 
+            Rutina rutina,
+            bool esParteDeDatosAbiertos = false
+        ) 
         {
             DateTime fecha;
 
@@ -57,6 +63,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 FueAlAireLibre = this.FueAlAireLibre,
                 DatosActividad = datosDeActividad,
                 Rutina = rutina,
+                EsInformacionAbierta = esParteDeDatosAbiertos,
             };
         }
     }

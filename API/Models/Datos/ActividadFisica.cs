@@ -35,6 +35,8 @@ namespace ServicioHydrate.Modelos.Datos
 
         public Rutina Rutina { get; set; }
 
+        public bool EsInformacionAbierta { get; set; }
+
         public DTOActividad ComoDTO() 
         {
             return new DTOActividad
