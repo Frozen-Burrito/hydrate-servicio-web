@@ -14,9 +14,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioComentarios : IServicioComentarios
     {
-        private readonly ContextoDBSqlite _contexto;
+        private readonly ContextoDBMysql _contexto;
 
-        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBSqlite contexto)
+        public RepositorioComentarios(IWebHostEnvironment env, ContextoDBMysql contexto)
         {
             this._contexto = contexto;
         }

@@ -13,9 +13,9 @@ namespace ServicioHydrate.Data
 	public class RepositorioLlavesDeAPI : IServicioLlavesDeAPI
 	{
 		// El contexto de EF para la base de datos.
-        private readonly ContextoDBSqlite _contexto;
+        private readonly ContextoDBMysql _contexto;
 
-        public RepositorioLlavesDeAPI(ContextoDBSqlite contexto)
+        public RepositorioLlavesDeAPI(ContextoDBMysql contexto)
         {
             this._contexto = contexto;
         }
