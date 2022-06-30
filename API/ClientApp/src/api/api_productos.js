@@ -185,7 +185,7 @@ export const exportarOrdenesConFormato = async (formato, jwt) => {
   partesHeader.forEach(parte => {
     // Buscar el valor de "filename" en el valor del header.
     if (parte.trim().startsWith("filename=")) {
-      nombreArchivo = parte.split("=")[1].replace(/\"/g, "");
+      nombreArchivo = parte.split("=")[1].replace(/"/g, "");
     }
   });
 

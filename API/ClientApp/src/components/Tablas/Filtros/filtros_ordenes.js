@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-import { validarRangoFechas } from "../../../utils/validaciones";
-
 import { 
   SearchBox, 
   Dropdown,
@@ -27,8 +25,9 @@ export default function FiltrosParaOrdenes(props) {
     }
   });
 
-  const [errFechaInicial, setErrFechaInicial] = useState(null);
-  const [errFechaFinal, setErrFechaFinal] = useState(null);
+  //TODO: Usar y mostrar estos errores (faltan funciones "set...").
+  const [errFechaInicial] = useState(null);
+  const [errFechaFinal] = useState(null);
 
   const estadoDeOrden = [
     "Pendiente",
@@ -99,7 +98,7 @@ export default function FiltrosParaOrdenes(props) {
       }
     });
 
-    const resultadoVal = validarRangoFechas(fechaIntroducida, filtros.rangoFechas.fin);
+    // const resultadoVal = validarRangoFechas(fechaIntroducida, filtros.rangoFechas.fin);
     // else {
     //   if (resultadoVal.error === ErrorDeRecurso.errFechaNoValida.error) {
     //     setErrFechaInicial("La fecha de publicación del recurso debe ser anterior a la fecha actual.");
@@ -121,7 +120,7 @@ export default function FiltrosParaOrdenes(props) {
       }
     });
 
-    const resultadoVal = validarRangoFechas(filtros.rangoFechas.inicio, fechaIntroducida);
+    // const resultadoVal = validarRangoFechas(filtros.rangoFechas.inicio, fechaIntroducida);
     // else {
     //   if (resultadoVal.error === ErrorDeFecha.errRangoNoCoincide.error) {
     //     setErrFechaInicial("La fecha de fin del rango debe ser posterior a la fecha de inicio.");
@@ -131,7 +130,7 @@ export default function FiltrosParaOrdenes(props) {
 
   useEffect(() => {
     onCambioEnFiltros(filtros);
-  }, [filtros]);
+  }, [filtros, onCambioEnFiltros]);
 
   const renderDropdownFiltroEstado = () => (
     <Dropdown 
