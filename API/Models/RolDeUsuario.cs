@@ -7,5 +7,6 @@ namespace ServicioHydrate.Modelos
         ADMIN_ORDENES,
         ADMIN_RECURSOS_INF,
         ADMINISTRADOR,
+        TERCERO_CON_API_KEY,
     }
 }

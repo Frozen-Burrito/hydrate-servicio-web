@@ -11,6 +11,12 @@ namespace ServicioHydrate.Data
 		public int IndicePagina { get; private set; }
 		public int PaginasTotales { get; private set; }
 
+		public ListaPaginada()
+		{
+			IndicePagina = 1;
+			PaginasTotales = 1;
+		}
+
 		public ListaPaginada(List<T> elementos, int total, int indicePagina, int sizePagina)
 		{
 			IndicePagina = indicePagina;

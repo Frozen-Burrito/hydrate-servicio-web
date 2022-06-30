@@ -25,6 +25,8 @@ namespace ServicioHydrate.Modelos
 
         public virtual ICollection<Orden> Ordenes { get; set; }
 
+        public virtual ICollection<LlaveDeApi> LlavesDeAPI { get; set; }
+
         public virtual ICollection<Comentario> Comentarios { get; set; }
         public virtual ICollection<Respuesta> Respuestas { get; set; }
         
