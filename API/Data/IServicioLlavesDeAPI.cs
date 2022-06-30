@@ -41,7 +41,13 @@ namespace ServicioHydrate.Data
 		/// </remarks>
 		/// <param name="paramsPagina">Los controles de paginación para el resultado.</param>
 		/// <returns>Un resultado paginado con todas las llaves de API.</returns>
-		Task<ICollection<DTOLlaveDeAPI>> GetTodasLasLlaves(DTOParamsPagina paramsPagina);
+		Task<ICollection<DTOLlaveDeAPIAdmin>> GetTodasLasLlaves(DTOParamsPagina paramsPagina);
+
+		/// <summary>
+		/// Calcula estadísticas de utilización de la API en el mes pasado.
+		/// </summary>
+		/// <returns>Un resumen estadístico de uso de API.</returns>
+		Task<DTOStatsLlavesDeApi> GetUsoDeAPI();
 
 		/// <summary>
 		/// Genera una nueva llave de API, si el usuario tiene menos de 
@@ -49,13 +55,26 @@ namespace ServicioHydrate.Data
 		/// </summary>
 		/// <param name="idUsuario">El usuario que desea generar la nueva llave.</param>
 		Task GenerarNuevaLlave(Guid idUsuario);
+
+		/// <summary>
+		/// Incrementa el número de peticiones realizadas de una llave de API específica.
+		/// </summary>
+		/// <param name="llave">La llave de API usada para la petición.</param>
+		Task RegistrarPeticion(string llave);
+
+		/// <summary>
+		/// Incrementa el número de errores ocurridos en peticiones realizadas con
+		/// una llave de API específica.
+		/// </summary>
+		/// <param name="llave">La llave de API usada para la petición.</param>
+		Task RegistrarError(string llave);
 		
 		/// <summary>
 		/// Elimina una llave de API existente.
 		/// </summary>
 		/// <param name="idUsuario">El ID del usuario dueño de la llave.</param>
-		/// <param name="llave">La llave de API.</param>
-		Task EliminarLlave(Guid idUsuario, string llave);
+		/// <param name="idLlave">El ID de la llave de API.</param>
+		Task EliminarLlave(Guid idUsuario, int idLlave);
 	}
 }
 #nullable disable

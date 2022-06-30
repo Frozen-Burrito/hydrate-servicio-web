@@ -50,7 +50,7 @@ namespace ServicioHydrate.Controladores
         /// <returns>Resultado HTTP</returns>
         [HttpGet]
         [Authorize(Roles = "ADMINISTRADOR")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOLlaveDeAPI>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOLlaveDeAPIAdmin>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -69,10 +69,48 @@ namespace ServicioHydrate.Controladores
 
                 int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
 
-                var resultado = DTOResultadoPaginado<DTOLlaveDeAPI>
+                var resultado = DTOResultadoPaginado<DTOLlaveDeAPIAdmin>
                                 .DesdeColeccion(llaves, numPagina, ruta);
 
                 return Ok(resultado);
+            }
+            catch (Exception e) 
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Produce un resumen estadístico con ciertos datos clave del uso de la 
+        /// API por medio de llaves:
+        /// - Peticiones totales en el mes pasado.
+        /// - Número de errores.
+        /// - Número de llaves de API registradas.
+        /// </summary>
+        /// <returns>Resultado HTTP</returns>
+        [HttpGet]
+        [Authorize(Roles = "ADMINISTRADOR")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOStatsLlavesDeApi))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetEstadisticas()
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try 
+            {
+                // Obtener los datos de uso acumulados de la API.
+                var resumenDeUsoDeAPI = await _repoLlaves.GetUsoDeAPI();
+
+                return Ok(resumenDeUsoDeAPI);
             }
             catch (Exception e) 
             {
@@ -185,14 +223,14 @@ namespace ServicioHydrate.Controladores
         /// <summary>
         /// Intenta eliminar una llave de API.
         /// </summary>
-        /// <param name="llave">El valor de la llave de API a eliminar.</param>
+        /// <param name="idLlave">El ID de la llave de API a eliminar.</param>
         /// <returns>Un resultado HTTP sin cuerpo, de confirmación de éxito.</returns>
-        [HttpDelete("{llave}")]
+        [HttpDelete("{idLlave}")]
         [Authorize(Roles = "NINGUNO,ADMINISTRADOR")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> EliminarLlave([FromRoute] string llave, Guid? idPropietario)
+        public async Task<IActionResult> EliminarLlave([FromRoute] int idLlave, Guid? idPropietario)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -235,7 +273,7 @@ namespace ServicioHydrate.Controladores
                 }
 
                 // Eliminar la llave en BD.
-                await _repoLlaves.EliminarLlave(idUsuario, llave);
+                await _repoLlaves.EliminarLlave(idUsuario, idLlave);
 
                 return NoContent();
             }

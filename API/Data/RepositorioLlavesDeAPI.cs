@@ -36,13 +36,15 @@ namespace ServicioHydrate.Data
             return llave;
         }
 
-        public async Task EliminarLlave(Guid idUsuario, string llave)
+        public async Task EliminarLlave(Guid idUsuario, int idLlave)
         {
-            LlaveDeApi? llaveEncontrada = await BuscarLlave(llave);
+            LlaveDeApi? llave = await _contexto.LlavesDeAPI
+                .Where(ll => ll.Llave.Equals(idLlave))
+                .FirstOrDefaultAsync();
 
-            if (llaveEncontrada is not null)
+            if (llave is not null)
             {
-                _contexto.LlavesDeAPI.Remove(llaveEncontrada);
+                _contexto.LlavesDeAPI.Remove(llave);
                 await _contexto.SaveChangesAsync();
             }
         }
@@ -83,21 +85,81 @@ namespace ServicioHydrate.Data
             return llavesDeApiDeUsuario;
         }
 
-        public async Task<ICollection<DTOLlaveDeAPI>> GetTodasLasLlaves(DTOParamsPagina paramsPagina)
+        public async Task<ICollection<DTOLlaveDeAPIAdmin>> GetTodasLasLlaves(DTOParamsPagina paramsPagina)
         {
             if (await _contexto.LlavesDeAPI.CountAsync() <= 0) 
             {
                 // No hay ninguna llave registrada.
-                return new ListaPaginada<DTOLlaveDeAPI>();
+                return new ListaPaginada<DTOLlaveDeAPIAdmin>();
             }
 
-            IQueryable<DTOLlaveDeAPI> todasLasLlaves = _contexto.LlavesDeAPI
-                .Select(ll => ll.ComoDTO());
+            IQueryable<DTOLlaveDeAPIAdmin> todasLasLlaves = _contexto.LlavesDeAPI
+                .Include(ll => ll.Usuario)
+                .Select(ll => ll.ComoDTOAdmin());
 
-            var llavesPaginadas = await ListaPaginada<DTOLlaveDeAPI>
+            var llavesPaginadas = await ListaPaginada<DTOLlaveDeAPIAdmin>
                 .CrearAsync(todasLasLlaves, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return llavesPaginadas;
+        }
+
+        public async Task<DTOStatsLlavesDeApi> GetUsoDeAPI()
+        {
+            if (await _contexto.LlavesDeAPI.CountAsync() <= 0) 
+            {
+                // No hay ninguna llave registrada.
+                return new DTOStatsLlavesDeApi();
+            }
+
+            IQueryable<LlaveDeApi> llaves = _contexto.LlavesDeAPI.AsQueryable();
+
+            int peticionesTotales = await llaves
+                .SumAsync(ll => ll.PeticionesEnMes);
+
+            int erroresTotales = await llaves
+                .SumAsync(ll => ll.ErroresEnMes);
+
+            int clientesActivos = await llaves
+                .Where(ll => ll.TuvoActividadEnMesPasado)
+                .CountAsync();
+
+            return new DTOStatsLlavesDeApi
+            {
+                Plazo = "mes",
+                PeticionesTotales = peticionesTotales,
+                ErroresTotales = erroresTotales,
+                NumDeLlavesActivas = clientesActivos,
+            };
+        }
+
+        public async Task RegistrarError(string llave)
+        {
+            LlaveDeApi? llaveDeApi = await BuscarLlave(llave);
+
+            if (llaveDeApi is null)
+            {
+                throw new InvalidOperationException("La llave de API no fue encontrada.");
+            }
+
+            llaveDeApi.RegistrarError();
+
+            _contexto.Entry(llaveDeApi).State = EntityState.Modified;
+            await _contexto.SaveChangesAsync();
+        }
+
+        public async Task RegistrarPeticion(string llave)
+        {
+            LlaveDeApi? llaveDeApi = await BuscarLlave(llave);
+
+            if (llaveDeApi is null)
+            {
+                throw new InvalidOperationException("La llave de API no fue encontrada.");
+            }
+
+            llaveDeApi.RegistrarUso();
+
+            _contexto.Entry(llaveDeApi).State = EntityState.Modified;
+            await _contexto.SaveChangesAsync();
         }
     }
 }  
