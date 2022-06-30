@@ -7,35 +7,45 @@ namespace ServicioHydrate.Modelos
 {
 	public class LlaveDeApi 
 	{
-		public int Id { get; private set; }
+		public int Id { get; set; }
 
-		public Guid IdUsuario { get; private set; }
+		public Guid IdUsuario { get; set; }
 
 		public Usuario Usuario { get; set; }
 
-		public string Llave { get; private set; }
+		public string Llave { get; set; }
 
-		public string NombreDelCliente { get; private set; }
+		public string NombreDelCliente { get; set; }
 
-		public int PeticionesEnMes { get; private set; }
+		public int PeticionesEnMes { get; set; }
 
 		public int ErroresEnMes { get; set; }
 
-		public DateTime FechaDeCreacion { get; private set; }
+		public DateTime FechaDeCreacion { get; set; }
 
-		public RolDeUsuario RolDeAcceso { get; private set; }
+		public RolDeUsuario RolDeAcceso { get; set; }
 
 		public bool TuvoActividadEnMesPasado => PeticionesEnMes > 0;
 
-		public LlaveDeApi(int id, Guid idUsuario, string llave, DateTime fechaDeCreacion)
+		public LlaveDeApi()
+		{
+		}
+
+		public LlaveDeApi(int id, Guid idUsuario, string nombreDelCliente, string llave, DateTime fechaDeCreacion)
 		{
 			Id = id;
 			IdUsuario = idUsuario;
+			NombreDelCliente = nombreDelCliente;
 			Llave = llave;
 			FechaDeCreacion = fechaDeCreacion;
 
 			// Rol de acceso especifico para usuarios de llaves de API.
 			RolDeAcceso = RolDeUsuario.TERCERO_CON_API_KEY;
+		}
+
+		public void RegenerarLlave()
+		{
+			Llave = Guid.NewGuid().ToString();
 		}
 
 		public void RegistrarUso()
@@ -54,6 +64,7 @@ namespace ServicioHydrate.Modelos
 			{
 				Id = this.Id,
 				IdUsuario = this.IdUsuario,
+				Nombre = this.NombreDelCliente,
 				Llave = this.Llave,
 				FechaDeCreacion = this.FechaDeCreacion.ToString("o"),
 				PeticionesEnMes = this.PeticionesEnMes,
@@ -70,6 +81,7 @@ namespace ServicioHydrate.Modelos
 				NombrePropietario = this.Usuario.NombreUsuario,
 				EmailPropietario = this.Usuario.Email,
 				NombreDelCliente = this.NombreDelCliente,
+				NumeroDePeticiones = this.PeticionesEnMes,
 				TuvoActividadEnMesPasado = this.TuvoActividadEnMesPasado,
 			};
 		}

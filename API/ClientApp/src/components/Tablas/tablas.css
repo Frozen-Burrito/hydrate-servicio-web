@@ -4,6 +4,8 @@ table {
   background-color: var(--superficie-claro);
   border-radius: 5px;
   border-collapse: collapse;
+  width: 100%;
+  margin: auto;
 }
 
 table > tbody > tr > td, table > thead > tr > th {

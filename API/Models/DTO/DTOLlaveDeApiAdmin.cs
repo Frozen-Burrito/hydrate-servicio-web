@@ -15,6 +15,8 @@ namespace ServicioHydrate.Modelos.DTO
 
         public string NombreDelCliente { get; set; }
 
+        public int NumeroDePeticiones { get; set; }
+
         public bool TuvoActividadEnMesPasado { get; set; }
     }
 }

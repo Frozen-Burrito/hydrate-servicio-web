@@ -9,6 +9,8 @@ namespace ServicioHydrate.Modelos.DTO
 
 		public Guid IdUsuario { get; set; }
 
+		public string Nombre { get; set; }
+
 		public string Llave { get; set; }
 
 		public int PeticionesEnMes { get; set; }

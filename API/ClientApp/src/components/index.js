@@ -20,6 +20,7 @@ export { default as FormCrearCuenta } from "./formularios/FormCrearCuenta";
 export { default as FormIniciarSesion } from "./formularios/FormInicioSesion";
 export { default as FormPublicarComentario } from "./formularios/form_publicar_comentario";
 export { default as FormStripeCheckout } from "./formularios/form_stripe_checkout";
+export { default as FormObtenerLlave } from "./formularios/form_generar_llave";
 
 export { default as Layout } from "./Layout/Layout";
 export { default as ListItem } from "./ListItemExpandible/list_item_expandible";
@@ -33,6 +34,7 @@ export { default as Tabla } from "./Tablas/Tabla";
 export { default as FilaTabla } from "./Tablas/FilaTabla";
 export { default as EncabezadoColumna } from "./Tablas/EncabezadoColumna";
 export { default as TablaOrdenes } from "./Tablas/tabla_ordenes";
+export { default as TablaLlaves } from "./Tablas/tabla_llaves_api";
 
 export { default as FiltrosParaOrdenes } from "./Tablas/Filtros/filtros_ordenes";
 

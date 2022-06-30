@@ -79,10 +79,13 @@ form > .form-fields > .form-group {
 }
 
 form > .form-fields > .form-group > .campo, .campo {
-  /* width: 100%; */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+form > .form-fields > .form-group > .campo.full-width, .campo.full-width {
+  width: 100%;
 }
 
 form > .form-fields > .form-group > .campo > .stack > p {

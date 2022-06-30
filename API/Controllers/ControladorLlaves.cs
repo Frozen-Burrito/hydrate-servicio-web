@@ -91,7 +91,7 @@ namespace ServicioHydrate.Controladores
         /// - Número de llaves de API registradas.
         /// </summary>
         /// <returns>Resultado HTTP</returns>
-        [HttpGet]
+        [HttpGet("stats")]
         [Authorize(Roles = "ADMINISTRADOR")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOStatsLlavesDeApi))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -175,7 +175,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GenerarLlaveDeAPI()
+        public async Task<IActionResult> GenerarLlaveDeAPI(string nombre)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -190,7 +190,7 @@ namespace ServicioHydrate.Controladores
                 if (idEsValido)
                 {
                     // Intentar generar la nueva llave de API.
-                    await _repoLlaves.GenerarNuevaLlave(idUsuario);
+                    await _repoLlaves.GenerarNuevaLlave(idUsuario, nombre);
 
                     return NoContent();
 
@@ -221,6 +221,58 @@ namespace ServicioHydrate.Controladores
         }
 
         /// <summary>
+        /// Regenera el valor de una llave de API especifica.
+        /// </summary>
+        /// <param name="idLlave">El ID de la llave de API a regenerar.</param>
+        /// <returns>Un resultado HTTP con los datos de la llave regenerada.</returns>
+        [HttpPatch("{idLlave}")]
+        [Authorize(Roles = "NINGUNO")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOLlaveDeAPI))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RegenerarValorLlave([FromRoute] int idLlave)
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "ruta no identificada";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                // Eliminar la llave en BD.
+                DTOLlaveDeAPI llaveActualizada = await _repoLlaves.RegenerarLlave(idLlave);
+
+                return Ok(llaveActualizada);
+            }
+            catch (ArgumentNullException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (FormatException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (DbUpdateException e)
+            {
+                // Hubo un error de base de datos. Enviarlo a los logs y retornar 503.
+                _logger.LogError(e, $"Error de actualizacion de DB en {metodo} - {ruta}");
+
+                return Problem(
+                    "Ocurrió un error al procesar la petición. Intente más tarde.", 
+                    statusCode: StatusCodes.Status503ServiceUnavailable
+                );
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
         /// Intenta eliminar una llave de API.
         /// </summary>
         /// <param name="idLlave">El ID de la llave de API a eliminar.</param>
@@ -229,6 +281,7 @@ namespace ServicioHydrate.Controladores
         [Authorize(Roles = "NINGUNO,ADMINISTRADOR")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> EliminarLlave([FromRoute] int idLlave, Guid? idPropietario)
         {
@@ -276,6 +329,10 @@ namespace ServicioHydrate.Controladores
                 await _repoLlaves.EliminarLlave(idUsuario, idLlave);
 
                 return NoContent();
+            }
+            catch (ArgumentNullException e)
+            {
+                return NotFound(e.Message);
             }
             catch (FormatException e)
             {

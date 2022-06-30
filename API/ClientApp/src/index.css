@@ -311,6 +311,6 @@ ul {
   gap: 1.6rem;
 }
 
-.escondido {
+.no-mostrar {
   display: none;
 }

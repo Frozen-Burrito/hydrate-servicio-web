@@ -54,7 +54,18 @@ namespace ServicioHydrate.Data
 		/// tres llaves.
 		/// </summary>
 		/// <param name="idUsuario">El usuario que desea generar la nueva llave.</param>
-		Task GenerarNuevaLlave(Guid idUsuario);
+		Task GenerarNuevaLlave(Guid idUsuario, string nombreLlave);
+
+		/// <summary>
+		/// Regenera una llave de API existente, asignándole un nuevo valor.
+		/// </summary>
+		/// <remarks>
+		/// Este método puede interrumpir el uso de la API por clientes
+		/// que sigan utilizando el valor anterior de la llave regenerada.
+		/// </remarks>
+		/// <param name="idLlave">El ID de la llave a regenerar.</param>
+		/// <returns>Los datos actualizados de la llave de API regenerada.</returns>
+		Task<DTOLlaveDeAPI> RegenerarLlave(int idLlave);
 
 		/// <summary>
 		/// Incrementa el número de peticiones realizadas de una llave de API específica.

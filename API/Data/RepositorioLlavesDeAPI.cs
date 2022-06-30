@@ -13,9 +13,9 @@ namespace ServicioHydrate.Data
 	public class RepositorioLlavesDeAPI : IServicioLlavesDeAPI
 	{
 		// El contexto de EF para la base de datos.
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioLlavesDeAPI(ContextoDBMysql contexto)
+        public RepositorioLlavesDeAPI(ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
@@ -38,18 +38,18 @@ namespace ServicioHydrate.Data
 
         public async Task EliminarLlave(Guid idUsuario, int idLlave)
         {
-            LlaveDeApi? llave = await _contexto.LlavesDeAPI
-                .Where(ll => ll.Llave.Equals(idLlave))
-                .FirstOrDefaultAsync();
+            LlaveDeApi? llave = await _contexto.LlavesDeAPI.FindAsync(idLlave);
 
-            if (llave is not null)
+            if (llave is null)
             {
-                _contexto.LlavesDeAPI.Remove(llave);
-                await _contexto.SaveChangesAsync();
+                throw new ArgumentNullException("No existe una llave con el ID especificado.");
             }
+
+            _contexto.LlavesDeAPI.Remove(llave);
+            await _contexto.SaveChangesAsync();
         }
 
-        public async Task GenerarNuevaLlave(Guid idUsuario)
+        public async Task GenerarNuevaLlave(Guid idUsuario, string nombreLlave)
         {
             var llavesDelUsuario = await GetLlavesDeUsuario(idUsuario);
 
@@ -61,6 +61,7 @@ namespace ServicioHydrate.Data
             LlaveDeApi nuevaLlave = new LlaveDeApi(
                 0, 
                 idUsuario,
+                nombreLlave,
                 Guid.NewGuid().ToString(),
                 DateTime.Now
             );
@@ -120,7 +121,7 @@ namespace ServicioHydrate.Data
                 .SumAsync(ll => ll.ErroresEnMes);
 
             int clientesActivos = await llaves
-                .Where(ll => ll.TuvoActividadEnMesPasado)
+                .Where(ll => ll.PeticionesEnMes > 0)
                 .CountAsync();
 
             return new DTOStatsLlavesDeApi
@@ -130,6 +131,23 @@ namespace ServicioHydrate.Data
                 ErroresTotales = erroresTotales,
                 NumDeLlavesActivas = clientesActivos,
             };
+        }
+
+        public async Task<DTOLlaveDeAPI> RegenerarLlave(int idLlave)
+        {
+            LlaveDeApi? llaveDeApi = await _contexto.LlavesDeAPI.FindAsync(idLlave);
+
+            if (llaveDeApi is null)
+            {
+                throw new InvalidOperationException("La llave de API no fue encontrada.");
+            }
+
+            llaveDeApi.RegenerarLlave();
+
+            _contexto.Entry(llaveDeApi).State = EntityState.Modified;
+            await _contexto.SaveChangesAsync();
+
+            return llaveDeApi.ComoDTO();
         }
 
         public async Task RegistrarError(string llave)

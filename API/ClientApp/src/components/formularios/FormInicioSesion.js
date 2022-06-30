@@ -113,6 +113,8 @@ function FormInicioSesion() {
     } else if (resultado.status >= 500) {
       setErrGeneral('El servicio no está disponible, intente más tarde');
 
+      setEstaCargando(false);
+
     } else if (resultado.status >= 400) {
 
       const tipoError = Object.keys(ErrorDeAutenticacion)[resultado.cuerpo['tipo']];
@@ -125,9 +127,9 @@ function FormInicioSesion() {
       } else if (tipoError === ErrorDeAutenticacion.formatoIncorrecto.error) {
         setErrGeneral('Las credenciales no tienen el formato correcto');
       }
-    }
 
-    setEstaCargando(false);
+      setEstaCargando(false);
+    }
   }
 
   // Es true si existen errores de validación en el formulario.

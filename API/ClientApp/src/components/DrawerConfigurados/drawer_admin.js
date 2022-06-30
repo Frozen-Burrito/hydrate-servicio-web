@@ -18,6 +18,7 @@ const elementos = [
   { icono: "dashboard", texto: "Órdenes", url: "/admin/ordenes" },
   { icono: "forum", texto: "Comentarios", url: "/admin/comentarios" },
   { icono: "auto_stories", texto: "Recuros Informativos", url: "/admin/recursos-informativos" },
+  { icono: "api", texto: "Llaves de API", url: "/admin/llaves-api" },
 ];
 
 export default function DrawerAdmin(props) {

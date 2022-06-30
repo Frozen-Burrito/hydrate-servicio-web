@@ -17,6 +17,7 @@ const elementos = [
   { icono: "account_circle", texto: "Mi Cuenta", url: "" },
   { icono: "dashboard", texto: "Tablero", url: "/tablero" },
   { icono: "forum", texto: "Mis Comentarios", url: "/comentarios" },
+  { icono: "api", texto: "Llaves de API", url: "/llaves" },
 ];
 
 export default function DrawerPerfil(props) {

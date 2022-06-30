@@ -128,7 +128,7 @@ export default function TablaOrdenes() {
 
         const datosPaginados = resultado.datos;
 
-        const mapaProductos = new Map(datosPaginados.resultados.map(producto => [producto.id, producto]));
+        const mapaProductos = new Map(datosPaginados.resultados.map(producto => ([producto.id, producto])));
 
         setProductos(mapaProductos);
         setTieneError(false);
