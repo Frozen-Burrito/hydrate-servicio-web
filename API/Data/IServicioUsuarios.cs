@@ -10,7 +10,7 @@ namespace ServicioHydrate.Data
 {
     public interface IServicioUsuarios
     {
-        Task<ICollection<DTOUsuario>> GetUsuarios(DTOParamsPagina? paramsPagina);
+        Task<ICollection<DTOUsuario>> GetUsuarios(DTOParamsPagina paramsPagina);
         Task<DTOUsuario> GetUsuarioPorId(Guid id);
         Task<DTORespuestaAutenticacion> AutenticarUsuario(DTOPeticionAutenticacion datosUsuario);
         Task<DTOUsuario> RegistrarNuevoUsuario(DTOPeticionAutenticacion datosUsuario);

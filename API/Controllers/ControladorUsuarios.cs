@@ -165,7 +165,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUsuarios([FromQuery] DTOParamsPagina? paramsPagina)
+        public async Task<IActionResult> GetUsuarios([FromQuery] DTOParamsPagina paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();

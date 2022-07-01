@@ -67,7 +67,7 @@ export const fetchTodosLosUsuarios = async (jwt, filtros, numPagina = 1) => {
 
   const paramsUrl = new URLSearchParams();
 
-  if (filtros.nombreEnPerfil != null) paramsUrl.set("nombre", filtros.nombreEnPerfil);
+  if (filtros.nombreEnPerfil != null) paramsUrl.set("query", filtros.nombreEnPerfil);
 
   const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, paramsUrl, jwt);
 
