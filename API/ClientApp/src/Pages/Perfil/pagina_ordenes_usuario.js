@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Layout, DrawerPerfil, TablaLlaves } from "../../components";
+import { Layout, DrawerPerfil, TablaOrdenes } from "../../components";
 
-export function PaginaLlavesUsuario() {
+export function PaginaOrdenesUsuario() {
 
   const [drawerVisible, setDrawerVisible] = useState(false);
 
@@ -12,23 +12,16 @@ export function PaginaLlavesUsuario() {
       <DrawerPerfil 
         lado="izquierda"
         mostrar={drawerVisible} 
-        indiceItemActivo={4}
+        indiceItemActivo={3}
         onToggle={() => setDrawerVisible(!drawerVisible)}
       />
       
       <section className='contenedor full-page py-5'>
         <div className="stack horizontal justify-between gap-2 my-3">
-          <h2>Tokens Para Clientes de API</h2>
-
-					<Link 
-						to={ "/llaves/nueva" } 
-						className={`btn btn-primario`}
-					>
-						Nuevo Token
-					</Link>
+          <h2>Mis Órdenes de Compra</h2>
         </div>
 
-        <TablaLlaves />
+        <TablaOrdenes />
       </section>
     </Layout>
   );

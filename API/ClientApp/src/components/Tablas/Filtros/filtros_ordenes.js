@@ -9,7 +9,8 @@ import {
 export default function FiltrosParaOrdenes(props) {
 
   const { 
-    onCambioEnFiltros 
+    onCambioEnFiltros,
+    filtros: filtrosMostrados
   } = props;
 
   const [filtros, setFiltros] = useState({
@@ -169,54 +170,60 @@ export default function FiltrosParaOrdenes(props) {
   );
 
   return (
-    <>      
-      <div className="campo">
-        <div className="campo-con-icono compacto">
-          <span className="material-icons">
-            today
-          </span>
-          <input 
-            type="date" 
-            name="fechaInicio" 
-            className="input" 
-            placeholder="Inicio" 
-            // value={filtros.rangoFechas.inicio}
-            onChange={e => onChangeFechaInicial(e)}/>
-        </div>
+    <>
+      { filtrosMostrados.rangoDeFechas && 
+        <>
+          <div className="campo">
+            <div className="campo-con-icono compacto">
+              <span className="material-icons">
+                today
+              </span>
+              <input 
+                type="date" 
+                name="fechaInicio" 
+                className="input" 
+                placeholder="Inicio" 
+                // value={filtros.rangoFechas.inicio}
+                onChange={e => onChangeFechaInicial(e)}/>
+            </div>
 
-        <p className="error" >
-          {errFechaInicial}
-        </p>
-      </div>
+            <p className="error" >
+              {errFechaInicial}
+            </p>
+          </div>
 
-      <div className="campo">
-        <div className="campo-con-icono compacto">
-          <span className="material-icons">
-            date_range
-          </span>
-          <input 
-            type="date" 
-            name="fechaFin" 
-            className="input" 
-            placeholder="Fin" 
-            // value={filtros.rangoFechas.fin}
-            onChange={e => onChangeFechaFinal(e)}/>
-        </div>
+          <div className="campo">
+            <div className="campo-con-icono compacto">
+              <span className="material-icons">
+                date_range
+              </span>
+              <input 
+                type="date" 
+                name="fechaFin" 
+                className="input" 
+                placeholder="Fin" 
+                // value={filtros.rangoFechas.fin}
+                onChange={e => onChangeFechaFinal(e)}/>
+            </div>
 
-        <p className="error" >
-          {errFechaFinal}
-        </p>
-      </div>
+            <p className="error" >
+              {errFechaFinal}
+            </p>
+          </div>
+        </>
+      }      
 
-      { renderDropdownFiltroEstado() }
+      { filtrosMostrados.estado && renderDropdownFiltroEstado() }
 
-      <SearchBox 
-        icono="search" 
-        iconoSufijo="clear"
-        label="Busca por ID de orden, o con nombre o email del cliente" 
-        buscarEnOnChange={false}
-        onBusqueda={cambiarQueryOrdenes}
-      />
+      { filtrosMostrados.query && 
+        <SearchBox 
+          icono="search" 
+          iconoSufijo="clear"
+          label="Busca por ID de orden, o con nombre o email del cliente" 
+          buscarEnOnChange={false}
+          onBusqueda={cambiarQueryOrdenes}
+        />
+      }
     </>
   );
 }

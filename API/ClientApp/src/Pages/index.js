@@ -18,6 +18,7 @@ export { PaginaGenerarLlaveAPI } from './pagina_generar_llave_api';
 export { PaginaPerfil } from './Perfil';
 export { PaginaTableroPerfil } from './Perfil/pagina_tablero_usuario';
 export { PaginaComentariosPerfil } from './Perfil/pagina_comentarios_usuario';
+export { PaginaOrdenesUsuario } from './Perfil/pagina_ordenes_usuario';
 export { PaginaLlavesUsuario } from './Perfil/pagina_llaves_usuario';
 
 // Rutas de administracion. 

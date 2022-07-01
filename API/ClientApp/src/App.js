@@ -46,9 +46,27 @@ function App() {
         <Route path="/llaves/nueva" component={Pages.PaginaGenerarLlaveAPI} />
 
         <Route path="/perfil/:idUsuario" exact component={Pages.PaginaPerfil} />
-        <Route path="/perfil/:idUsuario/comentarios" component={Pages.PaginaComentariosPerfil} />
-        <Route path="/perfil/:idUsuario/tablero" component={Pages.PaginaTableroPerfil} />
-        <Route path="/perfil/:idUsuario/llaves" component={Pages.PaginaLlavesUsuario} />
+
+        <Route path="/perfil/:idUsuario/comentarios" 
+          component={
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaComentariosPerfil /></RutaProtegida>
+          } 
+        />
+        <Route path="/perfil/:idUsuario/tablero" 
+          component={
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaTableroPerfil /></RutaProtegida>
+          } 
+        />
+        <Route path="/perfil/:idUsuario/ordenes" 
+          component={
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaOrdenesUsuario /></RutaProtegida>
+          } 
+        />
+        <Route path="/perfil/:idUsuario/llaves" 
+          component={
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaLlavesUsuario /></RutaProtegida>
+          } 
+        />
 
         <Route path="/admin/comentarios" 
           component={

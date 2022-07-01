@@ -1,6 +1,7 @@
 import { saveAs } from "file-saver";
 
 import { formarTokenAuth } from "../utils/formato_token_auth";
+import { getIdUsuarioDesdeJwt } from "../utils/parseJwt";
 import * as api from "./api";
 
 export const fetchProductos = async (
@@ -66,6 +67,53 @@ export const fetchOrdenes = async (paramsOrdenes, jwt, numPagina = 1) => {
     paramsUrl.set("emailCliente", email);
   }
   if (idOrden != null) paramsUrl.set("idOrden", idOrden);
+
+  // Filtros por estado de la orden.
+  if (estadoOrden != null) paramsUrl.set("estado", estadoOrden);
+
+  // Filtros por rango de fechas.
+  if (rangoFechas.inicio != null) paramsUrl.set("desde", rangoFechas.inicio);
+  if (rangoFechas.fin != null) paramsUrl.set("hasta", rangoFechas.fin);
+
+  console.log(paramsUrl.toString());
+
+  const resultados = await api.fetchPaginado(
+    endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, paramsUrl, jwt
+  );
+
+  return resultados;
+}
+
+/**
+ * Obtiene las órdenes de compra, que cumplan con los parámetros y filtros.
+ * 
+ * @param {number} numPagina -El número de página de resultados a obtener.
+ * @param {string} jwt -Token de autenticación del usuario.
+ * @param {Object} paramsOrdenes -Parámetros de búsqueda de órdenes.
+ * @param {string | null} paramsOrdenes.query -
+ * @param {string | null} paramsOrdenes.idCliente
+ * @param {string | null} paramsOrdenes.nombreCliente - Filtra órdenes según el nombre de cliente de este valor.
+ * @param {string | null} paramsOrdenes.email - Filtra órdenes según este email.
+ * @param {string | null} paramsOrdenes.idOrden - Filtra órdenes que contengan el string en su ID.
+ * @param {string | null} paramsOrdenes.estadoOrden - Filtra órdenes según su estado.
+ * @returns Un resultado paginado con las órdenes disponibles.
+ */
+ export const fetchOrdenesDeUsuario = async (paramsOrdenes, jwt, numPagina = 1) => {
+
+  const {
+    idOrden = null,
+    estadoOrden = null,
+    rangoFechas = {
+      inicio: null,
+      fin: null,
+    }
+  } = paramsOrdenes;
+
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+  const endpoint = `ordenes/usuario/${idUsuario}`;
+
+  const paramsUrl = new URLSearchParams();
 
   // Filtros por estado de la orden.
   if (estadoOrden != null) paramsUrl.set("estado", estadoOrden);
