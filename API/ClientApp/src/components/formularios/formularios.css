@@ -84,7 +84,7 @@ form > .form-fields > .form-group > .campo, .campo {
   align-items: flex-start;
 }
 
-form > .form-fields > .form-group > .campo.full-width, .campo.full-width {
+form > .form-fields > .form-group > .campo.expandir, .campo.expandir {
   width: 100%;
 }
 

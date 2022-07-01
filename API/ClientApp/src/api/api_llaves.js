@@ -84,7 +84,7 @@ export const generarLlaveDeApi = async (nombreDeLlave, jwt) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 export const regenerarLlave = async (idLlave, jwt) => {
@@ -118,7 +118,7 @@ export const eliminarLlaveDeApi = async (idLlave, jwt, idPropietario = null) => 
 
   if (idPropietario != null) paramsUrl.set("idPropietario", idPropietario);
 	
-	const url = `${api.urlBase}/llaves/${idLlave}?${paramsUrl.toString()}`;
+	const url = `${api.urlBase}/llaves/${idLlave}${ idPropietario != null ? "?" + paramsUrl.toString() : ""}`;
 
   if (jwt === undefined || jwt === null || jwt.length === 0) {
     return {
@@ -138,5 +138,5 @@ export const eliminarLlaveDeApi = async (idLlave, jwt, idPropietario = null) => 
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }

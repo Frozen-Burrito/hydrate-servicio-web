@@ -127,7 +127,6 @@ export default function FormGenerarLlaveApi() {
 			});
 		}
 	}
-
 	
 	function renderCampoNombreLlave() {
 
@@ -135,7 +134,7 @@ export default function FormGenerarLlaveApi() {
 
 		return (
 			<div className="form-group">
-				<div className="campo full-width">
+				<div className="campo expandir">
 					<div className="campo-con-icono">
 						<span className="material-icons">drive_file_rename_outline</span>
 						<input

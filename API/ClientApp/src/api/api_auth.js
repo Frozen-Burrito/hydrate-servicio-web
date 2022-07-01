@@ -97,5 +97,5 @@ export const modificarRolDeAutorizacion = async (idUsuario, nuevoRol, jwt) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }

@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
+using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Data;
 using ServicioHydrate.Modelos.DTO;
 
@@ -15,7 +16,7 @@ namespace ServicioHydrate.Controladores
 {
     [ApiController]
     [Route("api/v1/recursos")]
-    [Authorize(Roles = "ADMIN_RECURSOS_INF")]
+    // [Authorize(Roles = "ADMIN_RECURSOS_INF")]
     [Produces("application/json")]
     [Consumes("application/json")]
     public class ControladorRecursosInformativos : ControllerBase
@@ -25,6 +26,11 @@ namespace ServicioHydrate.Controladores
 
         // Permite generar Logs desde las acciones del controlador.
         private readonly ILogger<ControladorRecursosInformativos> _logger;
+
+        private const string EsquemaJwt = JwtBearerDefaults.AuthenticationScheme;
+        private const string EsquemaApiKey = OpcionesAuthLlaveDeAPI.AuthenticationString;
+
+        private const string EsquemaJwtAndApiKey = $"{EsquemaJwt},{EsquemaApiKey}";
 
         public ControladorRecursosInformativos(
             IServicioRecursos servicioRecursos,
@@ -43,7 +49,7 @@ namespace ServicioHydrate.Controladores
 
         /// Regresa todos los Recursos Informativos disponibles.
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = EsquemaJwtAndApiKey)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTORecursoInformativo>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

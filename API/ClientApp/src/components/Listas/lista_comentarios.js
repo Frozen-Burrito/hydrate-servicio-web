@@ -142,8 +142,6 @@ export default function ListaComentarios({ idAutor, pendientes, conBusqueda }) {
       if (resultado.status === StatusHttp.Status200OK) {
 
         const resultadoPaginado = resultado.datos;
-
-        console.log(resultadoPaginado)
   
         setComentarios(resultadoPaginado.resultados);
 

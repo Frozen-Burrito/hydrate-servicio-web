@@ -35,17 +35,19 @@ export const StatusHttp = {
  * tendrá cuerpo JSON o no.
  * @returns La respuesta a la petición, incluyendo status y cuerpo.
  */
-export const hacerPeticion = async (peticion, respuestaConCuerpo = true) => {
-  const resultado = await fetch(peticion);
+export const hacerPeticion = async (peticion) => {
+  const respuesta = await fetch(peticion);
 
-  const resJson = respuestaConCuerpo && resultado.ok
-    ? await resultado.json() 
+  // console.log("La respuesta tiene un body: ", respuesta.body != null);
+
+  const datosJson = respuesta.body != null && respuesta.status !== 204
+    ? await respuesta.json() 
     : null;
     
   return {
-    ok: resultado.ok,
-    status: resultado.status,
-    cuerpo: resJson,
+    ok: respuesta.ok,
+    status: respuesta.status,
+    cuerpo: datosJson,
   };
 }
 

@@ -68,5 +68,5 @@ export const eliminarRecurso = async (jwt, idRecurso) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }

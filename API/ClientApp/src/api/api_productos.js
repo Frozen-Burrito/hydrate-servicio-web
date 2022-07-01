@@ -195,7 +195,7 @@ export const cambiarEstadoOrden = async (idOrden, indiceNuevoEstado, jwt) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 /**
