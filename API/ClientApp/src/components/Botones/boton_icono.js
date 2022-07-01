@@ -20,7 +20,7 @@ export default function BotonIcono(props) {
 
 	const claseTipoBtn = `btn-${tipo}`;
 	const claseColor = color != null ? `btn-${color}` : "";
-  const claseElevacion = `elevacion-${elevacion}`;
+  	const claseElevacion = `elevacion-${elevacion}`;
 	const claseDisabled = disabled ? "desactivado" : "";
 	const claseAlignIcono = iconoAlFinal ? "icono-final" : "icono-inicio";
 	const claseSeleccionado = seleccionado && !disabled ? "seleccionado" : ""; 

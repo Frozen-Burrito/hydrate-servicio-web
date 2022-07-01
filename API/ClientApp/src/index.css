@@ -314,3 +314,7 @@ ul {
 .no-mostrar {
   display: none;
 }
+
+.expandir-x {
+  width: 100%;
+}

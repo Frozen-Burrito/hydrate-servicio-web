@@ -35,8 +35,10 @@ export { default as FilaTabla } from "./Tablas/FilaTabla";
 export { default as EncabezadoColumna } from "./Tablas/EncabezadoColumna";
 export { default as TablaOrdenes } from "./Tablas/tabla_ordenes";
 export { default as TablaLlaves } from "./Tablas/tabla_llaves_api";
+export { default as TablaUsuarios } from "./Tablas/tabla_usuarios";
 
 export { default as FiltrosParaOrdenes } from "./Tablas/Filtros/filtros_ordenes";
+export { default as FiltrosParaUsuarios } from "./Tablas/Filtros/filtros_usuarios";
 
 export { default as Tarjeta } from "./Tarjetas/tarjeta";
 export { default as TarjetaComentario } from "./Tarjetas/tarjeta_comentario";

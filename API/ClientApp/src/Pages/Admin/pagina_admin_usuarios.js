@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Layout, DrawerAdmin } from '../../components';
+import { Layout, DrawerAdmin, TablaUsuarios } from '../../components';
 
 export function PaginaAdminUsuarios () {
 
@@ -18,6 +18,7 @@ export function PaginaAdminUsuarios () {
       <section className='contenedor full-page py-5'>
         <h3 className="mt-3">Usuarios</h3>
 
+        <TablaUsuarios />
       </section>
     </Layout>
   )
