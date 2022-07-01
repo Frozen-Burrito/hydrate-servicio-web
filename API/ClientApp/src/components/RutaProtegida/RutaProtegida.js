@@ -24,8 +24,6 @@ export default function RutaProtegida ({ children, rolRequerido }) {
     const claimsUsuario = obtenerClaims(datosToken);
 
     rolDeUsuario = claimsUsuario.rol;
-
-    console.log(claimsUsuario);
   }
   
   const ubicacion = useLocation();

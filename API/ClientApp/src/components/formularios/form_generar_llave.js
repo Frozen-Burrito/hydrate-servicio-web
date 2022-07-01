@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 
 import { estaVacio } from "../../utils/validaciones";
 
@@ -46,12 +46,12 @@ export default function FormGenerarLlaveApi() {
 		const nombreValor = e.target.name;
 		const valor = e.target.value;
 
-		let resultadoVal = "";
+		// let resultadoVal = "";
 
 		switch (nombreValor) {
 			case "nombreLlave":
 				//TODO: Especificar validaciones, cuando sean necesarias.
-				resultadoVal = null;
+				// resultadoVal = null;
 				break;
 			default:
 				console.error(
@@ -89,7 +89,7 @@ export default function FormGenerarLlaveApi() {
 
 		if (resultado != null) {
 
-			const { ok, status, cuerpo } = resultado;
+			const { ok, status } = resultado;
 
 			if (ok && resultadoEsOK(status)) {
 				const idUsuario = getIdUsuarioDesdeJwt(jwt);

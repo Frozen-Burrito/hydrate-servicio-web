@@ -6,6 +6,8 @@ import { obtenerClaims, parseJwt, getIdUsuarioDesdeJwt } from "../../utils/parse
 import Dropdown from "../Dropdown/dropdown";
 import BotonRedondeado from "../Botones/BotonRedondeado";
 
+const logDatosAuth = false;
+
 export default function Navbar() {
 
   const { valor: jwt, eliminarCookie: eliminarToken } = useCookie("jwt");
@@ -19,7 +21,9 @@ export default function Navbar() {
 
     const claimsUsuario = obtenerClaims(datosToken);
 
-    console.log(claimsUsuario);
+    if (logDatosAuth) {
+      console.log(claimsUsuario);
+    }
 
     rolDeUsuario = claimsUsuario.rol;
   }

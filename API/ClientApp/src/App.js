@@ -93,6 +93,8 @@ function App() {
             () => <RutaProtegida rolRequerido={"ADMINISTRADOR"}> <Pages.PaginaAdminLlaves /> </RutaProtegida>
           } 
         />
+
+        <Route path="*" component={ Pages.Pagina404 } />
       </Switch>
     </BrowserRouter>
   );

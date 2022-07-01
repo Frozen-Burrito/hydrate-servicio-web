@@ -27,3 +27,5 @@ export { PaginaAdminComentarios } from './Admin/pagina_admin_comentarios';
 export { PaginaAdminOrdenes } from './Admin/pagina_admin_ordenes';
 export { PaginaAdminRecursos } from './Admin/pagina_admin_recursos';
 export { PaginaAdminLlaves } from "./Admin/pagina_admin_llaves_api";
+
+export { Pagina404 } from "./404";

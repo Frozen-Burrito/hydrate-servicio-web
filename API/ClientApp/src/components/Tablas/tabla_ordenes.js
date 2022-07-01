@@ -74,6 +74,10 @@ export default function TablaOrdenes(props) {
     "Cancelada"
   ];
 
+  const opcionesExportar = [
+    ".csv"
+  ];
+
   async function onCambioEstadoOrden(idOrden, indNuevoEstado) {
 
     if (!esAdmin) return;
@@ -89,6 +93,18 @@ export default function TablaOrdenes(props) {
 
         return orden;
       }));
+    }
+  }
+
+  async function onExportarOrdenes(formato) {
+
+    if (!esAdmin) return;
+    
+    const resultado = await exportarOrdenesConFormato(formato, jwt);
+
+    console.log("Resultado de exportar: ", resultado);
+
+    if (resultado.ok) {
     }
   }
 
@@ -150,7 +166,7 @@ export default function TablaOrdenes(props) {
 
     obtenerDatos();
     
-  }, [jwt, paginaActual, filtrosOrdenes]);
+  }, [jwt, paginaActual, filtrosOrdenes, esAdmin]);
   
   const renderDropdownEstado = (orden) => (
     <Dropdown 
@@ -176,6 +192,35 @@ export default function TablaOrdenes(props) {
               onClick={() => onCambioEstadoOrden(orden.id, indice)}
             >
               { estado }
+            </button>
+          ))}
+        </>
+      )}
+    />
+  );
+
+  const renderDropdownExportar = () => (
+    <Dropdown 
+      onColor="superficie"
+      boton={(
+        <BotonIcono 
+          icono="file_download"
+          iconoSufijo="arrow_drop_down"
+          elevacion={1}
+          label="Exportar"
+          color="fondo"
+          tipo="dropdown"
+        />
+      )}
+      items={(
+        <>
+          { opcionesExportar.map((opcion, i) => (
+            <button 
+              key={i} 
+              className ="elemento-dropdown" 
+              onClick={() => onExportarOrdenes(opcion)}
+            >
+              { opcion }
             </button>
           ))}
         </>
@@ -257,6 +302,9 @@ export default function TablaOrdenes(props) {
 
   return (
     <>
+      <div className="stack horizontal justify-end gap-1 mt-1">
+        { esAdmin && renderDropdownExportar() }
+      </div>
       <div className="stack horizontal justify-end gap-2 mt-2">
         <FiltrosParaOrdenes 
           filtros={{

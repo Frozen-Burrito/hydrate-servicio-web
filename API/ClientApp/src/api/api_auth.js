@@ -76,8 +76,6 @@ export const fetchTodosLosUsuarios = async (jwt, filtros, numPagina = 1) => {
 
 export const modificarRolDeAutorizacion = async (idUsuario, nuevoRol, jwt) => {
 
-  const paramsUrl = new URLSearchParams();
-
   const url = `${api.urlBase}/usuarios/${idUsuario}`;
 
   if (jwt === undefined || jwt === null || jwt.length === 0) {
