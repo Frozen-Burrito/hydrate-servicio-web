@@ -23,9 +23,7 @@
   height: 100vh;
   width: 25vw;
   position: fixed;
-  z-index: 4;
   top: 0;
-  padding: 0 0.8rem;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 
   display: flex;
@@ -35,6 +33,11 @@
 
   -webkit-transition: left .3s ease-in-out, right .3s ease-in-out;
   transition: left .3s ease-in-out, right .3s ease-in-out; 
+}
+
+.contenedor-drawer > .menu-drawer.px {
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
 }
 
 .contenedor-drawer.activo.left > .menu-drawer {
@@ -51,6 +54,33 @@
  
 .contenedor-drawer.escondido.right > .menu-drawer {
   right: -50%; 
+}
+
+.contenido-desplazable {
+  position: absolute;
+  top: 0;
+  width: 100vw;
+
+  -webkit-transition: left .25s ease-in-out, right .25s ease-in-out, width .25s ease-in-out;
+  transition: left .25s ease-in-out, right .25s ease-in-out, width .25s ease-in-out; 
+}
+
+.contenido-desplazable.izquierda {
+  left: 0;
+}
+
+.contenido-desplazable.derecha {
+  right: 0;
+}
+
+.contenido-desplazable.desplazado {
+  left: 25vw;
+  width: 75vw;
+} 
+ 
+.contenido-desplazable.desplazado {
+  right: 25vw; 
+  width: 75vw;
 }
 
 .wrap-btn-cerrar-drawer {
@@ -109,6 +139,11 @@
   color: var(--contraste-primario-claro)!important;
 }
 
+.menu-drawer.fondo {
+  background-color: var(--fondo-claro);
+  color: var(--contraste-fondo-claro)!important;
+}
+
 .menu-drawer.secundario {
   background-color: var(--secundario-claro);
   color: var(--contraste-secundario-claro)!important;
@@ -121,7 +156,7 @@
 
 .menu-drawer > .drawer-superior,
 .menu-drawer > .drawer-inferior {
-  max-width: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -134,12 +169,17 @@ h5.encabezado-drawer {
   font-size: 1.8rem;
 }
 
+.menu-drawer.superficie > div > h5.encabezado-drawer {
+  color: var(--contraste-fondo-claro)!important;
+}
+
 h5.subtitulo-drawer {
   margin-bottom: 1.6rem;
   color: var(--contraste-superficie-claro)!important;
   font-weight: 500;
   font-size: 1.4rem;
 }
+
 
 .menu-drawer > .drawer-superior > .contenido-drawer {
   max-width: 100%;

@@ -1,0 +1,11 @@
+
+
+.breadcrumb > div > a {
+	margin: 0 0.2rem;
+	color: var(--primario-claro);
+	font-size: 1.2rem;
+	font-weight: 500;
+	line-height: 1.1rem;
+	text-transform: capitalize;
+	text-decoration: none;
+}

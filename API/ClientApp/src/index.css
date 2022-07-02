@@ -133,6 +133,18 @@ h6 {
   margin-right: 2.4rem;
 }
 
+.ml-1 {
+  margin-left: 0.8rem!important;
+}
+
+.ml-2 {
+  margin-left: 1.6rem!important;
+}
+
+.ml-3 {
+  margin-left: 2.4rem!important;
+}
+
 .my-1 {
   margin-top: 0.8rem;
   margin-bottom: 0.8rem;
@@ -148,7 +160,7 @@ h6 {
   margin-bottom: 2.4rem;
 }
 
-pt-5 {
+.pt-5 {
   padding-top: 4rem;
 }
 
@@ -205,6 +217,26 @@ pt-5 {
 
 .elevacion-1 {
   box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+}
+
+.capa-2 {
+  z-index: 2;
+}
+
+.capa-3 {
+  z-index: 3;
+}
+
+.capa-4 {
+  z-index: 4;
+}
+
+.capa-5 {
+  z-index: 5;
+}
+
+.capa-6 {
+  z-index: 6;
 }
 
 section.contenedor {
@@ -311,6 +343,18 @@ ul {
 
 .stack.justify-end {
   justify-content: flex-end;
+}
+
+.stack.align-start {
+  align-items: start;
+}
+
+.stack.align-center {
+  align-items: center;
+}
+
+.stack.align-end {
+  align-items: end;
 }
 
 .gap-1 {

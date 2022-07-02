@@ -311,7 +311,7 @@ export default function FormPublicarComentario(props) {
         } else {
             return (
                 <div className="form-group">
-                    <div className="campo">
+                    <div className="campo expandir">
                         <div className="campo-con-icono">
                             <span className="material-icons">
                                 format_quote
@@ -360,7 +360,7 @@ export default function FormPublicarComentario(props) {
 
                 <div className='form-fields'>
                     <div className='form-group'>
-                        <div className="campo">
+                        <div className="campo expandir">
                             <div className="campo-con-icono">
                                 <span className="material-icons">
                                     email
@@ -387,7 +387,7 @@ export default function FormPublicarComentario(props) {
                     { renderCampoAsunto() }
 
                     <div className="form-group">
-                        <div className="campo">
+                        <div className="campo expandir">
                             <div className="campo-con-icono">
                                 <span className="material-icons">
                                     subject

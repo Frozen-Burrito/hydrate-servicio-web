@@ -36,7 +36,7 @@ function App() {
         <Route path="/about" component={Pages.AboutUs} />
         <Route path="/datos-abiertos" component={Pages.DatosAbiertos} />
         <Route path="/productos" component={Pages.Products} />
-        <Route path="/guias-usuario" component={Pages.GuiasUsuario} />
+        <Route path="/guias" component={Pages.PaginaGuiasDeUsuario} />
         <Route path="/comentarios" exact component={Pages.ComentariosPage} />
         <Route path="/comentarios/publicar" exact component={Pages.PublicarComentarioPage} />
         <Route path="/comentarios/publicar/:idComentario" component={Pages.PublicarComentarioPage} />

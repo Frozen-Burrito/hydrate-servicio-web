@@ -33,10 +33,12 @@ export default function SearchBox(props) {
     }
 
     const handleCambioQuery = (e) => {
-        setQuery(e.target.value);
+        const valor = e.target.value;
+
+        setQuery(valor);
 
         if (buscarEnOnChange) {
-            onBusqueda(query);
+            onBusqueda(valor);
         }
     }
 

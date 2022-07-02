@@ -6,7 +6,7 @@ export { Home } from './Home/Home';
 export { AboutUs } from './AboutUs/AboutUs';
 export { DatosAbiertos } from './DatosAbiertos/DatosAbiertos';
 export { Products } from './Products/Products';
-export { GuiasUsuario } from './GuiasUsuario/GuiasUsuario';
+export { PaginaGuiasDeUsuario } from './GuiasUsuario/pagina_guias_usuario';
 export { InicioSesion } from './InicioSesion/InicioSesion';
 export { CreacionCuenta } from './CreacionCuenta/CreacionCuenta';
 export { ComentariosPage } from './comentarios_page';

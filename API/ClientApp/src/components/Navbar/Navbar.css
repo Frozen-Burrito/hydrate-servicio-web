@@ -2,7 +2,7 @@
 
 nav.navbar {
   position: fixed;
-  z-index: 2;
+  z-index: 5;
   top: 0;
   width: 100%;
   background-color: var(--primario-claro);

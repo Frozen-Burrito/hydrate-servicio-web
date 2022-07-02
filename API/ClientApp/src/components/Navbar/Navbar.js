@@ -133,7 +133,7 @@ export default function Navbar() {
   );
 
   return (
-    <nav className="navbar">
+    <nav className="navbar capa-5">
       <div className="container">
         <div className="logo-container">
           <Link className="logo contraste-primario" to="/" style={{ textDecoration: "none" }}>Hydrate</Link>

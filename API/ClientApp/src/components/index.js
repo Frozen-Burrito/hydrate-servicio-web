@@ -4,6 +4,7 @@ export { default as ElementoDrawer } from "./Drawer/ElementoDrawer";
 export { default as DrawerPerfil } from "./DrawerConfigurados/drawer_perfil";
 export { default as DrawerAdmin } from "./DrawerConfigurados/drawer_admin";
 export { default as DrawerCompra } from "./DrawerConfigurados/drawer_compra";
+export { default as DrawerGuias } from "./DrawerConfigurados/drawer_guias";
 export { default as Dropdown } from "./Dropdown/dropdown";
 export { default as Footer } from "./Footer/Footer";
 export { default as ListaComentarios } from "./Listas/lista_comentarios";
@@ -23,10 +24,12 @@ export { default as FormStripeCheckout } from "./formularios/form_stripe_checkou
 export { default as FormObtenerLlave } from "./formularios/form_generar_llave";
 
 export { default as Layout } from "./Layout/Layout";
-export { default as ListItem } from "./ListItemExpandible/list_item_expandible";
+export { default as ListItem } from "./ListItems/list_item_colapsable";
 export { default as Navbar } from "./Navbar/Navbar";
 export { default as RutaProtegida } from "./RutaProtegida/RutaProtegida";
 export { default as SearchBox } from "./SearchBox/searchbox";
+export { default as Toolbar } from "./Toolbar/toolbar";
+export { default as BreadCrumb } from "./Breadcumb/breadcrumb";
 
 export { TablaRecursosInf } from "./Tablas/TablaRecursosInf";
 export { FilaRecursoInformativo } from "./Tablas/FilaRecursoInformativo";
