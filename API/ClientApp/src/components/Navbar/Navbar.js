@@ -147,7 +147,7 @@ export default function Navbar() {
             <Link className="nav-link" to="/productos" style={{ textDecoration: "none" }}>Productos</Link>
           </li>
           <li>
-            <Link className="nav-link" to="/guias-usuario" style={{ textDecoration: "none" }}>Guías de Usuario</Link>
+            <Link className="nav-link" to="/guias" style={{ textDecoration: "none" }}>Guías</Link>
           </li>
           <li>
             <Link className="nav-link" to="/datos-abiertos" style={{ textDecoration: "none" }}>Datos Abiertos</Link>
