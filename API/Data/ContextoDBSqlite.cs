@@ -52,6 +52,8 @@ namespace ServicioHydrate.Data
 
         public DbSet<Rutina> RutinasDeActFisica { get; set; }
         
+        public DbSet<LlaveDeApi> LlavesDeAPI { get; set; }
+        
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
@@ -190,6 +192,11 @@ namespace ServicioHydrate.Data
                 .HasOne(r => r.RegistroDeActividad)
                 .WithOne(af => af.Rutina)
                 .HasForeignKey<Rutina>(r => new { Id = r.IdActividad, r.IdPerfil });
+            // Relación uno a muchos entre Usuario y LlaveDeAPI
+            modelBuilder.Entity<Usuario>()
+                .HasMany(u => u.LlavesDeAPI)
+                .WithOne(ll => ll.Usuario)
+                .HasForeignKey(ll => ll.IdUsuario);
         }
     }
 }

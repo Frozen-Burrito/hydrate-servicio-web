@@ -35,6 +35,8 @@ namespace ServicioHydrate.Data
     
         public DbSet<ComentarioArchivado> ComentariosArchivados { get; set; }
 
+        public DbSet<LlaveDeApi> LlavesDeAPI { get; set; }
+
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
@@ -110,6 +112,12 @@ namespace ServicioHydrate.Data
                 .HasMany(p => p.OrdenesDelProducto)
                 .WithOne(po => po.Producto)
                 .HasForeignKey(po => po.IdProducto);
+                
+            // Relación uno a muchos entre Usuario y LlaveDeAPI
+            modelBuilder.Entity<Usuario>()
+                .HasMany(u => u.LlavesDeAPI)
+                .WithOne(ll => ll.Usuario)
+                .HasForeignKey(ll => ll.IdUsuario);
         }
     }
 }

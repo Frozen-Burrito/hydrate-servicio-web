@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
+using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Data;
 using ServicioHydrate.Modelos.DTO;
 
+#nullable enable
 namespace ServicioHydrate.Controladores
 {
     [ApiController]
@@ -24,6 +26,11 @@ namespace ServicioHydrate.Controladores
 
         // Permite generar Logs desde las acciones del controlador.
         private readonly ILogger<ControladorRecursosInformativos> _logger;
+
+        private const string EsquemaJwt = JwtBearerDefaults.AuthenticationScheme;
+        private const string EsquemaApiKey = OpcionesAuthLlaveDeAPI.AuthenticationString;
+
+        private const string EsquemaJwtAndApiKey = $"{EsquemaJwt},{EsquemaApiKey}";
 
         public ControladorRecursosInformativos(
             IServicioRecursos servicioRecursos,
@@ -49,14 +56,8 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> GetRecursosInformativos([FromQuery] DTOParamsPagina? paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = "";
-            string ruta = "";
-
-            if (Request is not null)
-            {
-                metodo = Request.Method.ToString();
-                ruta = Request.Path.Value;
-            }
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "ruta no identificada";
 
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
@@ -90,14 +91,8 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> GetRecursoPorId(int idRecurso)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = "";
-            string ruta = "";
-
-            if (Request is not null)
-            {
-                metodo = Request.Method.ToString();
-                ruta = Request.Path.Value;
-            }
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "ruta no identificada";
             
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
@@ -135,14 +130,8 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> AgregarRecurso(DTORecursoInformativo nuevoRecurso)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = "";
-            string ruta = "";
-
-            if (Request is not null)
-            {
-                metodo = Request.Method.ToString();
-                ruta = Request.Path.Value;
-            }
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "ruta no identificada";
             
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
@@ -195,14 +184,8 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> ModificarRecurso(int idRecurso, DTORecursoInformativo recursoModificado)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = "";
-            string ruta = "";
-
-            if (Request is not null)
-            {
-                metodo = Request.Method.ToString();
-                ruta = Request.Path.Value;
-            }
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "ruta no identificada";
             
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
@@ -245,14 +228,8 @@ namespace ServicioHydrate.Controladores
         public async Task<IActionResult> EliminarRecurso(int idRecurso)
         {
             string strFecha = DateTime.Now.ToString("G");
-            string metodo = "";
-            string ruta = "";
-
-            if (Request is not null)
-            {
-                metodo = Request.Method.ToString();
-                ruta = Request.Path.Value;
-            }
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "ruta no identificada";
             
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
@@ -287,3 +264,4 @@ namespace ServicioHydrate.Controladores
         }
     }
 }
+#nullable disable

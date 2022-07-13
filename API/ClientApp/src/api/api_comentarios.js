@@ -90,7 +90,7 @@ export const eliminarComentarioConId = async (id, jwt) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 export const fetchComentariosDeAutor = async (idAutor, numPagina = 1, jwt = "") => {
@@ -134,7 +134,7 @@ export const fetchMotivosComentariosRetirados = async (jwt, idUsuario = "", numP
 
   const endpoint = `comentarios/pendientes/usuario/${idUsuario}`;
 
-  const resultados = await api.fetchPaginado(endpoint, numPagina, numResultados, jwt, true);
+  const resultados = await api.fetchPaginado(endpoint, numPagina, numResultados, null, jwt, true);
   
   return resultados;
 }
@@ -152,7 +152,7 @@ export const publicarComentarioPendiente = async (idComentario, jwt) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 /**
@@ -197,7 +197,7 @@ export const marcarUtilComentarioConId = async (id, jwt) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 export const reportarComentarioConId = async (id, jwt) => {
@@ -214,7 +214,7 @@ export const reportarComentarioConId = async (id, jwt) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 // Respuestas
@@ -290,7 +290,7 @@ export const eliminarRespuestaConId = async (idComentario, idRespuesta, jwt) => 
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 export const marcarUtilRespuestaConId = async (idComentario, idRespuesta, jwt) => {
@@ -307,7 +307,7 @@ export const marcarUtilRespuestaConId = async (idComentario, idRespuesta, jwt) =
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 export const reportarRespuestaConId = async (idComentario, idRespuesta, jwt) => {
@@ -324,5 +324,5 @@ export const reportarRespuestaConId = async (idComentario, idRespuesta, jwt) => 
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }

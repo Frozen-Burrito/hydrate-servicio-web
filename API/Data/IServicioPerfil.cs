@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.Enums;
 
@@ -9,7 +9,7 @@ namespace ServicioHydrate.Data
 {
     public interface IServicioPerfil 
     {
-        Task<DTOPerfil> GetPerfilPorId(Guid idCuentaUsuario, int idPerfil);
+        Task<Perfil> GetPerfilPorId(Guid idCuentaUsuario, int idPerfil);
 
         Task<DTOPerfil> RegistrarPerfilExistente(DTOPerfil perfil, DTOUsuario cuentaUsuario);
 

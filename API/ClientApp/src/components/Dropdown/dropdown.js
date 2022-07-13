@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './dropdown.css';
 
-export default function Dropdown({ boton, onColor, items }) {
+export default function Dropdown(props) {
+
+  const { boton, expandir, onColor, items, disabled } = props;
 
   const [ mostrar, setMostrar ] = useState(false);
 
@@ -26,8 +28,11 @@ export default function Dropdown({ boton, onColor, items }) {
 
   return (
     <>
-      <div className="dropdown">
-        <button className={`dropdown-btn ${getClaseContrasteBtn(onColor)}`} onClick={toggleDropdown}>
+      <div className={`dropdown ${expandir ? "expandir-x" : ""}`}>
+        <button 
+          className={`dropdown-btn ${getClaseContrasteBtn(onColor)} ${expandir ? "expandir-x" : ""}`} 
+          onClick={disabled ? null : toggleDropdown}
+        >
           { boton }
         </button>
 

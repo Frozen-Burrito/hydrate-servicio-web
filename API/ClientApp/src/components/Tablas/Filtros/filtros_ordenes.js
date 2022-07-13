@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-import { validarRangoFechas } from "../../../utils/validaciones";
-
 import { 
   SearchBox, 
   Dropdown,
@@ -11,7 +9,8 @@ import {
 export default function FiltrosParaOrdenes(props) {
 
   const { 
-    onCambioEnFiltros 
+    onCambioEnFiltros,
+    filtros: filtrosMostrados
   } = props;
 
   const [filtros, setFiltros] = useState({
@@ -27,8 +26,9 @@ export default function FiltrosParaOrdenes(props) {
     }
   });
 
-  const [errFechaInicial, setErrFechaInicial] = useState(null);
-  const [errFechaFinal, setErrFechaFinal] = useState(null);
+  //TODO: Usar y mostrar estos errores (faltan funciones "set...").
+  const [errFechaInicial] = useState(null);
+  const [errFechaFinal] = useState(null);
 
   const estadoDeOrden = [
     "Pendiente",
@@ -99,7 +99,7 @@ export default function FiltrosParaOrdenes(props) {
       }
     });
 
-    const resultadoVal = validarRangoFechas(fechaIntroducida, filtros.rangoFechas.fin);
+    // const resultadoVal = validarRangoFechas(fechaIntroducida, filtros.rangoFechas.fin);
     // else {
     //   if (resultadoVal.error === ErrorDeRecurso.errFechaNoValida.error) {
     //     setErrFechaInicial("La fecha de publicación del recurso debe ser anterior a la fecha actual.");
@@ -121,7 +121,7 @@ export default function FiltrosParaOrdenes(props) {
       }
     });
 
-    const resultadoVal = validarRangoFechas(filtros.rangoFechas.inicio, fechaIntroducida);
+    // const resultadoVal = validarRangoFechas(filtros.rangoFechas.inicio, fechaIntroducida);
     // else {
     //   if (resultadoVal.error === ErrorDeFecha.errRangoNoCoincide.error) {
     //     setErrFechaInicial("La fecha de fin del rango debe ser posterior a la fecha de inicio.");
@@ -131,7 +131,7 @@ export default function FiltrosParaOrdenes(props) {
 
   useEffect(() => {
     onCambioEnFiltros(filtros);
-  }, [filtros]);
+  }, [filtros, onCambioEnFiltros]);
 
   const renderDropdownFiltroEstado = () => (
     <Dropdown 
@@ -170,54 +170,60 @@ export default function FiltrosParaOrdenes(props) {
   );
 
   return (
-    <>      
-      <div className="campo">
-        <div className="campo-con-icono compacto">
-          <span className="material-icons">
-            today
-          </span>
-          <input 
-            type="date" 
-            name="fechaInicio" 
-            className="input" 
-            placeholder="Inicio" 
-            // value={filtros.rangoFechas.inicio}
-            onChange={e => onChangeFechaInicial(e)}/>
-        </div>
+    <>
+      { filtrosMostrados.rangoDeFechas && 
+        <>
+          <div className="campo">
+            <div className="campo-con-icono compacto">
+              <span className="material-icons">
+                today
+              </span>
+              <input 
+                type="date" 
+                name="fechaInicio" 
+                className="input" 
+                placeholder="Inicio" 
+                // value={filtros.rangoFechas.inicio}
+                onChange={e => onChangeFechaInicial(e)}/>
+            </div>
 
-        <p className="error" >
-          {errFechaInicial}
-        </p>
-      </div>
+            <p className="error" >
+              {errFechaInicial}
+            </p>
+          </div>
 
-      <div className="campo">
-        <div className="campo-con-icono compacto">
-          <span className="material-icons">
-            date_range
-          </span>
-          <input 
-            type="date" 
-            name="fechaFin" 
-            className="input" 
-            placeholder="Fin" 
-            // value={filtros.rangoFechas.fin}
-            onChange={e => onChangeFechaFinal(e)}/>
-        </div>
+          <div className="campo">
+            <div className="campo-con-icono compacto">
+              <span className="material-icons">
+                date_range
+              </span>
+              <input 
+                type="date" 
+                name="fechaFin" 
+                className="input" 
+                placeholder="Fin" 
+                // value={filtros.rangoFechas.fin}
+                onChange={e => onChangeFechaFinal(e)}/>
+            </div>
 
-        <p className="error" >
-          {errFechaFinal}
-        </p>
-      </div>
+            <p className="error" >
+              {errFechaFinal}
+            </p>
+          </div>
+        </>
+      }      
 
-      { renderDropdownFiltroEstado() }
+      { filtrosMostrados.estado && renderDropdownFiltroEstado() }
 
-      <SearchBox 
-        icono="search" 
-        iconoSufijo="clear"
-        label="Busca por ID de orden, o con nombre o email del cliente" 
-        buscarEnOnChange={false}
-        onBusqueda={cambiarQueryOrdenes}
-      />
+      { filtrosMostrados.query && 
+        <SearchBox 
+          icono="search" 
+          iconoSufijo="clear"
+          label="Busca por ID de orden, o con nombre o email del cliente" 
+          buscarEnOnChange={false}
+          onBusqueda={cambiarQueryOrdenes}
+        />
+      }
     </>
   );
 }

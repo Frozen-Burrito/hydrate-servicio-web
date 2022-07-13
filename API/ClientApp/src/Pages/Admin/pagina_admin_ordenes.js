@@ -114,7 +114,7 @@ export function PaginaAdminOrdenes () {
           })}
         </div>
 
-        <TablaOrdenes />
+        <TablaOrdenes esAdmin={true} />
       </section>
     </Layout>
   )

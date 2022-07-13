@@ -252,7 +252,7 @@ namespace ServicioHydrate.Controladores
 
                 // Obtener el tipo y el tipo de los elementos de la colección.
                 Type tipo = ordenes.GetType();
-                Type tipoDeElemento;
+                Type? tipoDeElemento;
 
                 if (tipo.GetGenericArguments().Length > 0) 
                 {
@@ -262,7 +262,8 @@ namespace ServicioHydrate.Controladores
                     tipoDeElemento = tipo.GetElementType();
                 }
 
-			    PropertyInfo[] propiedades = tipoDeElemento.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			    PropertyInfo[] propiedades = tipoDeElemento?.GetProperties(BindingFlags.Public | BindingFlags.Instance) 
+                    ?? new PropertyInfo[0];
                 
                 Stream stream = new MemoryStream();
 
@@ -483,7 +484,7 @@ namespace ServicioHydrate.Controladores
                         _logger.LogInformation($"Pago exitoso por ${intentDePago.Amount}, ID de la orden: {idOrden}");
 
                         // Método para manejar el evento de Stripe.
-                        _repositorioOrdenes.ModificarEstadoDeOrden(idOrden, EstadoOrden.EN_PROGRESO);
+                        await _repositorioOrdenes.ModificarEstadoDeOrden(idOrden, EstadoOrden.EN_PROGRESO);
                     }
                 } 
                 else if (eventoStripe.Type == Events.PaymentMethodAttached)

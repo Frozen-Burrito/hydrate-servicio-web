@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.Enums;
+using System.Text.Json;
+
 namespace ServicioHydrate.Modelos
 {
     /// Esta clase proporciona métodos de utilidad para facilitar la 
@@ -30,6 +32,56 @@ namespace ServicioHydrate.Modelos
             {
                 throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
             }
+        }
+
+        /// <summary>
+        /// Obtiene el ID de un Usuario desde el CLaim con llave "id" de un JWT.
+        /// </summary>
+        /// <param name="jwt">El Json Web Token</param>
+        /// <returns>El ID del Usuario, o null si el JWT no es válido.</returns>
+        public static Guid? GetIdUsuarioDesdeJwt(string jwt) 
+        {
+            string[] partesDelJwt = jwt.Split(".");
+
+            if (partesDelJwt.Length != 3)
+            {
+                // El JWT debe tener un encabezado, un payload y una firma de verificación,
+                // separados por puntos ".". Si no tiene exactamente estos elementos, el
+                // JWT no tiene formato válido.
+                return null;
+            }
+
+            string strClaims = partesDelJwt[1].Replace("-", "+").Replace("_", "/");
+
+            switch (strClaims.Length % 4) {
+                case 0:
+                    break;
+                case 2:
+                    strClaims += "==";
+                    break;
+                case 3:
+                    strClaims += "=";
+                    break;
+                default: 
+                    // Si la longitud de uno de los strings para claims no es mod. 4,
+                    // el JWT tiene un formato incorrecto.
+                    return null;
+            }
+
+            byte[] bytesDecodificados = Convert.FromBase64String(strClaims);
+            string claimsDecodificadas = System.Text.Encoding.UTF8.GetString(bytesDecodificados);
+
+            var claims = JsonSerializer.Deserialize<Dictionary<string, object>>(claimsDecodificadas);
+
+            if (claims is null || !claims.ContainsKey("id"))
+            {
+                // No se pudieron deserializar correctamente los claims del token.
+                return null;
+            }
+
+            bool esGuidValido = Guid.TryParse(claims["id"].ToString(), out Guid idUsuario);
+
+            return esGuidValido ? idUsuario : null;
         }
 
         public static Usuario ComoModelo(this DTOPeticionAutenticacion usuario, string hashContrasenia, bool generarGUID = false)

@@ -1,6 +1,7 @@
 import { saveAs } from "file-saver";
 
 import { formarTokenAuth } from "../utils/formato_token_auth";
+import { getIdUsuarioDesdeJwt } from "../utils/parseJwt";
 import * as api from "./api";
 
 export const fetchProductos = async (
@@ -81,6 +82,54 @@ export const fetchOrdenes = async (paramsOrdenes, jwt, numPagina = 1) => {
   return resultados;
 }
 
+/**
+ * Obtiene las órdenes de compra, que cumplan con los parámetros y filtros.
+ * 
+ * @param {number} numPagina -El número de página de resultados a obtener.
+ * @param {string} jwt -Token de autenticación del usuario.
+ * @param {Object} paramsOrdenes -Parámetros de búsqueda de órdenes.
+ * @param {string | null} paramsOrdenes.query -
+ * @param {string | null} paramsOrdenes.idCliente
+ * @param {string | null} paramsOrdenes.nombreCliente - Filtra órdenes según el nombre de cliente de este valor.
+ * @param {string | null} paramsOrdenes.email - Filtra órdenes según este email.
+ * @param {string | null} paramsOrdenes.idOrden - Filtra órdenes que contengan el string en su ID.
+ * @param {string | null} paramsOrdenes.estadoOrden - Filtra órdenes según su estado.
+ * @returns Un resultado paginado con las órdenes disponibles.
+ */
+ export const fetchOrdenesDeUsuario = async (paramsOrdenes, jwt, numPagina = 1) => {
+
+  const {
+    idOrden = null,
+    estadoOrden = null,
+    rangoFechas = {
+      inicio: null,
+      fin: null,
+    }
+  } = paramsOrdenes;
+
+  const idUsuario = getIdUsuarioDesdeJwt(jwt);
+
+  const endpoint = `ordenes/usuario/${idUsuario}`;
+
+  const paramsUrl = new URLSearchParams();
+
+  // Filtros por atributos de la orden.
+  if (idOrden != null) paramsUrl.set("idOrden", idOrden);
+
+  // Filtros por estado de la orden.
+  if (estadoOrden != null) paramsUrl.set("estado", estadoOrden);
+
+  // Filtros por rango de fechas.
+  if (rangoFechas.inicio != null) paramsUrl.set("desde", rangoFechas.inicio);
+  if (rangoFechas.fin != null) paramsUrl.set("hasta", rangoFechas.fin);
+
+  const resultados = await api.fetchPaginado(
+    endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, paramsUrl, jwt
+  );
+
+  return resultados;
+}
+
 export const fetchResumenDeOrdenes = async (jwt) => {
 
   const url = `${api.urlBase}/ordenes/stats`;
@@ -144,7 +193,7 @@ export const cambiarEstadoOrden = async (idOrden, indiceNuevoEstado, jwt) => {
     }),
   });
   
-  return await api.hacerPeticion(peticion, false);
+  return await api.hacerPeticion(peticion);
 }
 
 /**
@@ -183,7 +232,7 @@ export const exportarOrdenesConFormato = async (formato, jwt) => {
   partesHeader.forEach(parte => {
     // Buscar el valor de "filename" en el valor del header.
     if (parte.trim().startsWith("filename=")) {
-      nombreArchivo = parte.split("=")[1].replace(/\"/g, "");
+      nombreArchivo = parte.split("=")[1].replace(/"/g, "");
     }
   });
 

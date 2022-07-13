@@ -136,6 +136,40 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.ToTable("ComentariosArchivados");
                 });
 
+            modelBuilder.Entity("ServicioHydrate.Modelos.LlaveDeApi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("ErroresEnMes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaDeCreacion")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("IdUsuario")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Llave")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NombreDelCliente")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PeticionesEnMes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RolDeAcceso")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdUsuario");
+
+                    b.ToTable("LlavesDeAPI");
+                });
+
             modelBuilder.Entity("ServicioHydrate.Modelos.Orden", b =>
                 {
                     b.Property<Guid>("Id")
@@ -365,6 +399,17 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Navigation("Autor");
                 });
 
+            modelBuilder.Entity("ServicioHydrate.Modelos.LlaveDeApi", b =>
+                {
+                    b.HasOne("ServicioHydrate.Modelos.Usuario", "Usuario")
+                        .WithMany("LlavesDeAPI")
+                        .HasForeignKey("IdUsuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("ServicioHydrate.Modelos.Orden", b =>
                 {
                     b.HasOne("ServicioHydrate.Modelos.Usuario", "Cliente")
@@ -428,6 +473,8 @@ namespace ServicioHydrate.Migrations.MySQL
             modelBuilder.Entity("ServicioHydrate.Modelos.Usuario", b =>
                 {
                     b.Navigation("Comentarios");
+
+                    b.Navigation("LlavesDeAPI");
 
                     b.Navigation("Ordenes");
 

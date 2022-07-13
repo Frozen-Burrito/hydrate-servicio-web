@@ -81,18 +81,27 @@ namespace ServicioHydrate
 
             services.AddScoped<IServicioDatosAbiertos, RepositorioDatosAbiertos>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(Configuration.GetSection("AppConfig:SecretoJWT").Value)
-                        ),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                    };
-                });
+            services.AddScoped<IServicioLlavesDeAPI, RepositorioLlavesDeAPI>();
+
+            // Configurar autenticación usando llaves de API.
+            services.AddAuthentication(opciones => 
+            {
+                opciones.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opciones.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AgregarSoporteParaLlaveDeAPI(opciones => {})
+            .AddJwtBearer(opciones => 
+            {
+                opciones.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(Configuration.GetSection("AppConfig:SecretoJWT").Value)
+                    ),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                };
+            });
 
             services.AddMvc(opciones => 
             {
@@ -121,6 +130,14 @@ namespace ServicioHydrate
                     Description = "Encabezado estándar de autenticación con formato 'Bearer' (\"bearer {token}\").",
                     In = ParameterLocation.Header,
                     Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+
+                options.AddSecurityDefinition("Llave de API", new OpenApiSecurityScheme
+                {
+                    Description = "Encabezado de autenticación por llave de API.",
+                    In = ParameterLocation.Header,
+                    Name = "x-api-key",
                     Type = SecuritySchemeType.ApiKey
                 });
 

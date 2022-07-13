@@ -163,18 +163,26 @@ namespace ServicioHydrate.Data
             return usuario.ComoDTO();
         }
 
-        public async Task<ICollection<DTOUsuario>> GetUsuarios(DTOParamsPagina? paramsPagina)
+        public async Task<ICollection<DTOUsuario>> GetUsuarios(DTOParamsPagina paramsPagina)
         {
             if (_contexto.Usuarios.Count() == 0)
             {
                 return new List<DTOUsuario>();
             }
 
-            var usuarios = _contexto.Usuarios
+            IQueryable<Usuario> usuarios = _contexto.Usuarios;
+
+            if (paramsPagina.Query is not null)
+            {
+                usuarios = usuarios.Where(u => u.NombreUsuario.Contains(paramsPagina.Query));
+            }
+
+            IQueryable<DTOUsuario> dtosUsuarios = usuarios
+                .OrderBy(u => u.Id)
                 .Select(u => u.ComoDTO());
 
             var usuariosPaginados = await ListaPaginada<DTOUsuario>
-                .CrearAsync(usuarios, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+                .CrearAsync(dtosUsuarios, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return usuariosPaginados;
         }

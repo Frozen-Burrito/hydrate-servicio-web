@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import useCookie from '../../utils/useCookie';
-import { Link, useHistory, Redirect } from 'react-router-dom';
-import { iniciarSesion } from '../../api/api_auth';
+import React, { useState } from "react";
+import useCookie from "../../utils/useCookie";
+import { Link, useHistory, Redirect } from "react-router-dom";
+import { iniciarSesion } from "../../api/api_auth";
 import { 
   validarNombreUsuario, 
   validarCorreo, 
@@ -9,26 +9,26 @@ import {
   estaVacio,
   ErrorDeAutenticacion,
   ErrorDeValidacion 
-} from '../../utils/validaciones';
+} from "../../utils/validaciones";
 
-import './formularios.css';
+import "./formularios.css";
 
 function FormInicioSesion() {
   
   // Acceder a la cookie con el JWT, para actualizarlo o ver si ya existe.
-  const { valor: token, actualizarCookie: setToken } = useCookie('jwt');
+  const { valor: token, actualizarCookie: setToken } = useCookie("jwt");
 
   const history = useHistory();
 
   // Declarar estado con valor y errores para cada campo del formulario. 
   // Ambos comienzan como strings vacíos.
-  const [correoOUsuario, setCorreoOUsuario] = useState('');
-  const [errCorreoOUsuario, setErrCorreoOUsuario] = useState('');
+  const [correoOUsuario, setCorreoOUsuario] = useState("");
+  const [errCorreoOUsuario, setErrCorreoOUsuario] = useState("");
 
-  const [password, setPassword] = useState('');
-  const [errPassword, setErrPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [errPassword, setErrPassword] = useState("");
 
-  const [errGeneral, setErrGeneral] = useState('');
+  const [errGeneral, setErrGeneral] = useState("");
 
   // Describe si el formulario esta haciendo una peticion a la API.
   const [estaCargando, setEstaCargando] = useState(false);
@@ -38,27 +38,27 @@ function FormInicioSesion() {
   const handleCambioCorreoOUsuario = (e) => {
     const valor = e.target.value;
     
-    const resultadoVal = (valor.indexOf('@') > -1) 
+    const resultadoVal = (valor.indexOf("@") > -1) 
       ? validarCorreo(valor)
       : validarNombreUsuario(valor);
 
     setCorreoOUsuario(valor);
 
     if (resultadoVal === null) {
-      setErrCorreoOUsuario('');
+      setErrCorreoOUsuario("");
 
     } else {
       if (resultadoVal.error === ErrorDeValidacion.correoVacio.error) {
-        setErrCorreoOUsuario('El correo electrónico o nombre de usuario es obligatorio');
+        setErrCorreoOUsuario("El correo electrónico o nombre de usuario es obligatorio");
 
       } else if (resultadoVal.error === ErrorDeValidacion.correoNoValido.error) {
-        setErrCorreoOUsuario('El correo no tiene un formato válido');
+        setErrCorreoOUsuario("El correo no tiene un formato válido");
       } else if (resultadoVal.error === ErrorDeValidacion.nombreUsuarioNoValido) {
-        setErrCorreoOUsuario('El nombre de usuario no tiene un formato válido');
+        setErrCorreoOUsuario("El nombre de usuario no tiene un formato válido");
       } else if (resultadoVal.error === ErrorDeValidacion.nombreUsuarioMuyCorto) {
-        setErrCorreoOUsuario('El nombre de usuario debe tener más de 4 caracteres');
+        setErrCorreoOUsuario("El nombre de usuario debe tener más de 4 caracteres");
       } else if (resultadoVal.error === ErrorDeValidacion.nombreUsuarioNoValido) {
-        setErrCorreoOUsuario('El nombre de usuario debe tener menos de 20 caracteres');
+        setErrCorreoOUsuario("El nombre de usuario debe tener menos de 20 caracteres");
       }
     }
   }
@@ -72,20 +72,20 @@ function FormInicioSesion() {
     setPassword(passIntroducido);
 
     if (resultadoVal=== null) {
-      setErrPassword('');
+      setErrPassword("");
 
     } else {
       if (resultadoVal.error === ErrorDeValidacion.passwordVacio.error) {
-        setErrPassword('La contraseña es obligatoria');
+        setErrPassword("La contraseña es obligatoria");
 
       } else if (resultadoVal.error === ErrorDeValidacion.passwordMuyCorto.error) {
-        setErrPassword('La contraseña debe tener más de 8 caracteres.');
+        setErrPassword("La contraseña debe tener más de 8 caracteres.");
 
       } else if (resultadoVal.error === ErrorDeValidacion.passwordMuyLargo.error) {
-        setErrPassword('La contraseña debe tener menos de 40 caracteres.');
+        setErrPassword("La contraseña debe tener menos de 40 caracteres.");
 
       } else if (resultadoVal.error === ErrorDeValidacion.passwordNoValido.error) {
-        setErrPassword('La contraseña no tiene un formato válido');
+        setErrPassword("La contraseña no tiene un formato válido");
       }
     }
   }
@@ -108,26 +108,32 @@ function FormInicioSesion() {
       // redirigir a inicio.
       setToken(resultado.cuerpo.token);
   
-      history.push('/');
+      history.push("/");
 
     } else if (resultado.status >= 500) {
-      setErrGeneral('El servicio no está disponible, intente más tarde');
+      setErrGeneral("El servicio no está disponible, intente más tarde");
+
+      setEstaCargando(false);
 
     } else if (resultado.status >= 400) {
 
-      const tipoError = Object.keys(ErrorDeAutenticacion)[resultado.cuerpo['tipo']];
+      const tipoError = resultado.cuerpo != null 
+        ? Object.keys(ErrorDeAutenticacion)[resultado.cuerpo["tipo"]]
+        : ErrorDeAutenticacion.servicioNoDisponible; ;
 
       if (tipoError === ErrorDeAutenticacion.usuarioNoExiste.error) {
-        setErrCorreoOUsuario('No existe una cuenta con este correo o nombre de usuario');
+        setErrCorreoOUsuario("No existe una cuenta con este correo o nombre de usuario");
 
       } else if (tipoError === ErrorDeAutenticacion.passwordIncorrecto.error) {
-        setErrPassword('La contraseña es incorrecta');
+        setErrPassword("La contraseña es incorrecta");
       } else if (tipoError === ErrorDeAutenticacion.formatoIncorrecto.error) {
-        setErrGeneral('Las credenciales no tienen el formato correcto');
+        setErrGeneral("Las credenciales no tienen el formato correcto");
+      } else {
+        setErrGeneral("Ocurrió un error inesperado. Intenta de nuevo más tarde");
       }
-    }
 
-    setEstaCargando(false);
+      setEstaCargando(false);
+    }
   }
 
   // Es true si existen errores de validación en el formulario.
@@ -138,72 +144,72 @@ function FormInicioSesion() {
 
   // Declarar el componente para el formulario.
   const formulario = (
-    <div className='form-container'>
-      <Link to='/' className='no-underline-link'>
-        <h3 className='form-logo'>Hydrate</h3>
+    <div className="form-container">
+      <Link to="/" className="no-underline-link">
+        <h3 className="form-logo">Hydrate</h3>
       </Link>
 
       <form action="">
-        <h2 className='center-text mt-5'>Iniciar Sesión</h2>
+        <h2 className="center-text mt-5">Iniciar Sesión</h2>
 
-        <div className='form-fields'>
-          <div className='form-group'>
-            <div className="campo">
+        <div className="form-fields mt-5">
+          <div className="form-group">
+            <div className="campo expandir">
               <div className="campo-con-icono">
                 <span className="material-icons">
                   email
                 </span>
                 <input 
-                  type='text' 
-                  name='correo' 
-                  className='input' 
-                  placeholder='Correo Electrónico o Usuario'
+                  type="text" 
+                  name="correo" 
+                  className="input" 
+                  placeholder="Correo Electrónico o Usuario"
                   value={correoOUsuario}
                   onChange={handleCambioCorreoOUsuario}
                 />
               </div>
 
-              <p className='error' >
+              <p className="error mt-1" >
                 {errCorreoOUsuario}
               </p>
             </div>
           </div>
 
-          <div className='form-group'>
-            <div className="campo">
+          <div className="form-group">
+            <div className="campo expandir">
               <div className="campo-con-icono">
                 <span className="material-icons">
                   vpn_key
                 </span>
                 <input 
-                  type='password' 
-                  name='password' 
-                  className='input' 
-                  placeholder='Constraseña'
+                  type="password" 
+                  name="password" 
+                  className="input" 
+                  placeholder="Constraseña"
                   value={password}
                   onChange={handleCambioPassword}
                 />
               </div>
 
-              <p className='error' >
+              <p className="error mt-1" >
                 {errPassword}
               </p>
             </div>
           </div>
 
-          <p className='text-acount'>
+          <p className="mt-3">
             ¿No tienes una cuenta? 
-            <Link className='account-link' to='/creacion-cuenta'>Registrate</Link>
+            <Link className="account-link" to="/creacion-cuenta">Registrate</Link>
           </p>
 
-          <p className='error' >
+          <p className="error mt-1" >
             {errGeneral}
           </p>
         </div>
 
-        <div className='center-text mt-1'>
+        <div className="center-text mt-5">
           <button 
-            className={`btn btn-primario ${submitDesactivado ? 'btn-desactivado' : ''}`}
+            className={`btn btn-primario ${submitDesactivado ? "btn-desactivado" : ""}`}
             disabled={submitDesactivado} 
             onClick={handleSubmit}
           >
@@ -222,7 +228,7 @@ function FormInicioSesion() {
     ? <>{formulario}</>
     : <Redirect
         replace={true}
-        to='/'
+        to="/"
       />
 }
 

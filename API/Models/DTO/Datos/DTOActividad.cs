@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using ServicioHydrate.Modelos.Datos;
 
+#nullable enable
 namespace ServicioHydrate.Modelos.DTO.Datos
 {
     public class DTOActividad 
@@ -12,10 +13,10 @@ namespace ServicioHydrate.Modelos.DTO.Datos
         public int IdPerfil { get; set; }
 
         [MaxLength(40)]
-        public string Titulo { get; set; }
+        public string Titulo { get; set; } = string.Empty;
 
         [MaxLength(33)]
-        public string Fecha { get; set; }
+        public string Fecha { get; set; } = string.Empty;
 
         /// La duración en minutos del registro de actividad física.
         [Range(1, 480)]
@@ -30,9 +31,10 @@ namespace ServicioHydrate.Modelos.DTO.Datos
     
         public bool FueAlAireLibre { get; set; }
 
-        public DTODatosActividad DatosDeActividad { get; set; }
+        public int IdDatosDeActividad { get; set; }
+        public DTODatosActividad? DatosDeActividad { get; set; }
 
-        public DTORutina Rutina { get; set; }
+        public DTORutina? Rutina { get; set; }
 
         public bool EsInformacionAbierta { get; set; }
 
@@ -68,3 +70,4 @@ namespace ServicioHydrate.Modelos.DTO.Datos
         }
     }
 }
+#nullable disable

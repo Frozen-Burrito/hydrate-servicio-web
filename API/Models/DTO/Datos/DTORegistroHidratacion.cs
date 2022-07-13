@@ -21,7 +21,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
 		public int IdPerfilUsuario { get; set; }
 
-        public RegistroDeHidratacion ComoNuevoModelo(Perfil perfilDeUsuario, bool esParaDatosAbiertos = false) 
+        public RegistroDeHidratacion ComoNuevoModelo(Perfil perfilDeUsuario, bool esParteDeDatosAbiertos = false) 
 		{
             DateTime fecha;
 
@@ -40,7 +40,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 TemperaturaAproximada = this.TemperaturaAproximada,
                 Fecha = fecha,
                 PerfilDeUsuario = perfilDeUsuario,
-				EsInformacionAbierta = esParaDatosAbiertos
+				EsInformacionAbierta = esParteDeDatosAbiertos,
 			};
 		}
 	}

@@ -87,7 +87,7 @@ namespace ServicioHydrate.Data
             await _contexto.SaveChangesAsync();
         }
 
-        public async Task<DTOPerfil> GetPerfilPorId(Guid idCuentaUsuario, int idPerfil)
+        public async Task<Perfil> GetPerfilPorId(Guid idCuentaUsuario, int idPerfil)
         {
             if (await _contexto.Perfiles.CountAsync() <= 0) 
             {
@@ -106,7 +106,7 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado");
             }
 
-            return perfil.ComoDTO();
+            return perfil;
         }
 
         public async Task<DTOPerfil> RegistrarPerfilExistente(DTOPerfil perfil, DTOUsuario cuentaUsuario)

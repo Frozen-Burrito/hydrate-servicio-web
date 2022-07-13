@@ -10,6 +10,8 @@ Drawer.defaultProps = {
   lado: "left",
   mostrar: false,
   conFondo: false,
+  capa: 6,
+  conPadding: true,
   btnCerrarExterno: null,
 };
 
@@ -24,13 +26,17 @@ export default function Drawer(props) {
     lado, 
     conNavbar,
     conFondo, 
+    conPadding,
     colorFondo,
+    capa,
     btnCerrarExterno,
   } = props;
 
   const claseColor = colorFondo;
   const clasePadNavbar = conNavbar ? "pt-5" : "";
+  const clasePadHorizontal = conPadding ? "px" : "";
   const claseMostrar = mostrar ? "activo" : "escondido";
+  const claseCapa = `capa-${capa}`;
   const claseLado = convertirLado(lado);
 
   function convertirLado(lado) {
@@ -58,9 +64,13 @@ export default function Drawer(props) {
         </div> 
       }
       
-      <div className={`menu-drawer ${claseColor} ${clasePadNavbar}`}>
+      <div className={`menu-drawer ${claseColor} ${clasePadNavbar} ${claseCapa} ${clasePadHorizontal}`}>
         <div className="drawer-superior">
-          { encabezado != null && <h5 className="encabezado-drawer">{ encabezado }</h5>}
+          { encabezado != null && 
+            <h5 className={`encabezado-drawer ${conPadding ? "" : "ml-1"}`}>
+              { encabezado }
+            </h5>
+          }
 
           <>
             {elementos}

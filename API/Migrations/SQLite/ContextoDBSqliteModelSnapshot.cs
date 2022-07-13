@@ -434,6 +434,36 @@ namespace ServicioHydrate.Migrations.SQLite
                     b.ToTable("Entornos");
                 });
 
+                modelBuilder.Entity("ServicioHydrate.Modelos.LlaveDeApi", b =>
+                {
+                    b.Property<int>("ErroresEnMes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("FechaDeCreacion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("IdUsuario")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Llave")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NombreDelCliente")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PeticionesEnMes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RolDeAcceso")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdUsuario");
+
+                    b.ToTable("LlavesDeAPI");
+                });
+
             modelBuilder.Entity("ServicioHydrate.Modelos.Orden", b =>
                 {
                     b.Property<Guid>("Id")
@@ -829,6 +859,17 @@ namespace ServicioHydrate.Migrations.SQLite
                         .WithMany("EntornosDesbloqueados")
                         .HasForeignKey("PerfilId");
                 });
+                
+            modelBuilder.Entity("ServicioHydrate.Modelos.LlaveDeApi", b =>
+                {
+                    b.HasOne("ServicioHydrate.Modelos.Usuario", "Usuario")
+                        .WithMany("LlavesDeAPI")
+                        .HasForeignKey("IdUsuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Orden", b =>
                 {
@@ -939,6 +980,8 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Usuario", b =>
                 {
                     b.Navigation("Comentarios");
+
+                    b.Navigation("LlavesDeAPI");
 
                     b.Navigation("Ordenes");
 

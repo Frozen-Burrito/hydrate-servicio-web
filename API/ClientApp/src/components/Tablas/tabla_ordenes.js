@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { StatusHttp } from "../../api/api";
 import { 
   fetchOrdenes, 
+  fetchOrdenesDeUsuario,
   fetchProductos, 
   cambiarEstadoOrden,
   exportarOrdenesConFormato 
@@ -19,7 +20,9 @@ import {
   BotonIcono,
 } from "../";
 
-export default function TablaOrdenes() {
+export default function TablaOrdenes(props) {
+
+  const { esAdmin } = props;
 
   const { valor: jwt } = useCookie("jwt");
 
@@ -38,6 +41,7 @@ export default function TablaOrdenes() {
   // Control de resultados paginados.
   const [paginaActual, setPaginaActual] = useState(1);
   const [paginasTotales, setPaginasTotales] = useState(1);
+  const [resultadosPorPagina, setResultadosPorPagina] = useState(1);
 
   function manejarCambioPagina(e, nuevaPagina) {
     if ((nuevaPagina >= 1 && nuevaPagina <= paginasTotales) || paginasTotales == null) {
@@ -46,10 +50,18 @@ export default function TablaOrdenes() {
   }
 
   // Columnas.
-  const datosColumnas = [
+  const datosColumnas = esAdmin
+  ? [
     { texto: "ID de la Orden", onclick: null}, 
     { texto: "Fecha", onclick: () => {}}, 
     { texto: "Cliente", onclick: () => {}}, 
+    { texto: "Monto", onclick: () => {}}, 
+    { texto: "Productos", onclick: null}, 
+    { texto: "Estado", onclick: null}, 
+  ] 
+  : [
+    { texto: "ID de la Orden", onclick: null}, 
+    { texto: "Fecha", onclick: () => {}}, 
     { texto: "Monto", onclick: () => {}}, 
     { texto: "Productos", onclick: null}, 
     { texto: "Estado", onclick: null}, 
@@ -68,6 +80,8 @@ export default function TablaOrdenes() {
 
   async function onCambioEstadoOrden(idOrden, indNuevoEstado) {
 
+    if (!esAdmin) return;
+
     const resultado = await cambiarEstadoOrden(idOrden, indNuevoEstado, jwt);
 
     if (resultado.ok && resultado.status === StatusHttp.Status204SinContenido) {
@@ -83,6 +97,8 @@ export default function TablaOrdenes() {
   }
 
   async function onExportarOrdenes(formato) {
+
+    if (!esAdmin) return;
     
     const resultado = await exportarOrdenesConFormato(formato, jwt);
 
@@ -96,11 +112,9 @@ export default function TablaOrdenes() {
 
     async function obtenerOrdenes() {
 
-      const resultado = await fetchOrdenes(
-        filtrosOrdenes,
-        jwt, 
-        paginaActual,
-      );
+      const resultado = esAdmin 
+        ? await fetchOrdenes(filtrosOrdenes, jwt, paginaActual)
+        : await fetchOrdenesDeUsuario(filtrosOrdenes, jwt, paginaActual);
 
       if (resultado.ok && resultado.status === 200) {
 
@@ -110,6 +124,7 @@ export default function TablaOrdenes() {
 
         setPaginaActual(resultadoPaginado.paginaActual);
         setPaginasTotales(resultadoPaginado.paginasTotales);
+        setResultadosPorPagina(resultadoPaginado.resultadosPorPagina);
 
       } else if (resultado.status >= 500) {
         console.log(resultado);
@@ -128,7 +143,7 @@ export default function TablaOrdenes() {
 
         const datosPaginados = resultado.datos;
 
-        const mapaProductos = new Map(datosPaginados.resultados.map(producto => [producto.id, producto]));
+        const mapaProductos = new Map(datosPaginados.resultados.map(producto => ([producto.id, producto])));
 
         setProductos(mapaProductos);
         setTieneError(false);
@@ -151,18 +166,21 @@ export default function TablaOrdenes() {
 
     obtenerDatos();
     
-  }, [jwt, paginaActual, filtrosOrdenes]);
+  }, [jwt, paginaActual, filtrosOrdenes, esAdmin]);
   
   const renderDropdownEstado = (orden) => (
     <Dropdown 
       onColor="superficie"
+      disabled={ !esAdmin }
+      expandir={true}
       boton={(
         <BotonIcono 
+          tipo="dropdown"
+          color="fondo"
+          disabled={ !esAdmin }
           icono="pending_actions"
           iconoSufijo="arrow_drop_down"
           label={ estadoDeOrden[orden.estado] }
-          color="fondo"
-          tipo="dropdown"
         />
       )}
       items={(
@@ -228,7 +246,7 @@ export default function TablaOrdenes() {
     if (ordenes.length > 0) {
       return (
         <Tabla 
-          resultadosPorPagina={25}
+          resultadosPorPagina={resultadosPorPagina}
           columnas={(
             <>
               { datosColumnas.map((col, indice) => (
@@ -241,7 +259,7 @@ export default function TablaOrdenes() {
                 />
               )) } 
 
-              <th>Acciones</th>
+              { esAdmin && <th>Acciones</th> }
             </>
           )}>
           
@@ -249,13 +267,16 @@ export default function TablaOrdenes() {
             return (
               <FilaTabla 
                 key={orden.id}
-                // onEditar={() => onEditarRecurso(orden.id)}
-                onEditar={() => console.log("TODO: editar orden")}>
+                onEditar={ esAdmin 
+                  ? () => console.log("TODO: editar orden")
+                  : null}
+              >
                 <td>{ orden.id }</td>
                 <td>{ orden.fecha.substring(0, 10) }</td>
                 <td>
                   <a href={`mailto:${orden.emailCliente}`}>{ orden.nombreCliente }</a>
                 </td> 
+                { esAdmin && <td>{ orden.idCliente }</td> } 
                 <td>${ orden.montoTotal.toFixed(2) } MXN</td> 
                 
                 <td className="stack vertical justify-start gap-1">
@@ -285,10 +306,15 @@ export default function TablaOrdenes() {
   return (
     <>
       <div className="stack horizontal justify-end gap-1 mt-1">
-        { renderDropdownExportar() }
+        { esAdmin && renderDropdownExportar() }
       </div>
       <div className="stack horizontal justify-end gap-2 mt-2">
         <FiltrosParaOrdenes 
+          filtros={{
+            query: esAdmin,
+            estado: true,
+            rangoDeFechas: true,
+          }}
           onCambioEnFiltros={setFiltrosOrdenes}
         />
       </div>

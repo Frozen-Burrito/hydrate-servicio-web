@@ -31,16 +31,41 @@ namespace ServicioHydrate.Controladores
         /// El repositorio de acceso a datos abiertos.
         private readonly IServicioDatosAbiertos _repoDatosAbiertos;
 
+        private readonly IServicioPerfil _repoPerfiles;
+
         // Permite generar Logs desde las acciones del controlador.
         private readonly ILogger<ControladorDatosAbiertos> _logger;
 
         public ControladorDatosAbiertos(
             IServicioDatosAbiertos servicioDatosAbiertos,
+            IServicioPerfil servicioPerfil,
             ILogger<ControladorDatosAbiertos> logger
         )
         {
-            this._repoDatosAbiertos = servicioDatosAbiertos;
+            this._repoDatosAbiertos = servicioDatosAbiertos 
+                ?? throw new ArgumentNullException(nameof(servicioDatosAbiertos));
+
+            this._repoPerfiles = servicioPerfil
+                ?? throw new ArgumentNullException(nameof(servicioPerfil));
+
             this._logger = logger;
+        }       
+        
+        //TODO: Eliminar este endpoint de prueba.
+        [HttpGet("test")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult ProbarEndpoints()
+        {
+            // Registrar un log de la peticion.
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            return NoContent();
         }
 
         /// <summary>
@@ -247,7 +272,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> AportarDatosDeActFisica(
-            IEnumerable<DTOActividad> datos
+            IEnumerable<DTONuevaActividad> datos
         )
         {
             string strFecha = DateTime.Now.ToString("G");
@@ -257,7 +282,19 @@ namespace ServicioHydrate.Controladores
 
             try 
             {
-                await _repoDatosAbiertos.AportarDatosDeActividad(datos);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type.Equals("id"))?.Value ?? String.Empty;
+                bool idEsValido = Guid.TryParse(idStr, out Guid idUsuario);
+
+                if (!idEsValido) 
+                {
+                    return Unauthorized();
+                }
+
+                int idPerfil = datos.FirstOrDefault()?.IdPerfil ?? -1;
+
+                Perfil perfilDelContribuyente = await _repoPerfiles.GetPerfilPorId(idUsuario, idPerfil);
+
+                await _repoDatosAbiertos.AportarDatosDeActividad(perfilDelContribuyente, datos);
 
                 return NoContent();
             }
@@ -308,7 +345,20 @@ namespace ServicioHydrate.Controladores
 
             try 
             {
-                await _repoDatosAbiertos.AportarDatosDeHidratacion(datos);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type.Equals("id"))?.Value ?? String.Empty;
+                bool idEsValido = Guid.TryParse(idStr, out Guid idUsuario);
+
+                if (!idEsValido) 
+                {
+                    return Unauthorized();
+                }
+
+                int idPerfil = datos.FirstOrDefault()?.IdPerfilUsuario ?? -1;
+
+                Perfil perfilDelContribuyente = await _repoPerfiles.GetPerfilPorId(idUsuario, idPerfil);
+
+                await _repoDatosAbiertos
+                    .AportarDatosDeHidratacion(perfilDelContribuyente, datos);
 
                 return NoContent();
             }

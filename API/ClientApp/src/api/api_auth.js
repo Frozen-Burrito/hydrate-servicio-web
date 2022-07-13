@@ -1,4 +1,5 @@
 import * as api from "./api";
+import { formarTokenAuth } from "../utils/formato_token_auth";
 
 export const RolesAutorizacion = {
   ninguno: "NINGUNO",
@@ -58,4 +59,43 @@ export const registrarUsuarioTemporal = async (email) => {
   };
 
   return await registrarUsuario(credencialesTemporales); 
+}
+
+export const fetchTodosLosUsuarios = async (jwt, filtros, numPagina = 1) => {
+
+  const endpoint = "usuarios";
+
+  const paramsUrl = new URLSearchParams();
+
+  if (filtros.nombreEnPerfil != null) paramsUrl.set("query", filtros.nombreEnPerfil);
+
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, paramsUrl, jwt);
+
+  return resultados;
+}
+
+export const modificarRolDeAutorizacion = async (idUsuario, nuevoRol, jwt) => {
+
+  const url = `${api.urlBase}/usuarios/${idUsuario}`;
+
+  if (jwt === undefined || jwt === null || jwt.length === 0) {
+    return {
+      ok: false,
+      status: 401,
+      cuerpo: {},
+    };
+  }
+
+  const peticion = new Request(url, {
+    method: api.PATCH,
+    body: JSON.stringify({ nuevoRol }),
+    headers: new Headers({
+      // Incluir el JWT en el header de autorizacion.
+      'Authorization': formarTokenAuth(jwt), 
+      // Utiliza JSON para el cuerpo.
+      'Content-Type': 'application/json'
+    }),
+  });
+  
+  return await api.hacerPeticion(peticion);
 }

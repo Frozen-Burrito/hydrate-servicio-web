@@ -194,7 +194,7 @@ function FormCrearCuenta() {
 
         <div className='form-fields'>
           <div className='form-group'>
-            <div className="campo">
+            <div className="campo expandir">
               <div className="campo-con-icono">
                 <span className="material-icons">
                   email
@@ -210,14 +210,14 @@ function FormCrearCuenta() {
                   onChange={e => handleCambioCorreo(e)}/>
               </div>
 
-              <p className='error' >
+              <p className='error mt-1' >
                 {errCorreo}
               </p>
             </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo">
+            <div className="campo expandir">
               <div className="campo-con-icono">
                 <span className="material-icons">
                   person
@@ -232,14 +232,14 @@ function FormCrearCuenta() {
                   onChange={e => handleUsernameChange(e)}/>
               </div>
 
-              <p className='error' >
+              <p className='error mt-1' >
                 {errUsuario}
               </p>
             </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo">
+            <div className="campo expandir">
               <div className="campo-con-icono">
                 <span className="material-icons">
                   vpn_key
@@ -255,14 +255,14 @@ function FormCrearCuenta() {
                   onChange={e => handlePasswordChange(e)}/>
               </div>
 
-              <p className='error' >
+              <p className='error mt-1' >
                 {errPassword}
               </p>
             </div>
           </div>
 
           <div className='form-group'>
-            <div className="campo">
+            <div className="campo expandir">
               <div className="campo-con-icono">
                 <span className="material-icons">
                   vpn_key
@@ -277,23 +277,23 @@ function FormCrearCuenta() {
                   value={passConfirm}
                   onChange={e => handlePassConfirmChange(e)}/>
               </div>
-              <p className='error' >
+              <p className='error mt-1' >
                 {errPassConfirm}
               </p>
             </div>
           </div>
 
-          <p className='text-acount'>
+          <p className='mt-3'>
             ¿Ya tienes una cuenta? 
             <Link className='account-link' to='/inicio-sesion'>Iniciar Sesión</Link>
           </p>
 
-          <p className='error' >
+          <p className='error mt-1' >
             {errGeneral}
           </p>
         </div>
 
-        <div className='center-text mt-1'>
+        <div className='center-text mt-3'>
           <button 
             className={`btn btn-primario ${submitDesactivado ? 'btn-desactivado' : ''}`}
             disabled={submitDesactivado} 

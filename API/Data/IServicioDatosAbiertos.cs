@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.DTO.Datos;
 using ServicioHydrate.Modelos.Enums;
@@ -27,8 +28,9 @@ namespace ServicioHydrate.Data
         /// Incluye los registros de hidratación recibidos en la colección
         /// de datos abiertos de hidratación, haciéndolos públicamente accesibles.
         /// </summary>
+        /// <param name="perfil">El perfil del usuario que hizo la aportación.</param>
         /// <param name="datos">Los registros de hidratación aportados.</param>
-        Task AportarDatosDeHidratacion(IEnumerable<DTORegistroDeHidratacion> datos);
+        Task AportarDatosDeHidratacion(Perfil perfil, IEnumerable<DTORegistroDeHidratacion> datos);
 
         /// <summary>
         /// Obtiene todos los registros de actividad física que cumplan con los filtros.
@@ -48,8 +50,9 @@ namespace ServicioHydrate.Data
         /// Incluye los registros de actividad física de [datos] en la colección
         /// de datos abiertos de actividad física, haciéndolos públicamente accesibles.
         /// </summary>
+        /// <param name="perfil">El perfil del usuario que hizo la aportación.</param>
         /// <param name="datos">Los registros de actividad aportados.</param>
-        Task AportarDatosDeActividad(IEnumerable<DTOActividad> datos);
+        Task AportarDatosDeActividad(Perfil perfil, IEnumerable<DTONuevaActividad> datos);
 
         /// <summary>
         /// Exporta la colección completa de datos abiertos deseada, donde

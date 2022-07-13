@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
+using System.Text.Json;
 using ServicioHydrate.Modelos.Enums;
 
 namespace ServicioHydrate.Modelos
@@ -28,6 +28,8 @@ namespace ServicioHydrate.Modelos
         public Perfil PerfilDeUsuario { get; set; }
 
         public virtual ICollection<Orden> Ordenes { get; set; }
+
+        public virtual ICollection<LlaveDeApi> LlavesDeAPI { get; set; }
 
         public virtual ICollection<Comentario> Comentarios { get; set; }
         public virtual ICollection<Respuesta> Respuestas { get; set; }

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 using ServicioHydrate.Modelos.DTO.Datos; 
 
+#nullable enable
 namespace ServicioHydrate.Modelos.Datos
 {
     public class ActividadFisica 
@@ -11,10 +12,10 @@ namespace ServicioHydrate.Modelos.Datos
 
         [Required]
         public int IdPerfil { get; set; }
-        public Perfil PerfilDeUsuario { get; set; }
+        public Perfil? PerfilDeUsuario { get; set; }
 
         [MaxLength(40)]
-        public string Titulo { get; set; }
+        public string Titulo { get; set; } = string.Empty;
 
         public DateTime Fecha { get; set; }
 
@@ -31,9 +32,9 @@ namespace ServicioHydrate.Modelos.Datos
     
         public bool FueAlAireLibre { get; set; }
 
-        public DatosDeActividad DatosActividad { get; set; }
+        public DatosDeActividad? DatosActividad { get; set; }
 
-        public Rutina Rutina { get; set; }
+        public Rutina? Rutina { get; set; }
 
         public bool EsInformacionAbierta { get; set; }
 
@@ -49,9 +50,10 @@ namespace ServicioHydrate.Modelos.Datos
                 Distancia = this.Distancia,
                 KcalQuemadas = this.KcalQuemadas,
                 FueAlAireLibre = this.FueAlAireLibre,
-                DatosDeActividad = this.DatosActividad.ComoDTO(),
-                Rutina = this.Rutina.ComoDTO(),
+                DatosDeActividad = this.DatosActividad?.ComoDTO(),
+                Rutina = this.Rutina?.ComoDTO(),
             };
         }
     }
 }
+#nullable disable

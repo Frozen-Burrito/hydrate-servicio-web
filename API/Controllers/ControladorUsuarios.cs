@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,10 +7,14 @@ using Microsoft.AspNetCore.Http;
 
 using ServicioHydrate.Data;
 using ServicioHydrate.Autenticacion;
-using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using System.Linq;
+using System.Collections.Generic;
+using System.Text.Json;
+using ServicioHydrate.Modelos;
+// using Newtonsoft.Json;
 
+#nullable enable
 namespace ServicioHydrate.Controladores 
 {
     [ApiController]
@@ -61,7 +64,8 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "ruta no identificada";
+
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             if (!ModelState.IsValid)
@@ -79,7 +83,10 @@ namespace ServicioHydrate.Controladores
             {
                 // Hay un error de autenticacion. Enviar una respuesta con 
                 // código 401 (No autorizado).
-                MensajeErrorAutenticacion error = e.Data["ErrorAutenticacion"] as MensajeErrorAutenticacion; 
+                object? errDeAutenticacion = e.Data["ErrorAutenticacion"];
+
+                MensajeErrorAutenticacion error = (errDeAutenticacion as MensajeErrorAutenticacion) 
+                    ?? new MensajeErrorAutenticacion(); 
 
                 return Unauthorized(error);
             }
@@ -112,7 +119,8 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "ruta no identificada";
+
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -136,7 +144,69 @@ namespace ServicioHydrate.Controladores
             {
                 // Hay un error de autenticacion. Enviar una respuesta con 
                 // código 401 (No autorizado). 
-                MensajeErrorAutenticacion error = e.Data["ErrorAutenticacion"] as MensajeErrorAutenticacion; 
+                object? errDeAutenticacion = e.Data["ErrorAutenticacion"];
+
+                MensajeErrorAutenticacion error = (errDeAutenticacion as MensajeErrorAutenticacion) 
+                    ?? new MensajeErrorAutenticacion(); 
+
+                return Unauthorized(error);
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        //TODO: Eliminar este endpoint de pruebas.
+        [HttpPost("test")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTORespuestaAutenticacion))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesErrorResponseType(typeof(MensajeErrorAutenticacion))]
+        public async Task<IActionResult> CrearUsuarioDePruebas(
+            [FromQuery] DTOModificarRol rolDeUsuario,
+            [FromBody] DTOPeticionAutenticacion datosUsuario 
+        )
+        {
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "ruta no identificada";
+
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try 
+            {
+                // Intentar registrar una nueva cuenta de usuario con los datos.
+                DTOUsuario usuario = await _repoUsuarios.RegistrarNuevoUsuario(datosUsuario);
+
+                // Intentar autenticar al usuario usando los datos de la nueva cuenta.
+                var resultado = await _repoUsuarios.AutenticarUsuario(
+                    new DTOPeticionAutenticacion
+                    {
+                        NombreUsuario = datosUsuario.NombreUsuario,
+                        Email = datosUsuario.Email,
+                        Password = datosUsuario.Password
+                    }
+                );
+
+                await _repoUsuarios.ModificarRolDeUsuario(usuario.Id, rolDeUsuario.NuevoRol);
+
+                return Ok(resultado);
+            }
+            catch (ArgumentException e) 
+            {
+                // Hay un error de autenticacion. Enviar una respuesta con 
+                // código 401 (No autorizado). 
+                _logger.LogError(e, $"Error: {e}");
+
+                object? errDeAutenticacion = e.Data["ErrorAutenticacion"];
+
+                MensajeErrorAutenticacion error = (errDeAutenticacion as MensajeErrorAutenticacion) 
+                    ?? new MensajeErrorAutenticacion(); 
 
                 return Unauthorized(error);
             }
@@ -158,11 +228,12 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUsuarios([FromQuery] DTOParamsPagina? paramsPagina)
+        public async Task<IActionResult> GetUsuarios([FromQuery] DTOParamsPagina paramsPagina)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "ruta no identificada";
+
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -200,7 +271,8 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "ruta no identificada";
+
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -245,7 +317,8 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "ruta no identificada";
+
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -264,3 +337,4 @@ namespace ServicioHydrate.Controladores
         }
     }
 }
+#nullable disable

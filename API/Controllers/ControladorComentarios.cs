@@ -106,7 +106,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "ruta no identificada";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try
@@ -181,7 +181,7 @@ namespace ServicioHydrate.Controladores
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
-            string ruta = Request.Path.Value;
+            string ruta = Request.Path.Value ?? "/";
             _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
 
             try 
@@ -437,7 +437,8 @@ namespace ServicioHydrate.Controladores
 
             try
             {
-                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type.Equals("id"))?.Value ?? String.Empty;
+                bool idEsValido = Guid.TryParse(idStr, out Guid idUsuario);
 
                 comentarioModificado.Id = idComentario;
 
@@ -544,11 +545,15 @@ namespace ServicioHydrate.Controladores
 
             try
             { 
-                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type.Equals("id"))?.Value ?? String.Empty;
+                bool idEsValido = Guid.TryParse(idStr, out Guid idUsuario);
 
-                if (idUsuario is null) throw new ArgumentException("El ID del usuario no debe ser null.");
+                if (!idEsValido) 
+                {
+                    throw new ArgumentException("El ID del usuario no tiene el formato correcto.");
+                }
                 
-                await _repoComentarios.MarcarComentarioComoUtil(idComentario, (Guid) idUsuario);
+                await _repoComentarios.MarcarComentarioComoUtil(idComentario, idUsuario);
 
                 return NoContent();
             }
@@ -601,13 +606,19 @@ namespace ServicioHydrate.Controladores
 
             try
             {
-                Guid? idUsuario = new Guid(this.User.Claims.FirstOrDefault(i => i.Type == "id").Value);
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type.Equals(ClaimTypes.Actor))?.Value ?? String.Empty;
+                bool idEsValido = Guid.TryParse(idStr, out Guid idUsuario);
 
-                _logger.LogInformation($"Id usuario: {idUsuario.ToString()}");
+                if (idEsValido)
+                {
+                    await _repoComentarios.ReportarComentario(idComentario, idUsuario);
 
-                await _repoComentarios.ReportarComentario(idComentario, (Guid) idUsuario);
-
-                return NoContent();
+                    return NoContent();
+                } 
+                else 
+                {
+                    return Unauthorized();
+                }
             }
             catch (ArgumentException e)
             {
