@@ -31,6 +31,9 @@ export default function DrawerCompra(props) {
 
   function handleCambioCantidad(e) {
 
+    //TODO: Quitar esto, solo es para pruebas temporales.
+    console.log("Stripe test PK: ", process.env.REACT_APP_STRIPE_TEST_PK);
+
     const nuevaCantidad = e.target.value;
     setCantidad(nuevaCantidad);
   }

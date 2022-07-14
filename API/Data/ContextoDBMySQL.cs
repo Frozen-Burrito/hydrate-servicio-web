@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using ServicioHydrate.Modelos;
+using ServicioHydrate.Modelos.Datos;
 
 namespace ServicioHydrate.Data 
 {
@@ -34,6 +35,26 @@ namespace ServicioHydrate.Data
         public DbSet<Producto> Productos { get; set; }
     
         public DbSet<ComentarioArchivado> ComentariosArchivados { get; set; }
+
+        public DbSet<Perfil> Perfiles { get; set; }
+
+        public DbSet<Pais> Paises { get; set; }
+
+        public DbSet<Entorno> Entornos { get; set; }
+
+        public DbSet<ActividadFisica> RegistrosDeActFisica { get; set; } 
+
+        public DbSet<DatosDeActividad> DatosDeActividades { get; set; }
+
+        public DbSet<DatosMedicos> DatosMedicos { get; set; }
+
+        public DbSet<Meta> Metas { get; set; }
+
+        public DbSet<Etiqueta> Etiquetas { get; set; }
+
+        public DbSet<RegistroDeHidratacion> RegistrosDeHidratacion { get; set; }
+
+        public DbSet<Rutina> RutinasDeActFisica { get; set; }
 
         public DbSet<LlaveDeApi> LlavesDeAPI { get; set; }
 
@@ -112,6 +133,81 @@ namespace ServicioHydrate.Data
                 .HasMany(p => p.OrdenesDelProducto)
                 .WithOne(po => po.Producto)
                 .HasForeignKey(po => po.IdProducto);
+
+            // Relación uno a muchos entre Pais y Perfil.
+            modelBuilder.Entity<Pais>()
+                .HasMany(pa => pa.Perfiles)
+                .WithOne(pe => pe.PaisDeResidencia);
+
+            modelBuilder.Entity<Perfil>()
+                .HasOne(p => p.Cuenta)
+                .WithOne(u => u.PerfilDeUsuario)
+                .HasForeignKey<Perfil>(p => p.IdCuentaUsuario);
+
+            // Definir llaves primarias compuestas para todas las 
+            // entidades asociadas con un Perfil. 
+            // (Esto es para identificar los registros de distintos usuarios.)
+            modelBuilder.Entity<ActividadFisica>()
+                .HasKey(af => new { af.Id, af.IdPerfil });
+                
+            modelBuilder.Entity<DatosMedicos>()
+                .HasKey(dm => new { dm.Id, dm.IdPerfil });
+
+            modelBuilder.Entity<Etiqueta>()
+                .HasKey(e => new { e.Id, e.IdPerfil });
+
+            modelBuilder.Entity<ReporteSemanal>()
+                .HasKey(hs => new { hs.Id, hs.IdPerfil });
+
+            modelBuilder.Entity<Meta>()
+                .HasKey(m => new { m.Id, m.IdPerfil });
+
+            modelBuilder.Entity<RegistroDeHidratacion>()
+                .HasKey(rh => new { rh.Id, rh.IdPerfil });
+
+            modelBuilder.Entity<Rutina>()
+                .HasKey(ru => new { ru.Id, ru.IdPerfil });
+
+            // Determinar las relaciones entre entidades de datos de perfil.
+            modelBuilder.Entity<ActividadFisica>()
+                .HasOne(af => af.PerfilDeUsuario)
+                .WithMany(p => p.RegistrosDeActFisica);
+                
+            modelBuilder.Entity<DatosMedicos>()
+                .HasOne(dm => dm.PerfilDeUsuario)
+                .WithMany(p => p.RegistrosMedicos);
+
+            modelBuilder.Entity<Etiqueta>()
+                .HasOne(e => e.PerfilDeUsuario)
+                .WithMany(p => p.Etiquetas);
+
+            modelBuilder.Entity<ReporteSemanal>()
+                .HasOne(hs => hs.PerfilDeUsuario)
+                .WithMany(p => p.ReportesSemanales);
+
+            modelBuilder.Entity<Meta>()
+                .HasOne(m => m.PerfilDeUsuario)
+                .WithMany(p => p.Metas);
+
+            modelBuilder.Entity<RegistroDeHidratacion>()
+                .HasOne(rh => rh.PerfilDeUsuario)
+                .WithMany(p => p.RegistrosDeHidratacion);
+
+            modelBuilder.Entity<Rutina>()
+                .HasOne(r => r.PerfilDeUsuario)
+                .WithMany(p => p.Rutinas);
+            
+            // Relacion muchos-a-muchos entre Meta y Etiqueta.
+            modelBuilder.Entity<Meta>()
+                .HasMany(m => m.Etiquetas)
+                .WithMany(e => e.Metas)
+                .UsingEntity(j => j.ToTable("Etiquetas_De_Meta"));
+
+            // Relacion uno-a-uno entre ActividadFisica y Rutina.
+            modelBuilder.Entity<Rutina>()
+                .HasOne(r => r.RegistroDeActividad)
+                .WithOne(af => af.Rutina)
+                .HasForeignKey<Rutina>(r => new { Id = r.IdActividad, r.IdPerfil });
                 
             // Relación uno a muchos entre Usuario y LlaveDeAPI
             modelBuilder.Entity<Usuario>()
