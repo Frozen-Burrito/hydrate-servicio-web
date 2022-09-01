@@ -245,3 +245,13 @@ a.elemento-drawer > .sufijo > button {
 .panel-contenido > h3 {
   margin-top: 2.4rem;
 }
+
+@media screen and (max-width: 600px) {
+  .contenedor-drawer.activo.left > .wrap-btn-cerrar-drawer {
+    left: 71vw;
+  }
+
+  .contenedor-drawer.activo.left > .menu-drawer {
+    width: 70vw;
+  }
+}

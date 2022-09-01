@@ -1,16 +1,13 @@
 @import url("../../styles.css");
 
 .banner {
-  position: relative;
   width: 100%;
   height: 80vh;
-  background: url("luca-bravo-qCA6EULMskk-unsplash.jpg");
-  background-size: cover;
+  background: url("luca-bravo-qCA6EULMskk-unsplash.jpg") no-repeat center center/cover;
   background-attachment: fixed;
 }
 
 .color-contrast {
-  position: relative;
   width: 100%;
   height: 100%;
   background-color: var(--contraste-superficie-claro);
@@ -19,17 +16,12 @@
 }
 
 .container-text {
-  position: relative;
-  width: 80vw;
+  width: 90%;
   height: 100%;
-  padding: 0 2rem;
+  padding: 0 32px;
   display: flex;
   justify-content: center;
   flex-direction: column;
-}
-
-.text-flex {
-  margin: 1.5rem 0;
 }
 
 .text {
@@ -39,7 +31,6 @@
 }
 
 .together {
-  position: relative;
   display: flex;
   margin-bottom: 3.5rem;
 }
@@ -59,7 +50,6 @@
 }
 
 .info-container {
-  position: relative;
   padding: 4.5rem 0;
   width: 100%;
   height: 13vh;
@@ -68,7 +58,6 @@
 }
 
 .box-info {
-  position: relative;
   width: 80vw;
   height: 100%;
   padding: 0 2rem;
@@ -81,16 +70,13 @@
 }
 
 .home-second-part {
-  position: relative;
   width: 100vw;
   min-height: 100vh;
   display: flex;
 }
 
 .bottle-definition-box {
-  position: relative;
   width: 65vw;
-  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -98,7 +84,6 @@
 }
 
 .img-definition-box {
-  position: relative;
   width: 35vw;
   background: url("svitlana-arFB7nh1aQE-unsplash.jpg");
   background-size: cover;
@@ -108,7 +93,6 @@
 
 .bottle-definition-container-up {
   padding: 2.4rem 7.2rem;
-  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -118,7 +102,6 @@
 }
 
 .bottle-definition-container-down {
-  position: relative;
   width: 100%;
   padding: 1.2rem 0;
   background: var(--primario-claro);
@@ -139,7 +122,6 @@
 }
 
 .text-description-container-up {
-  position: relative;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -156,4 +138,16 @@
 
 .text-description-up {
   font-size: 1.15rem;
+}
+
+@media screen and (max-width: 840px) {
+
+  .banner {
+    width: 100%;
+  }
+
+  .together {
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
 }

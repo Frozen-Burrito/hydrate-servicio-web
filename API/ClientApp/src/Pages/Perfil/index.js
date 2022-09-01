@@ -1,3 +1,5 @@
+import './perfil.css';
+
 import React, { useState } from "react";
 
 import { Layout, Avatar, DrawerPerfil } from "../../components";
@@ -16,12 +18,85 @@ export function PaginaPerfil() {
       />
 
       <section className='contenedor full-page py-5'>
-        <div className="stack horizontal justify-between gap-2 my-3">
+        <div className="stack horizontal gap-2 my-3" style={{ display: 'flex', justifyContent: 'center' }}>
           <h3>Perfil del Usuario</h3>
         </div>
 
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", justifyContent: 'center' }}>
           <Avatar alt="Juan Perez" />
+        </div>
+
+        <div className='contenedor-perfil' >
+          <div className='izquierda-perfil' >
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                person
+              </span>
+              <input 
+              type="text" 
+              name="nombre" 
+              className="input" 
+              placeholder='Nombre' 
+              />
+            </div>
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                person
+              </span>
+              <input 
+              type="text" 
+              name="nombreUsuario" 
+              className="input" 
+              placeholder='Nombre del usuario' 
+              />
+            </div>
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                language
+              </span>
+                <input 
+                type="text" 
+                name="pais" 
+                className="input" 
+                placeholder='País' 
+                />
+            </div>
+          </div>
+          <div className='derecha-perfil' >
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                person
+              </span>
+              <input 
+              type="text" 
+              name="apellido" 
+              className="input" 
+              placeholder='Apellido' 
+              />
+            </div>
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                email
+              </span>
+              <input 
+              type="text" 
+              name="correo" 
+              className="input" 
+              placeholder='Correo Electrónico' 
+              />
+            </div>
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                calendar_month
+              </span>
+                <input 
+                type="text" 
+                name="edad" 
+                className="input" 
+                placeholder='Edad' 
+                />
+            </div>
+          </div>
         </div>
       </section>
     </Layout>

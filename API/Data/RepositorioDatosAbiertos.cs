@@ -12,9 +12,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioDatosAbiertos : IServicioDatosAbiertos
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioDatosAbiertos(ContextoDBMysql contexto)
+        public RepositorioDatosAbiertos(ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }

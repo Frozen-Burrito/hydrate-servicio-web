@@ -14,9 +14,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioPerfiles : IServicioPerfil
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioPerfiles(IWebHostEnvironment env, ContextoDBMysql contexto)
+        public RepositorioPerfiles(IWebHostEnvironment env, ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
