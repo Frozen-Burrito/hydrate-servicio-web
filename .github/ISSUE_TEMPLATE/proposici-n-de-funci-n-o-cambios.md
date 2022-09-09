@@ -16,5 +16,5 @@ Una descripción breve y clara de lo que te gustaría que cambiara o sucediera.
 **Describle las alternativas que hayas considerado**
 Un resumen de las posibles soluciones alternativas que has reflexionado.
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Contexto Adicional**
+Agrega más información o screenshots sobre la proposición de nueva función aquí.
