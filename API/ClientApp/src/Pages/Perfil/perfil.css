@@ -9,6 +9,10 @@
     font-size: 60px;
 }
 
+.titulo-perfil {
+    margin-left: 20px;
+}
+
 .contenedor-perfil {
     display: flex;
     justify-content: space-around;
@@ -67,7 +71,19 @@
     font-weight: 500;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
+
+    .contenedor-titulo {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .titulo-perfil,
+    .btn-editar {
+        justify-content: center;
+        margin-left: 0px;
+    }
+
     .contenedor-perfil {
         flex-direction: column;
     }

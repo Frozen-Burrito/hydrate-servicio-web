@@ -2,7 +2,11 @@ import './perfil.css';
 
 import React, { useState } from "react";
 
+import useCookie from "../../utils/useCookie";
+import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
+
 import { Layout, Avatar, DrawerPerfil } from "../../components";
+import { Link } from 'react-router-dom';
 
 export function PaginaPerfil() {
 
@@ -18,8 +22,13 @@ export function PaginaPerfil() {
       />
 
       <section className='contenedor full-page py-5'>
-        <div className="stack horizontal gap-2 my-3" style={{ display: 'flex', justifyContent: 'center' }}>
-          <h3>Perfil del Usuario</h3>
+        <div className="stack contenedor-titulo gap-2 my-3" >
+          <div style={{ width: '50%', display: 'flex', justifyContent: 'start' }} className='titulo-perfil' >
+            <h3 style={{ textAlign: 'center' }}>Perfil del Usuario</h3>
+          </div>
+          <div style={{ width: '50%', display: 'flex', justifyContent: 'center' }} className='btn-editar' >
+            <button className={`btn btn-primario`} >Editar</button>
+          </div>
         </div>
 
         <div style={{ display: "flex", justifyContent: 'center' }}>

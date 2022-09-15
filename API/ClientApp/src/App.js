@@ -68,6 +68,24 @@ function App() {
           } 
         />
 
+        {/* <Route path="/datos-abiertos/:idUsuario" exact component={Pages.DatosAbiertos} />
+
+        <Route path="/datos-abiertos/:idUsuario/calidad" 
+          component={
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaComentariosPerfil /></RutaProtegida>
+          } 
+        />
+        <Route path="/datos-abiertos/:idUsuario/metas" 
+          component={
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaTableroPerfil /></RutaProtegida>
+          } 
+        />
+        <Route path="/datos-abiertos/:idUsuario/consumo" 
+          component={
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaOrdenesUsuario /></RutaProtegida>
+          } 
+        /> */}
+
         <Route path="/admin/comentarios" 
           component={
             () => <RutaProtegida rolRequerido={"MODERADOR_COMENTARIOS"}> <Pages.PaginaAdminComentarios /> </RutaProtegida>
