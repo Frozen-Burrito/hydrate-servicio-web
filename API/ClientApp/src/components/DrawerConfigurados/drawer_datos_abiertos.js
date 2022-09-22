@@ -61,7 +61,7 @@ export default function DrawerDatosAbiertos(props) {
         key={indice}
         icono={item.icono}
         texto={item.texto}
-        url={`/perfil/${idUsuario}${item.url}`}
+        url={`/datos-abiertos${item.url}`}
         seleccionado={indiceItemActivo === indice}
         />
     ));

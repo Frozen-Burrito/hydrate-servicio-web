@@ -4,7 +4,6 @@
 // Rutas comunes.
 export { Home } from './Home/Home';
 export { AboutUs } from './AboutUs/AboutUs';
-// export { DatosAbiertos } from './DatosAbiertos/DatosAbiertos';
 export { Products } from './Products/Products';
 export { PaginaGuiasDeUsuario } from './GuiasUsuario/pagina_guias_usuario';
 export { InicioSesion } from './InicioSesion/InicioSesion';
@@ -17,6 +16,8 @@ export { PaginaGenerarLlaveAPI } from './pagina_generar_llave_api';
 // Rutas de Datos Abiertos
 export { DatosAbiertos } from './DatosAbiertos';
 export { PaginaCalidadDatosAbiertos } from './DatosAbiertos/pagina_calidad_datos_abiertos';
+export { PaginaMetasDatosAbiertos } from './DatosAbiertos/pagina_metas_datos_abiertos';
+export { PaginaConsumoDatosAbiertos } from './DatosAbiertos/pagina_consumo_datos_abiertos';
 
 // Rutas de perfil de usuario.
 export { PaginaPerfil } from './Perfil';

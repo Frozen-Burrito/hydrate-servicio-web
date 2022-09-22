@@ -1,16 +1,16 @@
-import React, { useState } from 'react'
-import { Layout, DrawerDatosAbiertos } from '../../components'
+import React, { useState } from 'react';
+import { Layout, DrawerDatosAbiertos } from '../../components';
 
-export function PaginaCalidadDatosAbiertos() {
+export function PaginaConsumoDatosAbiertos() {
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
+    const [drawerVisible, setDrawerVisible] = useState(false);
 
   return (
     <Layout>
         <DrawerDatosAbiertos
             lado="izquierda"
             mostrar={drawerVisible}
-            indiceItemActivo={1}
+            indiceItemActivo={3}
             onToggle={() => setDrawerVisible(!drawerVisible)}
         />
 

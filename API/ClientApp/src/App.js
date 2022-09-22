@@ -34,7 +34,7 @@ function App() {
           <Pages.Home />
         </Route>
         <Route path="/about" component={Pages.AboutUs} />
-        <Route path="/datos-abiertos" component={Pages.DatosAbiertos} />
+        {/* <Route path="/datos-abiertos" component={Pages.DatosAbiertos} /> */}
         <Route path="/productos" component={Pages.Products} />
         <Route path="/guias" component={Pages.PaginaGuiasDeUsuario} />
         <Route path="/comentarios" exact component={Pages.ComentariosPage} />
@@ -68,23 +68,23 @@ function App() {
           } 
         />
 
-        {/* <Route path="/datos-abiertos/:idUsuario" exact component={Pages.DatosAbiertos} />
+        <Route path="/datos-abiertos" exact component={Pages.DatosAbiertos} />
 
-        <Route path="/datos-abiertos/:idUsuario/calidad" 
+        <Route path="/datos-abiertos/calidad" 
           component={
-            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaComentariosPerfil /></RutaProtegida>
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaCalidadDatosAbiertos /></RutaProtegida>
           } 
         />
-        <Route path="/datos-abiertos/:idUsuario/metas" 
+        <Route path="/datos-abiertos/metas" 
           component={
-            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaTableroPerfil /></RutaProtegida>
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaMetasDatosAbiertos /></RutaProtegida>
           } 
         />
-        <Route path="/datos-abiertos/:idUsuario/consumo" 
+        <Route path="/datos-abiertos/consumo" 
           component={
-            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaOrdenesUsuario /></RutaProtegida>
+            () => <RutaProtegida rolRequerido={"NINGUNO"}> <Pages.PaginaConsumoDatosAbiertos /></RutaProtegida>
           } 
-        /> */}
+        />
 
         <Route path="/admin/comentarios" 
           component={
