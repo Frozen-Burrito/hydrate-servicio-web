@@ -6,7 +6,7 @@ using ServicioHydrate.Modelos.Datos;
 #nullable enable
 namespace ServicioHydrate.Modelos.DTO.Datos
 {
-    public class DTOActividad 
+    public class DTORegistroActividad 
     {
         public int Id { get; set; }
 
@@ -31,7 +31,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
     
         public bool FueAlAireLibre { get; set; }
 
-        public int IdDatosDeActividad { get; set; }
+        public int IdTipoDeActividad { get; set; }
         public DTODatosActividad? DatosDeActividad { get; set; }
 
         public DTORutina? Rutina { get; set; }
@@ -40,7 +40,8 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
         public ActividadFisica ComoNuevoModelo(
             DatosDeActividad datosDeActividad, 
-            Rutina rutina,
+            Perfil perfilDeUsuario,
+            Rutina? rutina,
             bool esParteDeDatosAbiertos = false
         ) 
         {
@@ -56,6 +57,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
             return new ActividadFisica
             {
+                Id = this.Id,
                 IdPerfil = this.IdPerfil,
                 Titulo = this.Titulo,
                 Fecha = fecha,
@@ -64,6 +66,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 KcalQuemadas = this.KcalQuemadas,
                 FueAlAireLibre = this.FueAlAireLibre,
                 DatosActividad = datosDeActividad,
+                PerfilDeUsuario = perfilDeUsuario,
                 Rutina = rutina,
                 EsInformacionAbierta = esParteDeDatosAbiertos,
             };

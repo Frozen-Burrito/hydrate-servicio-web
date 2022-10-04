@@ -17,11 +17,11 @@ namespace ServicioHydrate.Data
     public class RepositorioUsuarios : IServicioUsuarios
     {
         // El contexto de EF para la base de datos.
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
         // Generador de JWT, utilizado por la autenticación. 
         private readonly GeneradorDeToken _generadorToken;
 
-        public RepositorioUsuarios(ContextoDBMysql contexto, GeneradorDeToken generadorToken)
+        public RepositorioUsuarios(ContextoDBSqlite contexto, GeneradorDeToken generadorToken)
         {
             this._contexto = contexto;
             this._generadorToken = generadorToken;
@@ -65,7 +65,7 @@ namespace ServicioHydrate.Data
             }
 
             // Buscar un usuario en la base de datos con el username o email recibidos.
-            var usuario = await _contexto.Usuarios.SingleOrDefaultAsync(
+            Usuario? usuario = await _contexto.Usuarios.SingleOrDefaultAsync(
                 u => (u.NombreUsuario == infoUsuario.NombreUsuario || 
                       u.Email == infoUsuario.Email)
             );
@@ -102,10 +102,32 @@ namespace ServicioHydrate.Data
             }
 
             // En este punto, la cuenta de usuario existe y las contraseñas coinciden.
+            Perfil? perfil = await _contexto.Perfiles
+                .SingleOrDefaultAsync(p => (p.IdCuentaUsuario == usuario.Id));
+
+            int idPerfil = -1;
+
+            // Revisar si todavía no existe un perfil para la cuenta de usuario. En ese 
+            // caso, crear un nuevo perfil asociado a la cuenta.
+            if (perfil is null) 
+            {
+                Perfil nuevoPerfil = new Perfil
+                {
+                    IdCuentaUsuario = usuario.Id,
+                };
+
+                _contexto.Perfiles.Add(nuevoPerfil);
+                await _contexto.SaveChangesAsync();
+
+                idPerfil = nuevoPerfil.Id;
+            } else 
+            {
+                idPerfil = perfil.Id;
+            }
 
             // Utilizando GeneradorDeToken.Generar, generar el JWT de autenticación para 
             // el usuario. Luego, retornar la RespuestaDeAutenticación.
-            string jwt = _generadorToken.Generar(usuario);
+            string jwt = _generadorToken.Generar(usuario, idPerfil);
             
             // Obtener un DTO de RespuestaDeAutenticación.
             var datosUsuario = new DTORespuestaAutenticacion{ Token = jwt };
@@ -217,8 +239,48 @@ namespace ServicioHydrate.Data
             modeloUsuario.Id = new Guid();
 
             // Agregar el nuevo objeto Usuario al contexto de la base de
-            // datos. Luego, guardar los cambios al contexto.
+            // datos. 
             _contexto.Usuarios.Add(modeloUsuario);
+
+            Perfil? perfil = await _contexto.Perfiles
+                .SingleOrDefaultAsync(p => (p.IdCuentaUsuario == modeloUsuario.Id));
+
+            int idPerfil = -1;
+
+            // Revisar si todavía no existe un perfil para la cuenta de usuario. En ese 
+            // caso, crear un nuevo perfil asociado a la cuenta.
+            if (perfil is null) 
+            {
+                Perfil nuevoPerfil = new Perfil
+                {
+                    IdCuentaUsuario = modeloUsuario.Id,
+                };
+
+                _contexto.Perfiles.Add(nuevoPerfil);
+
+                idPerfil = nuevoPerfil.Id;
+
+                perfil = nuevoPerfil;
+            } else 
+            {
+                idPerfil = perfil.Id;
+            }
+
+            Configuracion? config = await _contexto.Configuraciones
+                .Include(c => c.Perfil)
+                .AsSplitQuery()
+                .Where(c => c.Perfil.Id.Equals(idPerfil) && c.Perfil.IdCuentaUsuario.Equals(modeloUsuario.Id))
+                .FirstOrDefaultAsync();
+
+            if (config is null) 
+            {
+                Configuracion nuevaConfiguracion = Configuracion.PorDefecto();
+                nuevaConfiguracion.Perfil = perfil;
+
+                _contexto.Configuraciones.Add(nuevaConfiguracion);
+            } 
+
+            // Luego, guardar los cambios al contexto.
             await _contexto.SaveChangesAsync();
 
             return modeloUsuario.ComoDTO();

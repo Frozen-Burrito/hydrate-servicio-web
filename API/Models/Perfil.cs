@@ -46,6 +46,10 @@ namespace ServicioHydrate.Modelos
 		public int IdEntornoSeleccionado { get; set; }
 		public ICollection<Entorno> EntornosDesbloqueados { get; set; }
 
+		public virtual Configuracion Configuracion { get; set; }
+
+		public virtual TokenFCM TokenFCM { get; set; }
+
 		// Datos asociados al perfil.
 		public virtual ICollection<ActividadFisica> RegistrosDeActFisica { get; set; }
 		public virtual ICollection<DatosMedicos> RegistrosMedicos { get; set; }

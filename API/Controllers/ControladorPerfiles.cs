@@ -11,6 +11,7 @@ using System.Security.Claims;
 using ServicioHydrate.Data;
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.Enums;
+using ServicioHydrate.Modelos;
 
 #nullable enable
 namespace ServicioHydrate.Controladores
@@ -72,7 +73,9 @@ namespace ServicioHydrate.Controladores
 
                 var perfil = await _repoPerfiles.GetPerfilPorId(idUsuarioActual, idPerfil);
 
-                return Ok(perfil);
+                DTOPerfil? perfilDTO = perfil.ComoDTO();
+
+                return Ok(perfilDTO);
             }
             catch (FormatException e) 
             {
@@ -269,6 +272,182 @@ namespace ServicioHydrate.Controladores
                     "Ocurrió un error al procesar la petición. Intente más tarde.", 
                     statusCode: StatusCodes.Status503ServiceUnavailable
                 );
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Busca un perfil que identificado por el ID perfil de la URL y el ID de usuario 
+        /// del JWT, para luego retornar la configuración asociada al perfil. 
+        /// </summary>
+        /// <remarks>
+        /// Siempre retorna la configuración para uno de los perfiles del usuario autenticado. 
+        /// No es posible obtener la configuración de perfil de usuarios ajenos.
+        /// 
+        /// Si el perfil es nuevo y no tiene una configuración asociada, se creará un registro
+        /// con la configuración por defecto.
+        /// </remarks>
+        /// <param name="idPerfil">El ID del perfil seleccionado por el usuario.</param>
+        /// <returns>El DTO de la configuración para el perfil, o un error.</returns>
+        [HttpGet("{idPerfil}/configuracion")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOConfiguracion))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> GetConfiguracionDePerfil(int idPerfil)
+        {
+            // Registrar un log de la petición.
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                // Obtener el ID del usuario actual desde el JWT.
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
+                Guid idUsuarioActual = new Guid(idStr);
+
+                DTOConfiguracion? configuracion = await _repoPerfiles.GetConfiguracionDelPerfil(idUsuarioActual, idPerfil);
+
+                return Ok(configuracion);
+            }
+            catch (FormatException e) 
+            {
+                _logger.LogInformation("Usuario no autorizado");
+                return Unauthorized("El ID de usuario recibido en el JWT no es válido." + e.Message);
+            }
+            catch (ArgumentException e)
+            {
+                // No existe un perfil con el idPerfil e idUsuario especificados. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Busca un perfil que identificado por el ID perfil de la URL y el ID de usuario 
+        /// del JWT, para actualizar la configuración asociada al perfil con los cambios
+        /// descritos en cambiosDeConfiguracion.
+        /// </summary>
+        /// <remarks>
+        /// Siempre retorna la configuración para uno de los perfiles del usuario autenticado. 
+        /// No es posible obtener la configuración de perfil de usuarios ajenos.
+        /// 
+        /// Si el perfil es nuevo y no tiene una configuración asociada, se creará un registro
+        /// con la configuración por defecto.
+        /// </remarks>
+        /// <param name="idPerfil">El ID del perfil seleccionado por el usuario.</param>
+        /// <returns>El DTO de la configuración para el perfil, o un error.</returns>
+        [HttpPatch("{idPerfil}/configuracion")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOConfiguracion))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> ModificarConfiguracionDePerfil(int idPerfil, [FromBody] DTOConfiguracion cambiosDeConfiguracion)
+        {
+            // Registrar un log de la petición.
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                // Obtener el ID del usuario actual desde el JWT.
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
+                Guid idUsuarioActual = new Guid(idStr);
+
+                DTOConfiguracion? configModificada = await _repoPerfiles.ModificarConfiguracionDelPerfil(
+                    idUsuarioActual, 
+                    idPerfil,
+                    cambiosDeConfiguracion
+                );
+
+                return Ok(configModificada);
+            }
+            catch (FormatException e) 
+            {
+                _logger.LogInformation("Usuario no autorizado");
+                return Unauthorized("El ID de usuario recibido en el JWT no es válido." + e.Message);
+            }
+            catch (ArgumentException e)
+            {
+                // No existe un perfil con el idPerfil e idUsuario especificados. Retorna 404.
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                // Hubo un error inesperado. Enviarlo a los logs y retornar 500.
+                _logger.LogError(e, $"Error no identificado en {metodo} - {ruta}");
+
+                return Problem("Ocurrió un error al procesar la petición. Intente más tarde.");
+            }
+        }
+
+        /// <summary>
+        /// Busca un perfil que identificado por el ID perfil de la URL y el ID de usuario 
+        /// del JWT, para actualizar su token de registro de FCM. El servidor guarda 
+        /// automáticamente el timestamp.
+        /// </summary>
+        /// <remarks>
+        /// Siempre actualiza el FCM de uno de los perfiles del usuario autenticado. 
+        /// No es posible modificar el FCM de usuarios ajenos.
+        /// 
+        /// Si el perfil no ha registrado un token de FCM previamente, crea un nuevo 
+        /// registro y guarda el token recibido.
+        /// </remarks>
+        /// <param name="idPerfil">El ID del perfil seleccionado por el usuario.</param>
+        /// <returns>El DTO de la configuración para el perfil, o un error.</returns>
+        [HttpPut("{idPerfil}/fcm")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> ActualizarTokenFCM(int idPerfil, [FromBody] DTOTokenFCM nuevoToken)
+        {
+            // Registrar un log de la petición.
+            string strFecha = DateTime.Now.ToString("G");
+            string metodo = Request.Method.ToString();
+            string ruta = Request.Path.Value ?? "/";
+            _logger.LogInformation($"[{strFecha}] {metodo} - {ruta}");
+
+            try
+            {
+                // Obtener el ID del usuario actual desde el JWT.
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
+                Guid idUsuarioActual = new Guid(idStr);
+
+                await _repoPerfiles.ActualizarTokenFCM(idUsuarioActual, idPerfil, nuevoToken);
+
+                return NoContent();
+            }
+            catch (FormatException e) 
+            {
+                _logger.LogInformation("Usuario no autorizado");
+                return Unauthorized("El ID de usuario recibido en el JWT no es válido." + e.Message);
+            }
+            catch (ArgumentException e)
+            {
+                // No existe un perfil con el idPerfil e idUsuario especificados. Retorna 404.
+                return NotFound(e.Message);
             }
             catch (Exception e)
             {

@@ -79,6 +79,7 @@ namespace ServicioHydrate
 
             services.AddScoped<IServicioPerfil, RepositorioPerfiles>();
 
+            services.AddScoped<IServicioDatos, RepositorioDatos>();
             services.AddScoped<IServicioDatosAbiertos, RepositorioDatosAbiertos>();
 
             services.AddScoped<IServicioLlavesDeAPI, RepositorioLlavesDeAPI>();

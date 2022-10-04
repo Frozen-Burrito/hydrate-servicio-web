@@ -14,9 +14,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioPerfiles : IServicioPerfil
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioPerfiles(IWebHostEnvironment env, ContextoDBMysql contexto)
+        public RepositorioPerfiles(IWebHostEnvironment env, ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
@@ -67,6 +67,45 @@ namespace ServicioHydrate.Data
             await _contexto.SaveChangesAsync();
         }
 
+        public async Task ActualizarTokenFCM(Guid idCuentaUsuario, int idPerfil, DTOTokenFCM tokenActualizado)
+        {
+            if (await _contexto.Perfiles.CountAsync() <= 0) 
+            {
+                throw new ArgumentException("No existe el perfil de usuario solicitado.");
+            }
+
+            Perfil? perfil = await _contexto.Perfiles
+                .Where(p => p.IdCuentaUsuario.Equals(idCuentaUsuario) && p.Id == idPerfil)
+                .FirstOrDefaultAsync();
+
+            if (perfil is null)
+            {
+                throw new ArgumentException("No existe un perfil con el ID especificado.");
+            }
+
+            TokenFCM? tokenFCM = null;
+
+            if (await _contexto.Perfiles.CountAsync() > 0) 
+            {
+                tokenFCM = await _contexto.TokensParaNotificaciones
+                    .Include(t => t.Perfil)
+                    .AsSplitQuery()
+                    .Where(t => (t.Perfil.IdCuentaUsuario.Equals(idCuentaUsuario) && t.Perfil.Id.Equals(idPerfil)))
+                    .FirstOrDefaultAsync();
+            }
+
+            if (tokenFCM is null) 
+            {
+                 _contexto.TokensParaNotificaciones.Add(tokenActualizado.ComoNuevoModelo());
+            } else 
+            {
+                tokenFCM.Actualizar(tokenActualizado);
+                _contexto.Entry(tokenFCM).State = EntityState.Modified;
+            }
+
+            await _contexto.SaveChangesAsync();
+        }
+
         public async Task EliminarPerfil(Guid idCuentaUsuario, int idPerfil)
         {
             if (await _contexto.Perfiles.CountAsync() <= 0) 
@@ -85,6 +124,45 @@ namespace ServicioHydrate.Data
 
             _contexto.Perfiles.Remove(perfil);
             await _contexto.SaveChangesAsync();
+        }
+
+        public async Task<DTOConfiguracion> GetConfiguracionDelPerfil(Guid idCuentaUsuario, int idPerfil)
+        {
+            if (await _contexto.Perfiles.CountAsync() <= 0) 
+            {
+                throw new ArgumentException("No existe el perfil de usuario solicitado.");
+            }
+
+            Perfil? perfil = await _contexto.Perfiles
+                .Where(p => p.Id.Equals(idPerfil) && p.IdCuentaUsuario.Equals(idCuentaUsuario))
+                .FirstOrDefaultAsync();
+
+            if (perfil is null) 
+            {
+                throw new ArgumentException("No existe un perfil con el ID especificado");
+            }
+
+            Configuracion? config = await _contexto.Configuraciones
+                .Include(c => c.Perfil)
+                .AsSplitQuery()
+                .Where(c => (c.Perfil.Id == perfil.Id && c.Perfil.IdCuentaUsuario == idCuentaUsuario))
+                .FirstOrDefaultAsync();
+
+            // Si no hay un registro con la configuración del usuario, crear 
+            // uno nuevo con configuración por defecto.
+            if (config is null) 
+            {
+                config = Configuracion.PorDefecto();
+                _contexto.Configuraciones.Add(config);
+                await _contexto.SaveChangesAsync();
+
+                if (config is null)
+                {
+                    throw new Exception("No fue posible obtener la configuración del perfil");
+                }
+            }
+
+            return config.ComoDTO();
         }
 
         public async Task<Perfil> GetPerfilPorId(Guid idCuentaUsuario, int idPerfil)
@@ -107,6 +185,38 @@ namespace ServicioHydrate.Data
             }
 
             return perfil;
+        }
+
+        public async Task<DTOConfiguracion> ModificarConfiguracionDelPerfil(Guid idCuentaUsuario, int idPerfil, DTOConfiguracion cambiosDeConfiguracion)
+        {
+            if (await _contexto.Configuraciones.CountAsync() <= 0) 
+            {
+                throw new ArgumentException("No existen configuraciones registradas para perfiles de usuario.");
+            }
+
+            Configuracion? config = await _contexto.Configuraciones
+                .Include(c => c.Perfil)
+                .AsSplitQuery()
+                .Where(c => c.Perfil.Id.Equals(idPerfil) && c.Perfil.IdCuentaUsuario.Equals(idCuentaUsuario))
+                .FirstOrDefaultAsync();
+
+            if (config is null) 
+            {
+                config = Configuracion.PorDefecto();
+            }
+
+            config.Actualizar(cambiosDeConfiguracion);
+
+            _contexto.Entry(config).State = EntityState.Modified;
+            int numOfEntriesWritten = await _contexto.SaveChangesAsync();
+
+            // Revisar si no fue posible persistir los cambios.
+            if (numOfEntriesWritten <= 0) 
+            {
+                throw new DbUpdateException("No fue posible persistir los cambios de configuración.");
+            }
+
+            return config.ComoDTO();
         }
 
         public async Task<DTOPerfil> RegistrarPerfilExistente(DTOPerfil perfil, DTOUsuario cuentaUsuario)

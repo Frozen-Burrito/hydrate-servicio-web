@@ -35,6 +35,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
 			return new RegistroDeHidratacion 
 			{
+				Id = this.Id,
 				CantidadEnMl = this.CantidadEnMl,
                 PorcentajeCargaBateria = this.PorcentajeCargaBateria,
                 TemperaturaAproximada = this.TemperaturaAproximada,

@@ -38,9 +38,9 @@ namespace ServicioHydrate.Modelos.Datos
 
         public bool EsInformacionAbierta { get; set; }
 
-        public DTOActividad ComoDTO() 
+        public DTORegistroActividad ComoDTO() 
         {
-            return new DTOActividad
+            return new DTORegistroActividad
             {
                 Id = this.Id,
                 IdPerfil = this.IdPerfil,

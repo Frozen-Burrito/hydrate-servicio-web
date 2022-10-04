@@ -12,9 +12,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioDatosAbiertos : IServicioDatosAbiertos
     {
-        private readonly ContextoDBMysql _contexto;
+        private readonly ContextoDBSqlite _contexto;
 
-        public RepositorioDatosAbiertos(ContextoDBMysql contexto)
+        public RepositorioDatosAbiertos(ContextoDBSqlite contexto)
         {
             this._contexto = contexto;
         }
@@ -68,10 +68,10 @@ namespace ServicioHydrate.Data
                 case TipoDeDatosAbiertos.ACTIVIDAD_FISICA:
                     if (await _contexto.RegistrosDeActFisica.CountAsync() <= 0)
                     {
-                        return new List<DTOActividad>();
+                        return new List<DTORegistroActividad>();
                     }
 
-                    IEnumerable<DTOActividad> registrosAct = await _contexto.RegistrosDeActFisica
+                    IEnumerable<DTORegistroActividad> registrosAct = await _contexto.RegistrosDeActFisica
                         .OrderByDescending(ra => ra)
                         .Select(ra => ra.ComoDTO())
                         .ToListAsync();
@@ -83,14 +83,14 @@ namespace ServicioHydrate.Data
             } 
         }
 
-        public async Task<ICollection<DTOActividad>> GetDatosDeActividad(FiltrosPorPerfil filtros, DTOParamsPagina paramsPagina)
+        public async Task<ICollection<DTORegistroActividad>> GetDatosDeActividad(FiltrosPorPerfil filtros, DTOParamsPagina paramsPagina)
         {
             if (await _contexto.RegistrosDeActFisica.CountAsync() == 0) 
             {
-                return (ICollection<DTOActividad>) new List<DTOActividad>();
+                return (ICollection<DTORegistroActividad>) new List<DTORegistroActividad>();
             }
 
-            ICollection<DTOActividad> registrosActividad = await _contexto.RegistrosDeActFisica
+            ICollection<DTORegistroActividad> registrosActividad = await _contexto.RegistrosDeActFisica
                 .Where(ra => ra.EsInformacionAbierta)
                 .OrderByDescending(ra => ra.Id)
                 .Select(ra => ra.ComoDTO())

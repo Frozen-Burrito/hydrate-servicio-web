@@ -58,6 +58,10 @@ namespace ServicioHydrate.Data
 
         public DbSet<LlaveDeApi> LlavesDeAPI { get; set; }
 
+        public DbSet<Configuracion> Configuraciones { get; set; }
+
+        public DbSet<TokenFCM> TokensParaNotificaciones { get; set; }
+
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
@@ -214,6 +218,14 @@ namespace ServicioHydrate.Data
                 .HasMany(u => u.LlavesDeAPI)
                 .WithOne(ll => ll.Usuario)
                 .HasForeignKey(ll => ll.IdUsuario);
+
+            modelBuilder.Entity<Configuracion>()
+                .HasOne(c => c.Perfil)
+                .WithOne(p => p.Configuracion);
+
+            modelBuilder.Entity<TokenFCM>()
+                .HasOne(t => t.Perfil)
+                .WithOne(p => p.TokenFCM);
         }
     }
 }

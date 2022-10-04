@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using ServicioHydrate.Modelos.DTO.Datos;
@@ -15,7 +16,22 @@ namespace ServicioHydrate.Modelos.Datos
         public int IdPerfil { get; set; }
         public Perfil PerfilDeUsuario { get; set; }
 
-        public DiasDeLaSemana Dias { get; set; }
+        public int DiasDeOcurrencia { 
+            get 
+            {
+                int bitmaskDias = 0b_0000_0000;
+
+                foreach (var diaDeLaSemana in Dias) 
+                {
+                    bitmaskDias |= (int) diaDeLaSemana;
+                }
+
+                return bitmaskDias;
+            }
+        }
+
+        [NotMapped]
+        public List<DiasDeLaSemana> Dias { get; set; }
 
         public TimeOnly Hora { get; set; }
 
@@ -25,11 +41,15 @@ namespace ServicioHydrate.Modelos.Datos
 
         public DTORutina ComoDTO()
         {
+            int bitsDias = 0;
+
+            this.Dias.ForEach(dia => bitsDias |= (int) dia);
+
             return new DTORutina
             {
                 Id = this.Id,
                 IdPerfil = this.IdPerfil,
-                Dias = this.Dias,
+                Dias = bitsDias,
                 Hora = this.Hora.ToString("o"),
                 IdActividad = this.IdActividad,
             };

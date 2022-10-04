@@ -30,7 +30,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
         public ICollection<DTOEtiqueta> Etiquetas { get; set; }
 
-        public Meta ComoNuevoModelo(ICollection<Etiqueta> etiquetas)
+        public Meta ComoNuevoModelo(ICollection<Etiqueta> etiquetas, Perfil perfil)
         {
             DateTime fechaDeInicio;
 
@@ -54,7 +54,8 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
             return new Meta()
             {
-                IdPerfil = this.IdPerfil,
+                Id = this.Id,
+                IdPerfil = perfil.Id,
                 Plazo = this.Plazo,
                 FechaInicio = fechaDeInicio,
                 FechaTermino = fechaTermino,
