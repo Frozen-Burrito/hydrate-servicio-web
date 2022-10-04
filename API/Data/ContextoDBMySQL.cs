@@ -167,7 +167,7 @@ namespace ServicioHydrate.Data
                 .HasKey(m => new { m.Id, m.IdPerfil });
 
             modelBuilder.Entity<RegistroDeHidratacion>()
-                .HasKey(rh => new { rh.Id, rh.IdPerfil });
+                .HasKey(rh => new { rh.Id, idPerfil = rh.PerfilDeUsuario.Id });
 
             modelBuilder.Entity<Rutina>()
                 .HasKey(ru => new { ru.Id, ru.IdPerfil });

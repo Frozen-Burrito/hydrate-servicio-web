@@ -151,7 +151,7 @@ namespace ServicioHydrate.Data
                 .HasKey(m => new { m.Id, m.IdPerfil });
 
             modelBuilder.Entity<RegistroDeHidratacion>()
-                .HasKey(rh => new { rh.Id, rh.IdPerfil });
+                .HasKey(rh => new { rh.Id, idPerfil = rh.IdPerfil });
 
             modelBuilder.Entity<Rutina>()
                 .HasKey(ru => new { ru.Id, ru.IdPerfil });
@@ -177,9 +177,9 @@ namespace ServicioHydrate.Data
                 .HasOne(m => m.PerfilDeUsuario)
                 .WithMany(p => p.Metas);
 
-            modelBuilder.Entity<RegistroDeHidratacion>()
-                .HasOne(rh => rh.PerfilDeUsuario)
-                .WithMany(p => p.RegistrosDeHidratacion);
+            modelBuilder.Entity<Perfil>()
+                .HasMany(p => p.RegistrosDeHidratacion)
+                .WithOne(rh => rh.PerfilDeUsuario);
 
             modelBuilder.Entity<Rutina>()
                 .HasOne(r => r.PerfilDeUsuario)

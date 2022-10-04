@@ -24,6 +24,9 @@ namespace ServicioHydrate.Modelos.Datos
 
 		public bool EsInformacionAbierta { get; set; }
 
+		[NotMapped]
+		public static int PorcentajeCargaBajo = 15;
+
 		public DTORegistroDeHidratacion ComoDTO() 
 		{
 			return new DTORegistroDeHidratacion 

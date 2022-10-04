@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.Datos;
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.DTO.Datos;
+using ServicioHydrate.Modelos.Enums;
 
 #nullable enable
 namespace ServicioHydrate.Data
@@ -77,8 +80,83 @@ namespace ServicioHydrate.Data
                     esParteDeDatosAbiertos: false
                 ));
 
-            _contexto.AddRange(registros);
+            foreach (var registroHidratacion in registros) 
+            {
+                _contexto.Entry(registroHidratacion).State = EntityState.Modified;
+            }
+
             await _contexto.SaveChangesAsync();
+        }
+
+        public async Task<String?> NotificarAlertaBateria(Guid idCuentaUsuario, int idPerfil)
+        {
+            if (await _contexto.Perfiles.CountAsync() <= 0) 
+            {
+                throw new ArgumentException("No existe el perfil de usuario solicitado.");
+            }
+
+            Perfil? perfil = await _contexto.Perfiles
+                .Where(p => p.Id == idPerfil)
+                .Include(p => p.Configuracion)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync();
+
+            if (perfil is null)
+            {
+                throw new ArgumentException("No existe un perfil con el ID especificado.");
+            }
+
+            String? fcmMessageId = null;
+
+            // Intentar enviar una notificación de alerta de batería, si están activadas
+            // y los registros de hidratación más recientes incluyen un nivel de batería bajo.
+            if (perfil.Configuracion.NotificacionesPermitidas.Contains(TiposDeNotificacion.ALERTAS_BATERIA_DISPOSITIVO))
+            {                
+                IQueryable<RegistroDeHidratacion>? registrosRecientes = _contexto.RegistrosDeHidratacion
+                    .Include(rh => rh.PerfilDeUsuario)
+                    .AsSplitQuery()
+                    .Where(rh => (rh.PerfilDeUsuario.Id.Equals(idPerfil)))
+                    .OrderBy(rh => rh.Fecha)
+                    .Take(1);
+
+                if (registrosRecientes is not null && registrosRecientes.Count() > 0) 
+                {
+                    int nivelDeBateriaBaja = registrosRecientes.Last().PorcentajeCargaBateria;
+                    DateTime fechaMasRecienteConBateriaBaja = registrosRecientes.Last().Fecha;
+                    TimeSpan diferenciaDeFechas = DateTime.Now.Subtract(fechaMasRecienteConBateriaBaja);
+                    if (diferenciaDeFechas.TotalHours < 4) 
+                    {
+                        // Existe un registro de hidratación reciente con batería
+                        // baja. Notificar al usuario.
+                        var tokenDeRegistroFCM = await _contexto.TokensParaNotificaciones
+                            .Include(t => t.Perfil)
+                            .AsSplitQuery()
+                            .Where(t => (t.Perfil.IdCuentaUsuario.Equals(idCuentaUsuario) && t.Perfil.Id.Equals(idPerfil)))
+                            .FirstOrDefaultAsync();
+
+                        var instanciaFCM = FirebaseMessaging.DefaultInstance;
+
+                        if (tokenDeRegistroFCM is not null && instanciaFCM is not null) 
+                        {
+                            var mensaje = new Message()
+                            {
+                                Token = tokenDeRegistroFCM.Token,
+                                Notification = new Notification()
+                                {
+                                    Title = "La batería de tu extensión Hydrate está baja",
+                                    Body = $"Tu extensión tiene {nivelDeBateriaBaja}% de carga restante. Conéctala para recargarla.",
+                                    ImageUrl = "https://servicio-web-hydrate.azurewebsites.net/favicon.ico",
+                                },
+                            };
+
+                            // Enviar el mensaje a través de FCM.
+                            fcmMessageId = await instanciaFCM.SendAsync(mensaje);
+                        }
+                    }
+                }
+            } 
+
+            return fcmMessageId;
         }
 
         public async Task AgregarMetas(int idPerfil, ICollection<DTOMeta> nuevasMetas)
@@ -220,7 +298,9 @@ namespace ServicioHydrate.Data
             }
 
             IQueryable<DTORegistroDeHidratacion>? regHidratacion = _contexto.RegistrosDeHidratacion
-                .Where(rh => rh.IdPerfil == perfil.Id)
+                .Include(rh => rh.PerfilDeUsuario)
+                .AsSplitQuery()
+                .Where(rh => rh.PerfilDeUsuario.Id == perfil.Id)
                 .OrderBy(rh => rh.Fecha)
                 .Select(rh => rh.ComoDTO());
 

@@ -18,6 +18,8 @@ using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Utilidades;
 using ServicioHydrate.Formatters;
 using Microsoft.Net.Http.Headers;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 namespace ServicioHydrate
 {
@@ -158,6 +160,12 @@ namespace ServicioHydrate
         {
             // Configurar llave de API de Stripe
             StripeConfiguration.ApiKey = Configuration.GetSection("AppConfig:StripeApiKey").Value;
+            
+            // Inicializar el Admin SDK de Firebase para FCM.
+            FirebaseApp.Create(new AppOptions() 
+            {
+                Credential = GoogleCredential.GetApplicationDefault(),
+            });
             
             if (env.IsDevelopment())
             {

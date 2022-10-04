@@ -336,6 +336,11 @@ namespace ServicioHydrate.Controladores
 
                 await _repoDatos.AgregarHidratacion(idPerfil, regHidratacionActualizados);
 
+                //TODO: enviar una notificacion, si es necesario.
+                string? messageId = await _repoDatos.NotificarAlertaBateria(idUsuarioActual, idPerfil);
+
+                _logger.LogInformation($"Notification messageId: {messageId ?? "null"}");
+
                 return NoContent();
             }
             catch (FormatException e) 

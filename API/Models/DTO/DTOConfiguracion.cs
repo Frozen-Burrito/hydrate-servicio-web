@@ -33,7 +33,7 @@ namespace ServicioHydrate.Modelos.DTO
                 AportaDatosAbiertos = this.AportaDatosAbiertos,
                 FormulariosRecurrentesActivados = this.FormulariosRecurrentesActivados,
                 IntegradoConGoogleFit = this.IntegradoConGoogleFit,
-                NotificacionesPermitidas = (Enums.TiposDeNotificacion) this.NotificacionesPermitidas,
+                PreferenciasDeNotificaciones = this.NotificacionesPermitidas,
                 IdDispositivo = this.IdDispositivo,
                 CodigoLocalizacion = this.CodigoLocalizacion,
             };

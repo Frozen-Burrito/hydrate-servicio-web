@@ -20,7 +20,48 @@ namespace ServicioHydrate.Modelos
 
         public bool IntegradoConGoogleFit { get; set; }
 
-        public TiposDeNotificacion NotificacionesPermitidas { get; set; }
+        [NotMapped]
+        private int _preferenciasDeNotificaciones;
+
+        public int PreferenciasDeNotificaciones 
+        { 
+            get
+            {
+                int bitmaskFuentesNotif = 0b_0000_0000;
+
+                foreach (var fuenteDeNotificaciones in NotificacionesPermitidas) 
+                {
+                    bitmaskFuentesNotif |= (int) fuenteDeNotificaciones;
+                }
+
+                _preferenciasDeNotificaciones = bitmaskFuentesNotif;
+
+                return bitmaskFuentesNotif;
+            } 
+            set
+            {
+                // Reiniciar las fuentes de notificaciones.
+                NotificacionesPermitidas.Clear();
+
+                if (value == 0) 
+                {
+                    _preferenciasDeNotificaciones = 0;
+                    NotificacionesPermitidas.Add(TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS);
+                } else 
+                {
+                    foreach (var fuente in fuentesDeNotificaciones)
+                    {
+                        if (((int)fuente & value) == (int)fuente) 
+                        {
+                            NotificacionesPermitidas.Add(fuente);
+                        }
+                    }
+                }
+            } 
+        }
+
+        [NotMapped]
+        public List<TiposDeNotificacion> NotificacionesPermitidas { get; set; }
 
         [MaxLength(17)]
         public string IdDispositivo { get; set; }
@@ -31,6 +72,21 @@ namespace ServicioHydrate.Modelos
         [ForeignKey("id_perfil")]
         public Perfil Perfil { get; set; }
 
+        [NotMapped]
+        public bool TieneNotificacionesActivadas 
+        {
+            get => !(NotificacionesPermitidas.Contains(TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS));
+        }
+
+        private static List<TiposDeNotificacion> fuentesDeNotificaciones = new List<TiposDeNotificacion>{
+            TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS,
+            TiposDeNotificacion.RECORDATORIOS_METAS,
+            TiposDeNotificacion.ALERTAS_BATERIA_DISPOSITIVO,
+            TiposDeNotificacion.RECORDATORIOS_RUTINA,
+            TiposDeNotificacion.RECORDATORIOS_DESCANSO,
+            TiposDeNotificacion.TODAS,
+        };
+
         public static Configuracion PorDefecto() 
         {
             return new Configuracion
@@ -39,7 +95,10 @@ namespace ServicioHydrate.Modelos
                 AportaDatosAbiertos = false,
                 FormulariosRecurrentesActivados = false,
                 IntegradoConGoogleFit = false,
-                NotificacionesPermitidas = TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS,
+                NotificacionesPermitidas = new List<TiposDeNotificacion>() 
+                { 
+                    TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS, 
+                },
                 IdDispositivo = "",
                 CodigoLocalizacion = "en-US",
             };
@@ -54,7 +113,7 @@ namespace ServicioHydrate.Modelos
                 AportaDatosAbiertos = this.AportaDatosAbiertos,
                 FormulariosRecurrentesActivados = this.FormulariosRecurrentesActivados,
                 IntegradoConGoogleFit = this.IntegradoConGoogleFit,
-                NotificacionesPermitidas = (int) this.NotificacionesPermitidas,
+                NotificacionesPermitidas = _preferenciasDeNotificaciones,
                 IdDispositivo = this.IdDispositivo,
                 CodigoLocalizacion = this.CodigoLocalizacion,
             };
@@ -66,7 +125,7 @@ namespace ServicioHydrate.Modelos
             AportaDatosAbiertos = cambios.AportaDatosAbiertos;
             FormulariosRecurrentesActivados = cambios.FormulariosRecurrentesActivados;
             IntegradoConGoogleFit = cambios.IntegradoConGoogleFit;
-            NotificacionesPermitidas = (Enums.TiposDeNotificacion) cambios.NotificacionesPermitidas;
+            PreferenciasDeNotificaciones = cambios.NotificacionesPermitidas;
             IdDispositivo = cambios.IdDispositivo;
             CodigoLocalizacion = cambios.CodigoLocalizacion;
         }

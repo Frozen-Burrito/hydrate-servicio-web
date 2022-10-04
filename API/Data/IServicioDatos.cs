@@ -26,6 +26,8 @@ namespace ServicioHydrate.Data
         Task AgregarActividadFisica(int idPerfil, ICollection<DTORegistroActividad> nuevasActividades);
 
         Task EliminarMeta(int idPerfil, int idMeta);
+
+        Task<String?> NotificarAlertaBateria(Guid idCuentaUsuario, int idPerfil);
     }
 }
 #nullable disable

@@ -99,8 +99,16 @@ namespace ServicioHydrate.Data
                  _contexto.TokensParaNotificaciones.Add(tokenActualizado.ComoNuevoModelo());
             } else 
             {
-                tokenFCM.Actualizar(tokenActualizado);
-                _contexto.Entry(tokenFCM).State = EntityState.Modified;
+                bool debeBorrarTokenExistente = String.IsNullOrEmpty(tokenActualizado.Token.Trim());
+
+                if (debeBorrarTokenExistente) 
+                {
+                    _contexto.TokensParaNotificaciones.Remove(tokenFCM);
+                } else 
+                {
+                    tokenFCM.Actualizar(tokenActualizado);
+                    _contexto.Entry(tokenFCM).State = EntityState.Modified;
+                }
             }
 
             await _contexto.SaveChangesAsync();
@@ -206,6 +214,23 @@ namespace ServicioHydrate.Data
             }
 
             config.Actualizar(cambiosDeConfiguracion);
+
+            if (!config.TieneNotificacionesActivadas) 
+            {
+                var perfil = config.Perfil;
+                // Si el usuario desactivó las notificaciones, eliminar su
+                // token de registro de FCM para evitar tener tokens viejos.
+                var tokenFCM = await _contexto.TokensParaNotificaciones
+                    .Include(t => t.Perfil)
+                    .AsSplitQuery()
+                    .Where(t => (t.Perfil.IdCuentaUsuario.Equals(perfil.IdCuentaUsuario) && t.Perfil.Id.Equals(perfil.Id)))
+                    .FirstOrDefaultAsync();
+
+                if (tokenFCM is not null) 
+                {
+                    _contexto.TokensParaNotificaciones.Remove(tokenFCM);
+                }
+            }
 
             _contexto.Entry(config).State = EntityState.Modified;
             int numOfEntriesWritten = await _contexto.SaveChangesAsync();

@@ -435,6 +435,8 @@ namespace ServicioHydrate.Controladores
                 string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
                 Guid idUsuarioActual = new Guid(idStr);
 
+                _logger.LogInformation($"Token de FCM recuperado: [{nuevoToken.Token}] - {nuevoToken.Timestamp}");
+
                 await _repoPerfiles.ActualizarTokenFCM(idUsuarioActual, idPerfil, nuevoToken);
 
                 return NoContent();
