@@ -14,9 +14,9 @@ namespace ServicioHydrate.Data
 {
     public class RepositorioOrdenes : IServicioOrdenes
     {
-        private readonly ContextoDBSqlite _contexto;
+        private readonly ContextoDBMysql _contexto;
 
-        public RepositorioOrdenes(IWebHostEnvironment env, ContextoDBSqlite contexto)
+        public RepositorioOrdenes(IWebHostEnvironment env, ContextoDBMysql contexto)
         {
             this._contexto = contexto;
         }

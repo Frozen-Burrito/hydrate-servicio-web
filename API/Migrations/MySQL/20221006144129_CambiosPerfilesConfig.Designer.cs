@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicioHydrate.Data;
 
@@ -10,9 +11,10 @@ using ServicioHydrate.Data;
 namespace ServicioHydrate.Migrations.MySQL
 {
     [DbContext(typeof(ContextoDBMysql))]
-    partial class ContextoDBMysqlModelSnapshot : ModelSnapshot
+    [Migration("20221006144129_CambiosPerfilesConfig")]
+    partial class CambiosPerfilesConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 using ServicioHydrate.Modelos;
@@ -141,7 +142,8 @@ namespace ServicioHydrate.Data
             // Relación uno a muchos entre Pais y Perfil.
             modelBuilder.Entity<Pais>()
                 .HasMany(pa => pa.PerfilesQueResidenEnPais)
-                .WithOne(pe => pe.PaisDeResidencia);
+                .WithOne(pe => pe.PaisDeResidencia)
+                .HasForeignKey(pe => pe.IdPaisDeResidencia);
 
             modelBuilder.Entity<Perfil>()
                 .HasOne(p => p.Cuenta)
@@ -167,65 +169,128 @@ namespace ServicioHydrate.Data
                 .HasKey(m => new { m.Id, m.IdPerfil });
 
             modelBuilder.Entity<RegistroDeHidratacion>()
-                .HasKey(rh => new { rh.Id, idPerfil = rh.Perfil.Id });
+                .HasKey(rh => new { rh.Id, idPerfil = rh.IdPerfil });
 
             modelBuilder.Entity<Rutina>()
                 .HasKey(ru => new { ru.Id, ru.IdPerfil });
 
             // Determinar las relaciones entre entidades de datos de perfil.
             modelBuilder.Entity<RegistroDeActividad>()
-                .HasOne(af => af.Perfil)
-                .WithMany(p => p.RegistrosDeActFisica);
+                .HasOne(ra => ra.Perfil)
+                .WithMany(p => p.RegistrosDeActFisica)
+                .HasForeignKey(ra => ra.IdPerfil)
+                .IsRequired();
+
+            modelBuilder.Entity<RegistroDeActividad>()
+                .HasOne(ra => ra.TipoDeActividad)
+                .WithMany(ta => ta.RegistrosDeActividad)
+                .HasForeignKey(ra => ra.IdTipoDeActividad)
+                .IsRequired();
                 
             modelBuilder.Entity<DatosMedicos>()
                 .HasOne(dm => dm.PerfilDeUsuario)
-                .WithMany(p => p.RegistrosMedicos);
+                .WithMany(p => p.RegistrosMedicos)
+                .HasForeignKey(dm => dm.IdPerfil)
+                .IsRequired();
 
             modelBuilder.Entity<Etiqueta>()
                 .HasOne(e => e.Perfil)
-                .WithMany(p => p.Etiquetas);
+                .WithMany(p => p.Etiquetas)
+                .HasForeignKey(e => e.IdPerfil)
+                .IsRequired();
 
             modelBuilder.Entity<ReporteSemanal>()
                 .HasOne(hs => hs.Perfil)
-                .WithMany(p => p.ReportesSemanales);
+                .WithMany(p => p.ReportesSemanales)
+                .HasForeignKey(dm => dm.IdPerfil)
+                .IsRequired();
 
             modelBuilder.Entity<MetaHidratacion>()
                 .HasOne(m => m.Perfil)
-                .WithMany(p => p.Metas);
+                .WithMany(p => p.Metas)
+                .HasForeignKey(m => m.IdPerfil)
+                .IsRequired();
 
             modelBuilder.Entity<RegistroDeHidratacion>()
                 .HasOne(rh => rh.Perfil)
-                .WithMany(p => p.RegistrosDeHidratacion);
+                .WithMany(p => p.RegistrosDeHidratacion)
+                .HasForeignKey(rh => rh.IdPerfil)
+                .IsRequired();
 
             modelBuilder.Entity<Rutina>()
                 .HasOne(r => r.Perfil)
-                .WithMany(p => p.Rutinas);
+                .WithMany(p => p.Rutinas)
+                .HasForeignKey(r => r.IdPerfil)
+                .IsRequired();
             
             // Relacion muchos-a-muchos entre Meta y Etiqueta.
             modelBuilder.Entity<MetaHidratacion>()
                 .HasMany(m => m.Etiquetas)
                 .WithMany(e => e.Metas)
-                .UsingEntity(j => j.ToTable("Etiquetas_De_Meta"));
+                .UsingEntity(j => j.ToTable("EtiquetasDeMetas"));
+
+            modelBuilder.Entity<Entorno>()
+                .HasMany(e => e.PerfilesQueDesbloquearon)
+                .WithMany(p => p.EntornosDesbloqueados)
+                .UsingEntity(j => j.ToTable("EntornosDesbloqueados"));
+
+            modelBuilder.Entity<Entorno>()
+                .HasMany(e => e.PerfilesQueSeleccionaron)
+                .WithOne(p => p.EntornoSeleccionado)
+                .HasForeignKey(p => p.IdEntornoSeleccionado);
+
+            // Seeding de entornos, paises y tipos de actividad fisica.
+            modelBuilder.Entity<Entorno>()
+                .HasData(new List<Entorno>() {
+                    Entorno.PrimerEntornoDesbloqueado,
+                    new Entorno { Id = 2, UrlImagen = "2", PrecioEnMonedas = 250 },
+                });
+
+            modelBuilder.Entity<Pais>()
+                .HasData(new List<Pais>() {
+                    Pais.PaisNoEspecificado,
+                    new Pais { Id = 2, Codigo = "MX" },
+                    new Pais { Id = 3, Codigo = "USA" },
+                });
+
+            modelBuilder.Entity<TipoDeActividad>() 
+                .HasData(new List<TipoDeActividad>() {
+                    new TipoDeActividad { Id = 1, METs = 4.3, VelocidadPromedioKMH = 5.0, IdActividadGoogleFit = 7 },
+                    new TipoDeActividad { Id = 2, METs = 7.0, VelocidadPromedioKMH = 8.0, IdActividadGoogleFit = 8 },
+                    new TipoDeActividad { Id = 3, METs = 7.5, VelocidadPromedioKMH = 11.0, IdActividadGoogleFit = 1 },
+                    new TipoDeActividad { Id = 4, METs = 9.8, VelocidadPromedioKMH = 0.0, IdActividadGoogleFit = 82 },
+                    new TipoDeActividad { Id = 5, METs = 7.0, VelocidadPromedioKMH = 0.0, IdActividadGoogleFit = 29 },
+                    new TipoDeActividad { Id = 6, METs = 6.5, VelocidadPromedioKMH = 0.0, IdActividadGoogleFit = 12 },
+                    new TipoDeActividad { Id = 7, METs = 4.0, VelocidadPromedioKMH = 0.0, IdActividadGoogleFit = 89 },
+                    new TipoDeActividad { Id = 8, METs = 7.8, VelocidadPromedioKMH = 0.0, IdActividadGoogleFit = 24 },
+                    new TipoDeActividad { Id = 9, METs = 1.3, VelocidadPromedioKMH = 0.0, IdActividadGoogleFit = 100 },
+                });
 
             // Relacion uno-a-uno entre ActividadFisica y Rutina.
             modelBuilder.Entity<Rutina>()
                 .HasOne(r => r.RegistroDeActividad)
                 .WithOne(af => af.Rutina)
-                .HasForeignKey<Rutina>(r => new { Id = r.IdActividad, r.IdPerfil });
+                .HasForeignKey<Rutina>(r => new { Id = r.IdActividad, r.IdPerfil })
+                .IsRequired();
                 
             // Relación uno a muchos entre Usuario y LlaveDeAPI
             modelBuilder.Entity<Usuario>()
                 .HasMany(u => u.LlavesDeAPI)
                 .WithOne(ll => ll.Usuario)
-                .HasForeignKey(ll => ll.IdUsuario);
+                .HasForeignKey(ll => ll.IdUsuario)
+                .IsRequired();
 
             modelBuilder.Entity<Configuracion>()
                 .HasOne(c => c.Perfil)
-                .WithOne(p => p.Configuracion);
+                .WithOne(p => p.Configuracion)
+                .HasForeignKey<Configuracion>(c => c.IdPerfil)
+                .IsRequired();
 
             modelBuilder.Entity<TokenFCM>()
                 .HasOne(t => t.Perfil)
-                .WithOne(p => p.TokenFCM);
+                .WithOne(p => p.TokenFCM)
+                .HasForeignKey<TokenFCM>(t => t.IdPerfil)
+                .IsRequired();
         }
     }
 }
