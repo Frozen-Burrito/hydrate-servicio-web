@@ -42,13 +42,13 @@ namespace ServicioHydrate.Data
 
         public DbSet<Entorno> Entornos { get; set; }
 
-        public DbSet<ActividadFisica> RegistrosDeActFisica { get; set; } 
+        public DbSet<RegistroDeActividad> RegistrosDeActFisica { get; set; } 
 
-        public DbSet<DatosDeActividad> DatosDeActividades { get; set; }
+        public DbSet<TipoDeActividad> DatosDeActividades { get; set; }
 
         public DbSet<DatosMedicos> DatosMedicos { get; set; }
 
-        public DbSet<Meta> Metas { get; set; }
+        public DbSet<MetaHidratacion> Metas { get; set; }
 
         public DbSet<Etiqueta> Etiquetas { get; set; }
 
@@ -57,6 +57,10 @@ namespace ServicioHydrate.Data
         public DbSet<Rutina> RutinasDeActFisica { get; set; }
 
         public DbSet<LlaveDeApi> LlavesDeAPI { get; set; }
+
+        public DbSet<Configuracion> Configuraciones { get; set; }
+
+        public DbSet<TokenFCM> TokensParaNotificaciones { get; set; }
 
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
@@ -136,7 +140,7 @@ namespace ServicioHydrate.Data
 
             // Relación uno a muchos entre Pais y Perfil.
             modelBuilder.Entity<Pais>()
-                .HasMany(pa => pa.Perfiles)
+                .HasMany(pa => pa.PerfilesQueResidenEnPais)
                 .WithOne(pe => pe.PaisDeResidencia);
 
             modelBuilder.Entity<Perfil>()
@@ -147,7 +151,7 @@ namespace ServicioHydrate.Data
             // Definir llaves primarias compuestas para todas las 
             // entidades asociadas con un Perfil. 
             // (Esto es para identificar los registros de distintos usuarios.)
-            modelBuilder.Entity<ActividadFisica>()
+            modelBuilder.Entity<RegistroDeActividad>()
                 .HasKey(af => new { af.Id, af.IdPerfil });
                 
             modelBuilder.Entity<DatosMedicos>()
@@ -159,18 +163,18 @@ namespace ServicioHydrate.Data
             modelBuilder.Entity<ReporteSemanal>()
                 .HasKey(hs => new { hs.Id, hs.IdPerfil });
 
-            modelBuilder.Entity<Meta>()
+            modelBuilder.Entity<MetaHidratacion>()
                 .HasKey(m => new { m.Id, m.IdPerfil });
 
             modelBuilder.Entity<RegistroDeHidratacion>()
-                .HasKey(rh => new { rh.Id, rh.IdPerfil });
+                .HasKey(rh => new { rh.Id, idPerfil = rh.Perfil.Id });
 
             modelBuilder.Entity<Rutina>()
                 .HasKey(ru => new { ru.Id, ru.IdPerfil });
 
             // Determinar las relaciones entre entidades de datos de perfil.
-            modelBuilder.Entity<ActividadFisica>()
-                .HasOne(af => af.PerfilDeUsuario)
+            modelBuilder.Entity<RegistroDeActividad>()
+                .HasOne(af => af.Perfil)
                 .WithMany(p => p.RegistrosDeActFisica);
                 
             modelBuilder.Entity<DatosMedicos>()
@@ -178,27 +182,27 @@ namespace ServicioHydrate.Data
                 .WithMany(p => p.RegistrosMedicos);
 
             modelBuilder.Entity<Etiqueta>()
-                .HasOne(e => e.PerfilDeUsuario)
+                .HasOne(e => e.Perfil)
                 .WithMany(p => p.Etiquetas);
 
             modelBuilder.Entity<ReporteSemanal>()
-                .HasOne(hs => hs.PerfilDeUsuario)
+                .HasOne(hs => hs.Perfil)
                 .WithMany(p => p.ReportesSemanales);
 
-            modelBuilder.Entity<Meta>()
-                .HasOne(m => m.PerfilDeUsuario)
+            modelBuilder.Entity<MetaHidratacion>()
+                .HasOne(m => m.Perfil)
                 .WithMany(p => p.Metas);
 
             modelBuilder.Entity<RegistroDeHidratacion>()
-                .HasOne(rh => rh.PerfilDeUsuario)
+                .HasOne(rh => rh.Perfil)
                 .WithMany(p => p.RegistrosDeHidratacion);
 
             modelBuilder.Entity<Rutina>()
-                .HasOne(r => r.PerfilDeUsuario)
+                .HasOne(r => r.Perfil)
                 .WithMany(p => p.Rutinas);
             
             // Relacion muchos-a-muchos entre Meta y Etiqueta.
-            modelBuilder.Entity<Meta>()
+            modelBuilder.Entity<MetaHidratacion>()
                 .HasMany(m => m.Etiquetas)
                 .WithMany(e => e.Metas)
                 .UsingEntity(j => j.ToTable("Etiquetas_De_Meta"));
@@ -214,6 +218,14 @@ namespace ServicioHydrate.Data
                 .HasMany(u => u.LlavesDeAPI)
                 .WithOne(ll => ll.Usuario)
                 .HasForeignKey(ll => ll.IdUsuario);
+
+            modelBuilder.Entity<Configuracion>()
+                .HasOne(c => c.Perfil)
+                .WithOne(p => p.Configuracion);
+
+            modelBuilder.Entity<TokenFCM>()
+                .HasOne(t => t.Perfil)
+                .WithOne(p => p.TokenFCM);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
-
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ServicioHydrate.Modelos.DTO.Datos;
 
 namespace ServicioHydrate.Modelos.Datos
@@ -25,6 +26,8 @@ namespace ServicioHydrate.Modelos.Datos
 
         public DateTime FechaProxCita { get; set; }
 
+        public DateTime FechaCreacion { get; set; }
+
         public DTORegistroMedico ComoDTO() 
         {
             return new DTORegistroMedico()
@@ -38,6 +41,7 @@ namespace ServicioHydrate.Modelos.Datos
                 GananciaRegistrada = this.GananciaRegistrada,
                 GananciaReal = this.GananciaReal,
                 FechaProxCita = this.FechaProxCita.ToString("o"),
+                FechaDeCreacion = this.FechaCreacion.ToString("o"),
             };
         }
     }

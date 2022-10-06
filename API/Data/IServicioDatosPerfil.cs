@@ -29,9 +29,9 @@ namespace ServicioHydrate.Data
 
         Task AgregarDatosDeMetas(IEnumerable<DTOMeta> datos);
 
-        Task<IEnumerable<DTOResultadoPaginado<DTOActividad>>> GetDatosDeActividad(Guid idUsuario, int idPerfil);
+        Task<IEnumerable<DTOResultadoPaginado<DTORegistroActividad>>> GetDatosDeActividad(Guid idUsuario, int idPerfil);
 
-        Task AgregarDatosDeActividad(IEnumerable<DTOActividad> datos);
+        Task AgregarDatosDeActividad(IEnumerable<DTORegistroActividad> datos);
 
         Task<IEnumerable<DTOResultadoPaginado<DTORegistroMedico>>> GetRegistrosMedicos(Guid idUsuario, int idPerfil);
 

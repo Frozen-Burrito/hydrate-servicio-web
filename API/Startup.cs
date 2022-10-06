@@ -18,6 +18,9 @@ using ServicioHydrate.Autenticacion;
 using ServicioHydrate.Utilidades;
 using ServicioHydrate.Formatters;
 using Microsoft.Net.Http.Headers;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using System;
 
 namespace ServicioHydrate
 {
@@ -79,6 +82,7 @@ namespace ServicioHydrate
 
             services.AddScoped<IServicioPerfil, RepositorioPerfiles>();
 
+            services.AddScoped<IServicioDatos, RepositorioDatos>();
             services.AddScoped<IServicioDatosAbiertos, RepositorioDatosAbiertos>();
 
             services.AddScoped<IServicioLlavesDeAPI, RepositorioLlavesDeAPI>();
@@ -157,6 +161,24 @@ namespace ServicioHydrate
         {
             // Configurar llave de API de Stripe
             StripeConfiguration.ApiKey = Configuration.GetSection("AppConfig:StripeApiKey").Value;
+            
+            if (env.IsDevelopment())
+            {
+                // Usar inicialización por defecto para el AdminSDK (por medio
+                // del path del archivo JSON con el key de la cuenta de servicio)
+                FirebaseApp.Create(new AppOptions() 
+                {
+                    Credential = GoogleCredential.GetApplicationDefault(),
+                });
+            } else 
+            {
+                // Inicializar el Admin SDK de Firebase para FCM, usando una variable de entorno 
+                // con el JSON del key.
+                FirebaseApp.Create(new AppOptions() 
+                {
+                    Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("GOOGLE_SERVICE_ACCOUNT_KEY")),
+                });
+            }
             
             if (env.IsDevelopment())
             {

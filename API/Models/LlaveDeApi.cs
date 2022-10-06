@@ -1,5 +1,5 @@
 using System;
-
+using System.ComponentModel.DataAnnotations;
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Modelos.Enums;
 

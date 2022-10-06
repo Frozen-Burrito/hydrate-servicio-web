@@ -6,7 +6,7 @@ using ServicioHydrate.Modelos.Datos;
 #nullable enable
 namespace ServicioHydrate.Modelos.DTO.Datos
 {
-    public class DTOActividad 
+    public class DTORegistroActividad 
     {
         public int Id { get; set; }
 
@@ -31,16 +31,16 @@ namespace ServicioHydrate.Modelos.DTO.Datos
     
         public bool FueAlAireLibre { get; set; }
 
-        public int IdDatosDeActividad { get; set; }
-        public DTODatosActividad? DatosDeActividad { get; set; }
+        public int IdTipoDeActividad { get; set; }
 
         public DTORutina? Rutina { get; set; }
 
         public bool EsInformacionAbierta { get; set; }
 
-        public ActividadFisica ComoNuevoModelo(
-            DatosDeActividad datosDeActividad, 
-            Rutina rutina,
+        public RegistroDeActividad ComoNuevoModelo(
+            TipoDeActividad datosDeActividad, 
+            Perfil perfilDeUsuario,
+            Rutina? rutina,
             bool esParteDeDatosAbiertos = false
         ) 
         {
@@ -54,8 +54,9 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
             }
 
-            return new ActividadFisica
+            return new RegistroDeActividad
             {
+                Id = this.Id,
                 IdPerfil = this.IdPerfil,
                 Titulo = this.Titulo,
                 Fecha = fecha,
@@ -63,7 +64,8 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 Distancia = this.Distancia,
                 KcalQuemadas = this.KcalQuemadas,
                 FueAlAireLibre = this.FueAlAireLibre,
-                DatosActividad = datosDeActividad,
+                TipoDeActividad = datosDeActividad,
+                Perfil = perfilDeUsuario,
                 Rutina = rutina,
                 EsInformacionAbierta = esParteDeDatosAbiertos,
             };

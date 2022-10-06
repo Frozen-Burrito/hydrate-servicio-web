@@ -174,7 +174,7 @@ namespace ServicioHydrate.Controladores
         /// <param name="filtros">Los criterios que definen los registros que son incluidos.</param>
         /// <returns>Un resultado HTTP con los datos de actividad física.</returns>
         [HttpGet("act-fisica")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOActividad>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTORegistroActividad>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -195,7 +195,7 @@ namespace ServicioHydrate.Controladores
               
                 int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
 
-                var resultadoPaginado = DTOResultadoPaginado<DTOActividad>
+                var resultadoPaginado = DTOResultadoPaginado<DTORegistroActividad>
                                 .DesdeColeccion(datosDeActividad, numPagina, ruta);
 
                 return Ok(resultadoPaginado);

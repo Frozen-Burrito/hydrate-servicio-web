@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using ServicioHydrate.Modelos.DTO;
 
 namespace ServicioHydrate.Modelos 
@@ -9,7 +10,16 @@ namespace ServicioHydrate.Modelos
 
         public string Codigo { get; set; }
 
-        public ICollection<Perfil> Perfiles { get; set; }
+        public ICollection<Perfil> PerfilesQueResidenEnPais { get; set; }
+
+        [NotMapped]
+        private static Pais _paisNoEspecificado = new Pais
+        {
+            Id = 1,
+            Codigo = "--",
+        };
+
+        public static Pais PaisNoEspecificado { get => _paisNoEspecificado; }
 
         public DTOPais ComoDTO() 
         {

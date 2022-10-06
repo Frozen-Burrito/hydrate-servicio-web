@@ -13,6 +13,9 @@ namespace ServicioHydrate.Autenticacion
 {
     public class GeneradorDeToken
     {
+        public static String TipoClaimIdUsuario { get => "id"; }
+        public static String TipoClaimIdPerfil { get => "idPerfil"; }
+
         private readonly AppConfig _appConfig;
 
         public GeneradorDeToken(IOptions<AppConfig> appConfig)
@@ -20,11 +23,12 @@ namespace ServicioHydrate.Autenticacion
             this._appConfig = appConfig.Value;
         }
 
-        public string Generar(Usuario usuario)
+        public string Generar(Usuario usuario, int idPerfilActivo)
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim("id", usuario.Id.ToString()),
+                new Claim(TipoClaimIdUsuario, usuario.Id.ToString()),
+                new Claim(TipoClaimIdPerfil, idPerfilActivo.ToString()),
                 new Claim(ClaimTypes.Role, usuario.RolDeUsuario.ToString()),
             };
 
