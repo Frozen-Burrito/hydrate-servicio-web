@@ -17,11 +17,11 @@ namespace ServicioHydrate.Data
     public class RepositorioUsuarios : IServicioUsuarios
     {
         // El contexto de EF para la base de datos.
-        private readonly ContextoDBSqlite _contexto;
+        private readonly ContextoDBMysql _contexto;
         // Generador de JWT, utilizado por la autenticación. 
         private readonly GeneradorDeToken _generadorToken;
 
-        public RepositorioUsuarios(ContextoDBSqlite contexto, GeneradorDeToken generadorToken)
+        public RepositorioUsuarios(ContextoDBMysql contexto, GeneradorDeToken generadorToken)
         {
             this._contexto = contexto;
             this._generadorToken = generadorToken;
