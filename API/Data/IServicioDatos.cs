@@ -17,13 +17,15 @@ namespace ServicioHydrate.Data
 
         Task<ICollection<DTORegistroActividad>> GetActividadesPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina);
 
-        Task AgregarMetas(int idPerfil, ICollection<DTOMeta> nuevasMetas);
+        Task AgregarMetas(int idPerfil, ICollection<DTOMeta> metas);
 
-        Task AgregarHidratacion(int idPerfil, ICollection<DTORegistroDeHidratacion> nuevosRegistrosHidr);
+        Task AgregarHidratacion(int idPerfil, ICollection<DTORegistroDeHidratacion> registrosDeHidratacion);
 
-        Task AgregarRutinas(int idPerfil, ICollection<DTORutina> nuevasRutinas);
+        Task AgregarRutinas(int idPerfil, ICollection<DTORutina> rutinas);
 
         Task AgregarActividadFisica(int idPerfil, ICollection<DTORegistroActividad> registrosDeActividad);
+
+        Task AgregarEtiquetas(int idPerfil, ICollection<DTOEtiqueta> etiquetasAgregadas);
 
         Task EliminarMeta(int idPerfil, int idMeta);
 

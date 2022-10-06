@@ -27,5 +27,18 @@ namespace ServicioHydrate.Modelos.Datos
                 Valor = this.Valor,
             };
         }
+
+        public void Actualizar(DTOEtiqueta cambios)
+		{
+            Valor = cambios.Valor;
+        }
+
+        public bool EsMismaEntidad(Etiqueta otra) 
+        {
+            bool idsSonIguales = Id == otra.Id;
+            bool usaMismoPerfil = IdPerfil == otra.IdPerfil;
+
+            return idsSonIguales && usaMismoPerfil;
+        }
     }
 }

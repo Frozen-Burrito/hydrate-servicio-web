@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.Globalization;
 using ServicioHydrate.Modelos.DTO.Datos; 
 
 namespace ServicioHydrate.Modelos.Datos
@@ -43,6 +43,24 @@ namespace ServicioHydrate.Modelos.Datos
                 Fecha = this.Fecha.ToString("o"),
                 IdPerfilUsuario = this.Perfil.Id,
 			};
+		}
+
+		public void Actualizar(DTORegistroDeHidratacion cambios)
+		{
+			DateTime fecha;
+
+            bool fechaEsValida = DateTime
+                .TryParse(cambios.Fecha, CultureInfo.InvariantCulture, DateTimeStyles.None, out fecha);
+
+            if (!fechaEsValida)
+            {
+                throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
+            }
+
+			CantidadEnMl = cambios.CantidadEnMl;
+			PorcentajeCargaBateria = cambios.PorcentajeCargaBateria;
+			TemperaturaAproximada = cambios.TemperaturaAproximada;
+			Fecha = fecha;
 		}
 	}
 }

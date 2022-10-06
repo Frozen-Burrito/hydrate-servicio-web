@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System.Globalization;
 using ServicioHydrate.Modelos.DTO.Datos;
 using ServicioHydrate.Modelos.Enums;
 
@@ -52,7 +52,7 @@ namespace ServicioHydrate.Modelos.Datos
         }
 
         [NotMapped]
-        public List<DiasDeLaSemana> Dias { get; set; }
+        public List<DiasDeLaSemana> Dias { get; set; } = new List<DiasDeLaSemana>();
 
         public TimeOnly Hora { get; set; }
 
@@ -87,5 +87,35 @@ namespace ServicioHydrate.Modelos.Datos
                 IdActividad = this.IdActividad,
             };
         }
+
+        public void Actualizar(DTORutina cambiosEnRutina)
+		{
+			TimeOnly horaDeRutina;
+
+            bool horaEsValida = TimeOnly
+                .TryParse(cambiosEnRutina.Hora, out horaDeRutina);
+
+            if (!horaEsValida)
+            {
+                throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
+            }
+
+            List<DiasDeLaSemana> diasDondeOcurreRutina = new List<DiasDeLaSemana>();
+
+            if (cambiosEnRutina.Dias > 0) 
+            {
+                foreach (var diaDeLaSemana in diasDeLaSemana)
+                {
+                    if (((int) diaDeLaSemana & cambiosEnRutina.Dias) == (int) diaDeLaSemana) 
+                    {
+                        diasDondeOcurreRutina.Add(diaDeLaSemana);
+                    }
+                }
+            }
+
+            Dias = diasDondeOcurreRutina;
+            Hora = horaDeRutina;
+            IdActividad = cambiosEnRutina.IdActividad;
+		}
     }
 }

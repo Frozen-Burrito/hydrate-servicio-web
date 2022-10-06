@@ -13,12 +13,13 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
         public int IdPerfil { get; set; }
 
-        public Etiqueta ComoNuevoModelo()
+        public Etiqueta ComoNuevoModelo(Perfil perfil)
         {
             return new Etiqueta
             {
+                Id = this.Id,
                 Valor = this.Valor,
-                IdPerfil = this.IdPerfil,
+                IdPerfil = perfil.Id,
             };
         }
     }

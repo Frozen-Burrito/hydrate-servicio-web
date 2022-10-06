@@ -196,32 +196,60 @@ namespace ServicioHydrate.Data
             return fcmMessageId;
         }
 
-        public async Task AgregarHidratacion(int idPerfil, ICollection<DTORegistroDeHidratacion> nuevosRegistrosHidr)
+        public async Task AgregarHidratacion(int idPerfil, ICollection<DTORegistroDeHidratacion> registrosDeHidratacionAgregados)
         {
             if (await _contexto.Perfiles.CountAsync() <= 0) 
             {
                 throw new ArgumentException("No existe el perfil de usuario solicitado.");
             }
 
-            Perfil? perfil = await _contexto.Perfiles
+            Perfil? perfilActual = await _contexto.Perfiles
                 .Where(p => p.Id == idPerfil)
                 .FirstOrDefaultAsync();
 
-            if (perfil is null)
+            if (perfilActual is null)
             {
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            IEnumerable<RegistroDeHidratacion> registros = nuevosRegistrosHidr
-                .Select(rh => rh.ComoNuevoModelo(
-                    perfil, 
-                    esParteDeDatosAbiertos: false
-                ));
+            List<RegistroDeHidratacion> hidratacionExistente = await _contexto.RegistrosDeHidratacion
+                .Where(rh => rh.IdPerfil.Equals(perfilActual.Id))
+                .OrderBy(rh => rh.Fecha)
+                .ToListAsync();
 
-            foreach (var registroHidratacion in registros) 
+            // Reducir los IDs de los registros de hidratación exitentes en BD, para  hacer más
+            // fácil filtrar entre registros de hidratación nuevas y registros de hidratación existentes.
+            List<int> idsHidratacionExistente = new List<int>();
+
+            foreach (var registroDeHidratacion in hidratacionExistente) 
             {
-                _contexto.Entry(registroHidratacion).State = EntityState.Modified;
-            }
+                idsHidratacionExistente.Add(registroDeHidratacion.Id);
+            } 
+
+            // Agregar los nuevos registros de hidratación para que sean persistidos.
+            List<RegistroDeHidratacion> nuevosRegistros = registrosDeHidratacionAgregados
+                .Where(rh => !idsHidratacionExistente.Contains(rh.Id))
+                .Select(rh => rh.ComoNuevoModelo( perfilDeUsuario: perfilActual ))
+                .ToList();
+
+            _contexto.AddRange(nuevosRegistros);
+
+            // Actualizar los registros de hidratación existentes.
+            List<RegistroDeHidratacion> registrosDeHidratacionModificados = hidratacionExistente
+                .Where(rh => idsHidratacionExistente.Contains(rh.Id))
+                .ToList();
+
+            foreach (var registroHidratacion in registrosDeHidratacionModificados) 
+            {
+                var registroModificado = registrosDeHidratacionAgregados
+                    .Where(m => m.Id.Equals(registroHidratacion.Id)).FirstOrDefault();
+
+                if (registroModificado is not null) 
+                {
+                    registroHidratacion.Actualizar(registroModificado);
+                    _contexto.Entry(registroHidratacion).State = EntityState.Modified;
+                }
+            }    
 
             await _contexto.SaveChangesAsync();
         }
@@ -297,7 +325,7 @@ namespace ServicioHydrate.Data
             return fcmMessageId;
         }
 
-        public async Task AgregarMetas(int idPerfil, ICollection<DTOMeta> nuevasMetas)
+        public async Task AgregarMetas(int idPerfil, ICollection<DTOMeta> metasDeHidratacion)
         {
             if (await _contexto.Perfiles.CountAsync() <= 0) 
             {
@@ -313,33 +341,92 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            var mapaDeEtiquetas = new Dictionary<int, Etiqueta>();
+            // Primero realizar los cambios en las etiquetas recibidas.
+            List<DTOEtiqueta> etiquetasAgregadas = new List<DTOEtiqueta>();
 
-            List<Etiqueta> etiquetasExistentes = await _contexto.Etiquetas
+            foreach (var metaAgregada in metasDeHidratacion) 
+            {
+                etiquetasAgregadas.AddRange(metaAgregada.Etiquetas);
+            }
+
+            await AgregarEtiquetas(idPerfil: perfil.Id, etiquetasAgregadas);
+
+            List<MetaHidratacion> metasExistentes = await _contexto.Metas
+                .Where(m => m.IdPerfil.Equals(perfil.Id))
+                .Include(m => m.Etiquetas)
+                .AsSplitQuery()
+                .OrderBy(m => m.FechaInicio)
+                .ToListAsync();
+
+            List<Etiqueta> etiquetasExistentesEnPerfil = await _contexto.Etiquetas
                 .Where(e => e.IdPerfil.Equals(idPerfil))
                 .ToListAsync();
 
-            etiquetasExistentes.ForEach((etiqueta) => mapaDeEtiquetas.Add(etiqueta.Id, etiqueta));
+            // Reducir los IDs de las metas de hidratación exitentes en BD, para  hacer más
+            // fácil filtrar entre metas de hidratación nuevas y metas de hidratación existentes.
+            IEnumerable<int> idsMetasExistentes = metasExistentes.Select(m => m.Id);
 
-            IEnumerable<MetaHidratacion> metasAgregadas = nuevasMetas
-                .Select(m => m.ComoNuevoModelo(
-                    etiquetasExistentes,
-                    perfil
-                ));
+            // Agregar las metas nuevas para ser persistidas.
+            List<DTOMeta> nuevasMetasDTO = metasDeHidratacion
+                .Where(m => !idsMetasExistentes.Contains(m.Id))
+                .ToList();
 
-            _contexto.AddRange(metasAgregadas);
+            static int SelectorIdDtoEtiqueta(DTOEtiqueta dtoEtiqueta) => dtoEtiqueta.Id;    
+            List<MetaHidratacion> nuevasMetas = new List<MetaHidratacion>();
+
+            foreach (var dtoNuevaMeta in nuevasMetasDTO)
+            {
+                IEnumerable<int> idsEtiquetasNuevaMeta = dtoNuevaMeta.Etiquetas
+                    .Select(SelectorIdDtoEtiqueta);
+
+                System.Console.WriteLine($"Etiquetas del perfil: {etiquetasExistentesEnPerfil.Count}");
+
+                var etiquetasNuevaMeta = etiquetasExistentesEnPerfil
+                    .Where(e => idsEtiquetasNuevaMeta.Contains(e.Id));
+
+                System.Console.WriteLine($"Etiquetas de nueva meta: {etiquetasNuevaMeta.Count()}");
+
+                var nuevaMeta = dtoNuevaMeta.ComoNuevoModelo(perfil, etiquetasNuevaMeta);
+
+                nuevasMetas.Add(nuevaMeta);
+            }
+
+            _contexto.AddRange(nuevasMetas);
+
+            static int SelectorIdDtoMeta(DTOMeta dtoMeta) => dtoMeta.Id;                
+
+            IEnumerable<DTOMeta> metasModificadas = metasDeHidratacion
+                .ExceptBy(nuevasMetasDTO.Select(SelectorIdDtoMeta), SelectorIdDtoMeta)
+                .ToList();
+
+            foreach (var dtoMeta in metasModificadas) 
+            {
+                var metaExistente = metasExistentes.Where(m => m.Id.Equals(dtoMeta.Id)).FirstOrDefault();
+
+                if (metaExistente is not null) 
+                {
+                    metaExistente.Actualizar(dtoMeta, etiquetasExistentesEnPerfil, perfil);
+                    _contexto.Entry(metaExistente).State = EntityState.Modified;
+                }
+            }
+
             await _contexto.SaveChangesAsync();
         }
 
-        public async Task AgregarRutinas(int idPerfil, ICollection<DTORutina> nuevasRutinas)
+        public async Task AgregarRutinas(int idPerfil, ICollection<DTORutina> rutinas)
         {
+            if (rutinas.Count > 32) 
+            {
+                throw new ArgumentOutOfRangeException("Solo es posible modificar hasta 32 rutinas por peticion");
+            }
+            
             if (await _contexto.Perfiles.CountAsync() <= 0) 
             {
                 throw new ArgumentException("No existe el perfil de usuario solicitado.");
             }
 
             Perfil? perfil = await _contexto.Perfiles
-                .Where(p => p.Id == idPerfil)
+                .Where(p => p.Id.Equals(idPerfil))
                 .FirstOrDefaultAsync();
 
             if (perfil is null)
@@ -347,10 +434,46 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            IEnumerable<Rutina> rutinas = nuevasRutinas
-                .Select(ru => ru.ComoNuevoModelo(perfil));
+            List<Rutina> rutinasExistentes = await _contexto.RutinasDeActFisica
+                .Where(ru => ru.IdPerfil.Equals(perfil.Id))
+                .Include(ru => ru.RegistroDeActividad)
+                .AsSplitQuery()
+                .OrderBy(ru => ru.RegistroDeActividad.Fecha)
+                .ToListAsync();
+            
+            // Reducir los IDs de las rutinas exitentes en BD, para  hacer más
+            // fácil filtrar entre rutinas nuevas y rutinas existentes.
+            List<int> idsRutinasExistentes = new List<int>();
 
-            _contexto.AddRange(rutinas);
+            foreach (var rutina in rutinasExistentes) 
+            {
+                idsRutinasExistentes.Add(rutina.Id);
+            } 
+
+            // Agregar las rutinas nuevas para ser persistidas.
+            List<Rutina> rutinasNuevas = rutinas
+                .Where(ra => !idsRutinasExistentes.Contains(ra.Id))
+                .Select(ra => ra.ComoNuevoModelo(perfil))
+                .ToList();
+
+            _contexto.AddRange(rutinasNuevas);
+
+            // Actualizar las rutinas existentes.
+            IEnumerable<Rutina> rutinasModificadas = rutinasExistentes
+                .Where(ra => idsRutinasExistentes.Contains(ra.Id))
+                .ToList();
+
+            foreach (var rutina in rutinasModificadas) 
+            {
+                var rutinaModificada = rutinas.Where(ra => ra.Id.Equals(rutina.Id)).FirstOrDefault();
+
+                if (rutinaModificada is not null) 
+                {
+                    rutina.Actualizar(rutinaModificada);
+                    _contexto.Entry(rutina).State = EntityState.Modified;
+                }
+            }
+
             await _contexto.SaveChangesAsync();
         }
 
@@ -508,6 +631,76 @@ namespace ServicioHydrate.Data
                 .CrearAsync(rutinas, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return registrosHidratacionPaginados;
+        }
+
+        public async Task AgregarEtiquetas(int idPerfil, ICollection<DTOEtiqueta> etiquetasAgregadas)
+        {
+            if (await _contexto.Perfiles.CountAsync() == 0) 
+            {
+                throw new ArgumentException("No existe el perfil de usuario solicitado.");
+            }
+
+            Perfil? perfil = await _contexto.Perfiles
+                .Where(p => p.Id.Equals(idPerfil))
+                .FirstOrDefaultAsync();
+
+            if (perfil is null)
+            {
+                throw new ArgumentException("No existe un perfil con el ID especificado.");
+            }
+
+            bool hayEtiquetasAgregadas = etiquetasAgregadas.Count > 0;
+
+            if (!hayEtiquetasAgregadas) return; 
+
+            List<Etiqueta> etiquetasExistentesEnPerfil = await _contexto.Etiquetas
+                .Where(e => e.IdPerfil.Equals(idPerfil))
+                .ToListAsync();
+
+            // Reducir los IDs de las metas de hidratación exitentes en BD, para  hacer más
+            // fácil filtrar entre metas de hidratación nuevas y metas de hidratación existentes.
+            List<int> idsEtiquetasExistentes = etiquetasExistentesEnPerfil
+                .Select(e => e.Id)
+                .ToList();
+
+            List<string> valoresEtiquetasExistentes = etiquetasExistentesEnPerfil
+                .Select(e => e.Valor)
+                .ToList();
+
+            IEnumerable<DTOEtiqueta> etiquetasNuevasDTO = etiquetasAgregadas
+                .DistinctBy(e => new { e.Id, e.Valor })
+                .Where(e => !(idsEtiquetasExistentes.Contains(e.Id) || valoresEtiquetasExistentes.Contains(e.Valor)));
+
+            IEnumerable<Etiqueta> etiquetasNuevas = etiquetasNuevasDTO
+                .Select(e => e.ComoNuevoModelo(perfil));
+
+            System.Console.WriteLine($"Etiquetas existentes: {etiquetasExistentesEnPerfil.Count}, etiquetas nuevas: {etiquetasNuevas.Count()}");
+
+            foreach (var etiqueta in etiquetasNuevas) 
+            {
+                _contexto.Add(etiqueta);
+                await _contexto.SaveChangesAsync();
+            }
+
+            static string SelectorValorDtoEtiqueta(DTOEtiqueta dtoEtiqueta) => dtoEtiqueta.Valor;
+
+            List<DTOEtiqueta> etiquetasModificadas = etiquetasAgregadas
+                .ExceptBy(etiquetasNuevasDTO.Select(SelectorValorDtoEtiqueta), SelectorValorDtoEtiqueta)
+                .ToList();
+
+            foreach (var etiquetaModificada in etiquetasModificadas)
+            {
+                Etiqueta? etiqueta = etiquetasExistentesEnPerfil
+                    .Find(e => e.Id.Equals(etiquetaModificada.Id));
+
+                if (etiqueta is not null) 
+                {
+                    etiqueta.Actualizar(cambios: etiquetaModificada);
+                    _contexto.Entry(etiqueta).State = EntityState.Modified;
+                }
+            }
+
+            await _contexto.SaveChangesAsync();
         }
     }
 }
