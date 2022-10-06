@@ -8,7 +8,6 @@ namespace ServicioHydrate.Modelos
     [Table("TokensFCM")]
     public class TokenFCM 
     {
-        //TODO: Encontrar un primarykey adecuado para esta entidad.
         [Key]
         public Guid Id { get; set; }
 
@@ -18,7 +17,8 @@ namespace ServicioHydrate.Modelos
 
         public DateTime TimestampPersistido { get; set; }
 
-        [ForeignKey("id_perfil")]
+        [Column("IdPerfil")]
+        public int IdPerfil { get; set; }
         public Perfil Perfil { get; set; }
 
         public DTOTokenFCM ComoDTO() 
@@ -32,7 +32,7 @@ namespace ServicioHydrate.Modelos
     
         public void Actualizar(DTOTokenFCM cambios) 
         {
-            var modeloActualizado = cambios.ComoNuevoModelo();
+            var modeloActualizado = cambios.ComoNuevoModelo(IdPerfil);
 
             Token = modeloActualizado.Token;
             TimestampGenerado = modeloActualizado.TimestampGenerado;

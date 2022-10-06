@@ -40,7 +40,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 PorcentajeCargaBateria = this.PorcentajeCargaBateria,
                 TemperaturaAproximada = this.TemperaturaAproximada,
                 Fecha = fecha,
-                PerfilDeUsuario = perfilDeUsuario,
+                Perfil = perfilDeUsuario,
 				EsInformacionAbierta = esParteDeDatosAbiertos,
 			};
 		}

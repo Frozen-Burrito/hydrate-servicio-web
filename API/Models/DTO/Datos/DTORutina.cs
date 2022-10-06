@@ -56,7 +56,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
             {
                 Id = this.Id,
                 IdPerfil = perfil.Id,
-                PerfilDeUsuario = perfil,
+                Perfil = perfil,
                 Dias = dias,
                 Hora = hora,
                 IdActividad = this.IdActividad,

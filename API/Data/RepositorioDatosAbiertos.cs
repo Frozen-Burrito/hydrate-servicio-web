@@ -21,16 +21,16 @@ namespace ServicioHydrate.Data
 
         public async Task AportarDatosDeActividad(Perfil perfil, IEnumerable<DTONuevaActividad> datos)
         {
-            var mapaTiposDeAct = new Dictionary<int, DatosDeActividad>();
+            var mapaTiposDeAct = new Dictionary<int, TipoDeActividad>();
 
-            List<DatosDeActividad> datosDeActividades = await _contexto.DatosDeActividades
+            List<TipoDeActividad> datosDeActividades = await _contexto.DatosDeActividades
                 .ToListAsync();
 
             datosDeActividades.ForEach((datosDeAct) => mapaTiposDeAct.Add(datosDeAct.Id, datosDeAct));
 
-            IEnumerable<ActividadFisica> registros = datos
+            IEnumerable<RegistroDeActividad> registros = datos
                 .Select(ra => ra.ComoNuevoModelo(
-                    datosDeActividades[ra.IdTipoActividad],
+                    datosDeActividades[ra.IdTipoDeActividad],
                     null, 
                     esParteDeDatosAbiertos: true
                 ));

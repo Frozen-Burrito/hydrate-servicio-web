@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 using ServicioHydrate.Modelos.DTO.Datos;
 
 namespace ServicioHydrate.Modelos.Datos 
@@ -10,7 +10,7 @@ namespace ServicioHydrate.Modelos.Datos
         public int Id { get; set; }
 
         public int IdPerfil { get; set; }
-        public Perfil PerfilDeUsuario { get; set; }
+        public Perfil Perfil { get; set; }
 
         [Range(0, 24)]
         public double HorasDeSuenio { get; set; }

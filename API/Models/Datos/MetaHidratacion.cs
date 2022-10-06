@@ -8,26 +8,24 @@ using ServicioHydrate.Modelos.Enums;
 
 namespace ServicioHydrate.Modelos.Datos 
 {
-    public class Meta 
+    public class MetaHidratacion 
     {
         public int Id { get; set; }
-
-        [Column("id_perfil")]
+        
         public int IdPerfil { get; set; }
-        public Perfil PerfilDeUsuario { get; set; }
+        public Perfil Perfil { get; set; }
 
         public PlazoTemporal Plazo { get; set; }
 
         public DateTime FechaInicio { get; set; }
 
-        [Column("fecha_fin")]
         public DateTime FechaTermino { get; set; }
 
-        [Column("recompensa")]
+        [Column("RecomensaMonedas")]
         [Range(0, 501)]
         public int RecompensaDeMonedas { get; set; }
 
-        [Column("cantidad")]
+        [Column("CantidadMl")]
         [Range(10, 5000)]
         public int CantidadEnMl { get; set; }
 

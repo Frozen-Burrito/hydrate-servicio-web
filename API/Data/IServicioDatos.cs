@@ -23,11 +23,13 @@ namespace ServicioHydrate.Data
 
         Task AgregarRutinas(int idPerfil, ICollection<DTORutina> nuevasRutinas);
 
-        Task AgregarActividadFisica(int idPerfil, ICollection<DTORegistroActividad> nuevasActividades);
+        Task AgregarActividadFisica(int idPerfil, ICollection<DTORegistroActividad> registrosDeActividad);
 
         Task EliminarMeta(int idPerfil, int idMeta);
 
         Task<String?> NotificarAlertaBateria(Guid idCuentaUsuario, int idPerfil);
+
+        Task<String?> NotificarRecordatorioDescanso(Guid idCuentaUsuario, int idPerfil);
     }
 }
 #nullable disable

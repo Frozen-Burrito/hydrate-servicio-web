@@ -9,7 +9,7 @@ namespace ServicioHydrate.Modelos.DTO
 
         public string Timestamp { get; set; }
 
-        public TokenFCM ComoNuevoModelo() 
+        public TokenFCM ComoNuevoModelo(int idPerfil) 
         {
             DateTime timestamp;
 
@@ -27,6 +27,7 @@ namespace ServicioHydrate.Modelos.DTO
 
             return new TokenFCM
             {
+                IdPerfil = idPerfil,
                 Token = Token,
                 TimestampGenerado = timestamp,
                 TimestampPersistido = DateTime.Now,

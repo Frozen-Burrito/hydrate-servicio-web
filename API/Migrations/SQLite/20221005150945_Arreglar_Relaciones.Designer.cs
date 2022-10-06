@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicioHydrate.Data;
 
@@ -10,9 +11,10 @@ using ServicioHydrate.Data;
 namespace ServicioHydrate.Migrations.SQLite
 {
     [DbContext(typeof(ContextoDBSqlite))]
-    partial class ContextoDBSqliteModelSnapshot : ModelSnapshot
+    [Migration("20221005150945_Arreglar_Relaciones")]
+    partial class Arreglar_Relaciones
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.3");
@@ -622,23 +624,6 @@ namespace ServicioHydrate.Migrations.SQLite
                     b.HasKey("Id");
 
                     b.ToTable("Paises");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Codigo = "--"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Codigo = "MX"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Codigo = "USA"
-                        });
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Perfil", b =>
@@ -662,13 +647,13 @@ namespace ServicioHydrate.Migrations.SQLite
                     b.Property<DateTime>("FechaDeCreacion")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("FechaDeModificacion")
+                    b.Property<DateTime>("FechaDeModificacion")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FechaNacimiento")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("FechaSyncConGoogleFit")
+                    b.Property<DateTime>("FechaSyncConGoogleFit")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("IdCuentaUsuario")

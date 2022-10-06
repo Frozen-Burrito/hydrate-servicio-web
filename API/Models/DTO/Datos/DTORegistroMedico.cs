@@ -26,6 +26,9 @@ namespace ServicioHydrate.Modelos.DTO.Datos
         [MaxLength(33)]
         public string FechaProxCita { get; set; }
 
+        [MaxLength(33)]
+        public string FechaDeCreacion { get; set; }
+
         public DatosMedicos ComoNuevoModelo()
         {
             DateTime fecha;
@@ -34,6 +37,16 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 .TryParse(this.FechaProxCita, CultureInfo.InvariantCulture, DateTimeStyles.None, out fecha);
 
             if (!strISO8601Valido)
+            {
+                throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
+            }
+
+            DateTime fechaDeCreacion;
+
+            bool fechaDeCreacionEsValida = DateTime
+                .TryParse(this.FechaDeCreacion, CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaDeCreacion);
+
+            if (!fechaDeCreacionEsValida)
             {
                 throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
             }
@@ -48,6 +61,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 GananciaRegistrada = this.GananciaRegistrada,
                 GananciaReal = this.GananciaReal,
                 FechaProxCita = fecha,
+                FechaCreacion = fechaDeCreacion,
             };
         }
     }

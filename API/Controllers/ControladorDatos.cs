@@ -336,7 +336,6 @@ namespace ServicioHydrate.Controladores
 
                 await _repoDatos.AgregarHidratacion(idPerfil, regHidratacionActualizados);
 
-                //TODO: enviar una notificacion, si es necesario.
                 string? messageId = await _repoDatos.NotificarAlertaBateria(idUsuarioActual, idPerfil);
 
                 _logger.LogInformation($"Notification messageId: {messageId ?? "null"}");
@@ -476,6 +475,13 @@ namespace ServicioHydrate.Controladores
                 int idPerfil = int.Parse(idPerfilStr);
 
                 await _repoDatos.AgregarActividadFisica(idPerfil, registrosDeActividad);
+
+                string? messageId = await _repoDatos.NotificarRecordatorioDescanso(idUsuarioActual, idPerfil);
+
+                if (messageId is not null) 
+                {
+                    _logger.LogInformation($"Notificacion enviada, messageId: {messageId}");
+                }
 
                 return NoContent();
             }

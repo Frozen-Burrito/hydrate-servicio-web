@@ -27,41 +27,92 @@ namespace ServicioHydrate.Modelos
         { 
             get
             {
-                int bitmaskFuentesNotif = 0b_0000_0000;
+                _preferenciasDeNotificaciones = 0b_0000_0000;
 
-                foreach (var fuenteDeNotificaciones in NotificacionesPermitidas) 
+                foreach (var fuenteDeNotificaciones in _notificacionesPermitidas) 
                 {
-                    bitmaskFuentesNotif |= (int) fuenteDeNotificaciones;
+                    _preferenciasDeNotificaciones |= (int) fuenteDeNotificaciones;
                 }
 
-                _preferenciasDeNotificaciones = bitmaskFuentesNotif;
-
-                return bitmaskFuentesNotif;
+                return _preferenciasDeNotificaciones;
             } 
             set
             {
-                // Reiniciar las fuentes de notificaciones.
-                NotificacionesPermitidas.Clear();
+                _preferenciasDeNotificaciones = value;
 
-                if (value == 0) 
+                // Reiniciar las fuentes de notificaciones.
+                _notificacionesPermitidas.Clear();
+
+                if (_preferenciasDeNotificaciones == 0) 
                 {
-                    _preferenciasDeNotificaciones = 0;
-                    NotificacionesPermitidas.Add(TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS);
+                    _notificacionesPermitidas.Add(TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS);
                 } else 
                 {
                     foreach (var fuente in fuentesDeNotificaciones)
                     {
-                        if (((int)fuente & value) == (int)fuente) 
+                        int flagFuente = (int) fuente;
+                        if ((flagFuente & _preferenciasDeNotificaciones) == flagFuente) 
                         {
-                            NotificacionesPermitidas.Add(fuente);
+                            _notificacionesPermitidas.Add(fuente);
                         }
+                    }
+
+                    bool todasLasNotifActivadas = _notificacionesPermitidas.Count == (fuentesDeNotificaciones.Count - 2);
+                    bool todasEstaSeleccionado = _notificacionesPermitidas.Contains(TiposDeNotificacion.TODAS);
+                    if (todasLasNotifActivadas && !todasEstaSeleccionado)
+                    {
+                        _notificacionesPermitidas.Add(TiposDeNotificacion.TODAS);
                     }
                 }
             } 
         }
 
         [NotMapped]
-        public List<TiposDeNotificacion> NotificacionesPermitidas { get; set; }
+        private List<TiposDeNotificacion> _notificacionesPermitidas = new List<TiposDeNotificacion>();
+
+        [NotMapped]
+        public List<TiposDeNotificacion> NotificacionesPermitidas 
+        { 
+            get 
+            {
+                // Reiniciar las fuentes de notificaciones.
+                _notificacionesPermitidas.Clear();
+
+                if (_preferenciasDeNotificaciones == 0) 
+                {
+                    _notificacionesPermitidas.Add(TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS);
+                } else 
+                {
+                    foreach (var fuente in fuentesDeNotificaciones)
+                    {
+                        int flagFuente = (int) fuente;
+                        if ((flagFuente & _preferenciasDeNotificaciones) == flagFuente) 
+                        {
+                            _notificacionesPermitidas.Add(fuente);
+                        }
+                    }
+
+                    bool todasLasNotifActivadas = _notificacionesPermitidas.Count == (fuentesDeNotificaciones.Count - 2);
+                    bool todasEstaSeleccionado = _notificacionesPermitidas.Contains(TiposDeNotificacion.TODAS);
+                    if (todasLasNotifActivadas && !todasEstaSeleccionado)
+                    {
+                        _notificacionesPermitidas.Add(TiposDeNotificacion.TODAS);
+                    }
+                }
+
+                return _notificacionesPermitidas;
+            }
+            set
+            {
+                _notificacionesPermitidas = value;
+                _preferenciasDeNotificaciones = 0b_0000_0000;
+
+                foreach (var fuenteDeNotificaciones in _notificacionesPermitidas) 
+                {
+                    _preferenciasDeNotificaciones |= (int) fuenteDeNotificaciones;
+                }
+            }
+        }
 
         [MaxLength(17)]
         public string IdDispositivo { get; set; }
@@ -69,13 +120,24 @@ namespace ServicioHydrate.Modelos
         [MaxLength(10)]
         public string CodigoLocalizacion { get; set; }
 
-        [ForeignKey("id_perfil")]
+        public int IdPerfil { get; set; }
         public Perfil Perfil { get; set; }
 
         [NotMapped]
         public bool TieneNotificacionesActivadas 
         {
             get => !(NotificacionesPermitidas.Contains(TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS));
+        }
+
+        public bool PuedeRecibirNotificacionesDeFuente(TiposDeNotificacion fuenteDeNotificaciones) 
+        {
+            // Un usuario no puede recibir notificaciones si la fuente es NOTIFIACIONES_DESACTIVADAS.
+            if (fuenteDeNotificaciones == TiposDeNotificacion.NOTIFIACIONES_DESACTIVADAS) 
+            {
+                return false;
+            }
+
+            return NotificacionesPermitidas.Contains(fuenteDeNotificaciones) || NotificacionesPermitidas.Contains(TiposDeNotificacion.TODAS);
         }
 
         private static List<TiposDeNotificacion> fuentesDeNotificaciones = new List<TiposDeNotificacion>{

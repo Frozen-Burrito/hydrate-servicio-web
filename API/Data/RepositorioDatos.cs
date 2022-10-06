@@ -23,8 +23,13 @@ namespace ServicioHydrate.Data
             this._contexto = contexto;
         }
 
-        public async Task AgregarActividadFisica(int idPerfil, ICollection<DTORegistroActividad> nuevasActividades)
+        public async Task AgregarActividadFisica(int idPerfil, ICollection<DTORegistroActividad> registrosDeActividad)
         {
+            if (registrosDeActividad.Count > 32) 
+            {
+                throw new ArgumentOutOfRangeException("Solo es posible modificar hasta 32 registros de actividad por peticion");
+            }
+            
             if (await _contexto.Perfiles.CountAsync() <= 0) 
             {
                 throw new ArgumentException("No existe el perfil de usuario solicitado.");
@@ -39,23 +44,156 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            var mapaTiposDeAct = new Dictionary<int, DatosDeActividad>();
+            var mapaTiposDeAct = new Dictionary<int, TipoDeActividad>();
 
-            List<DatosDeActividad> datosDeActividades = await _contexto.DatosDeActividades
+            List<TipoDeActividad> datosDeActividades = await _contexto.DatosDeActividades
                 .ToListAsync();
 
             datosDeActividades.ForEach((datosDeAct) => mapaTiposDeAct.Add(datosDeAct.Id, datosDeAct));
 
-            IEnumerable<ActividadFisica> registros = nuevasActividades
+            var mapaRutinas = new Dictionary<int, Rutina>();
+
+            List<Rutina> rutinasDePerfil = await _contexto.RutinasDeActFisica
+                .Where(rutina => rutina.IdPerfil.Equals(idPerfil))
+                .ToListAsync();
+
+            rutinasDePerfil.ForEach((rutina) => mapaRutinas.Add(rutina.Id, rutina));
+
+            List<RegistroDeActividad> actividadesExistentes = await _contexto.RegistrosDeActFisica
+                .Where(ra => ra.IdPerfil == perfil.Id)
+                .Include(ra => ra.TipoDeActividad)
+                .Include(ra => ra.Rutina)
+                .AsSplitQuery()
+                .OrderBy(ra => ra.Fecha)
+                .ToListAsync();
+
+            List<int> idsActividadesExistentes = new List<int>();
+
+            foreach (var actividad in actividadesExistentes) 
+            {
+                idsActividadesExistentes.Add(actividad.Id);
+            } 
+
+            List<RegistroDeActividad> actividadesNuevas = registrosDeActividad
+                .Where(ra => !idsActividadesExistentes.Contains(ra.Id))
                 .Select(ra => ra.ComoNuevoModelo(
                     datosDeActividades[ra.IdTipoDeActividad],
                     perfil, 
-                    null,
+                    GetEntidadDeRutina(ra.Rutina, mapaRutinas, perfil),
                     esParteDeDatosAbiertos: false
-                ));
+                ))
+                .ToList();
 
-            _contexto.AddRange(registros);
+            _contexto.AddRange(actividadesNuevas);
+
+            IEnumerable<RegistroDeActividad> actividadesModificadas = actividadesExistentes
+                .Where(ra => idsActividadesExistentes.Contains(ra.Id))
+                .ToList();
+
+            foreach (var registroDeActividad in actividadesModificadas) 
+            {
+                var cambiosAlRegistro = registrosDeActividad.Where(ra => ra.Id.Equals(registroDeActividad.Id)).FirstOrDefault();
+
+                if (cambiosAlRegistro is not null) 
+                {
+                    registroDeActividad.Actualizar(
+                        cambiosAlRegistro,
+                        GetEntidadDeRutina(cambiosAlRegistro.Rutina, mapaRutinas, perfil)
+                    );
+                    _contexto.Entry(registroDeActividad).State = EntityState.Modified;
+                }
+            }
+
             await _contexto.SaveChangesAsync();
+        }
+
+        private Rutina? GetEntidadDeRutina(DTORutina? rutina, Dictionary<int, Rutina> rutinasExistentes, Perfil perfil)
+        {
+            if (rutina is null) return null;
+
+            Rutina? entidadRutina = null;
+
+            try 
+            {
+                entidadRutina = rutinasExistentes[rutina.Id];
+            } catch (KeyNotFoundException) 
+            {
+                entidadRutina = rutina.ComoNuevoModelo(perfil);
+            }
+
+            return entidadRutina;
+        }
+
+        public async Task<string?> NotificarRecordatorioDescanso(Guid idCuentaUsuario, int idPerfil)
+        {
+            if (await _contexto.Perfiles.CountAsync() <= 0) 
+            {
+                throw new ArgumentException("No existe el perfil de usuario solicitado.");
+            }
+
+            Perfil? perfil = await _contexto.Perfiles
+                .Where(p => p.Id.Equals(idPerfil))
+                .Include(p => p.Configuracion)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync();
+
+            if (perfil is null)
+            {
+                throw new ArgumentException("No existe un perfil con el ID especificado.");
+            }
+
+            String? fcmMessageId = null;
+
+            bool notificacionesDeDescansoActivadas = perfil.Configuracion
+                .PuedeRecibirNotificacionesDeFuente(TiposDeNotificacion.ALERTAS_BATERIA_DISPOSITIVO);
+
+            // Intentar enviar una notificación de alerta de batería, si están activadas
+            // y los registros de hidratación más recientes incluyen un nivel de batería bajo.
+            if (notificacionesDeDescansoActivadas)
+            {                
+                DateTime fechaHaceTresDias = DateTime.Now.AddDays(-3.0);
+
+                List<RegistroDeActividad>? actividadDeUltimosTresDias = await _contexto.RegistrosDeActFisica
+                    .Where(ra => (ra.IdPerfil.Equals(idPerfil) && ra.Fecha > fechaHaceTresDias))
+                    .OrderBy(rh => rh.Fecha)
+                    .ToListAsync();
+
+                int numeroDeActividadesIntensasRecientes = actividadDeUltimosTresDias
+                    .Where(ra => ra.EsActividadIntensa)
+                    .Count();
+
+                if (actividadDeUltimosTresDias is not null && numeroDeActividadesIntensasRecientes >= 1) 
+                {
+                    // Existen más de 3 registros de actividad intensa en los últimos 
+                    // 3 días. Notificar al usuario.
+                    var tokenDeRegistroFCM = await _contexto.TokensParaNotificaciones
+                        .Include(t => t.Perfil)
+                        .AsSplitQuery()
+                        .Where(t => (t.Perfil.IdCuentaUsuario.Equals(idCuentaUsuario) && t.Perfil.Id.Equals(idPerfil)))
+                        .FirstOrDefaultAsync();
+
+                    var instanciaFCM = FirebaseMessaging.DefaultInstance;
+
+                    if (tokenDeRegistroFCM is not null && instanciaFCM is not null) 
+                    {
+                        var mensaje = new Message()
+                        {
+                            Token = tokenDeRegistroFCM.Token,
+                            Notification = new Notification()
+                            {
+                                Title = "Buen trabajo, pero recuerda descansar",
+                                Body = $"Tienes {numeroDeActividadesIntensasRecientes} registros de actividad intensa en los últimos 3 días.",
+                                ImageUrl = "https://servicio-web-hydrate.azurewebsites.net/favicon.ico",
+                            },
+                        };
+
+                        // Enviar el mensaje a través de FCM.
+                        fcmMessageId = await instanciaFCM.SendAsync(mensaje);
+                    }
+                }
+            } 
+
+            return fcmMessageId;
         }
 
         public async Task AgregarHidratacion(int idPerfil, ICollection<DTORegistroDeHidratacion> nuevosRegistrosHidr)
@@ -88,7 +226,7 @@ namespace ServicioHydrate.Data
             await _contexto.SaveChangesAsync();
         }
 
-        public async Task<String?> NotificarAlertaBateria(Guid idCuentaUsuario, int idPerfil)
+        public async Task<string?> NotificarAlertaBateria(Guid idCuentaUsuario, int idPerfil)
         {
             if (await _contexto.Perfiles.CountAsync() <= 0) 
             {
@@ -113,9 +251,9 @@ namespace ServicioHydrate.Data
             if (perfil.Configuracion.NotificacionesPermitidas.Contains(TiposDeNotificacion.ALERTAS_BATERIA_DISPOSITIVO))
             {                
                 IQueryable<RegistroDeHidratacion>? registrosRecientes = _contexto.RegistrosDeHidratacion
-                    .Include(rh => rh.PerfilDeUsuario)
+                    .Include(rh => rh.Perfil)
                     .AsSplitQuery()
-                    .Where(rh => (rh.PerfilDeUsuario.Id.Equals(idPerfil)))
+                    .Where(rh => (rh.Perfil.Id.Equals(idPerfil)))
                     .OrderBy(rh => rh.Fecha)
                     .Take(1);
 
@@ -183,7 +321,7 @@ namespace ServicioHydrate.Data
 
             etiquetasExistentes.ForEach((etiqueta) => mapaDeEtiquetas.Add(etiqueta.Id, etiqueta));
 
-            IEnumerable<Meta> metasAgregadas = nuevasMetas
+            IEnumerable<MetaHidratacion> metasAgregadas = nuevasMetas
                 .Select(m => m.ComoNuevoModelo(
                     etiquetasExistentes,
                     perfil
@@ -232,7 +370,7 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            Meta? meta = await _contexto.Metas
+            MetaHidratacion? meta = await _contexto.Metas
                 .Where(m => m.Id.Equals(idMeta) && m.IdPerfil.Equals(idPerfil))
                 .FirstOrDefaultAsync();
 
@@ -266,7 +404,7 @@ namespace ServicioHydrate.Data
 
             IQueryable<DTORegistroActividad>? actividades = _contexto.RegistrosDeActFisica
                 .Where(ra => ra.IdPerfil == perfil.Id)
-                .Include(ra => ra.DatosActividad)
+                .Include(ra => ra.TipoDeActividad)
                 .Include(ra => ra.Rutina)
                 .AsSplitQuery()
                 .OrderBy(ra => ra.Fecha)
@@ -298,9 +436,9 @@ namespace ServicioHydrate.Data
             }
 
             IQueryable<DTORegistroDeHidratacion>? regHidratacion = _contexto.RegistrosDeHidratacion
-                .Include(rh => rh.PerfilDeUsuario)
+                .Include(rh => rh.Perfil)
                 .AsSplitQuery()
-                .Where(rh => rh.PerfilDeUsuario.Id == perfil.Id)
+                .Where(rh => rh.Perfil.Id == perfil.Id)
                 .OrderBy(rh => rh.Fecha)
                 .Select(rh => rh.ComoDTO());
 

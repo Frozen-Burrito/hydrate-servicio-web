@@ -21,7 +21,7 @@ namespace ServicioHydrate.Data
             this._contexto = contexto;
         }
 
-        public async Task ActualizarPerfil(DTOPerfil modificacionesPerfil)
+        public async Task ActualizarPerfil(DTOPerfilModificado modificacionesPerfil)
         {
             if (await _contexto.Perfiles.CountAsync() <= 0) 
             {
@@ -49,7 +49,7 @@ namespace ServicioHydrate.Data
             }
             
             Pais? paisActualizado = await _contexto.Paises
-                .Where(p => p.Id == modificacionesPerfil.PaisDeResidencia.Id)
+                .Where(p => p.Id.Equals(modificacionesPerfil.IdPaisDeResidencia))
                 .FirstOrDefaultAsync();
 
             if (paisActualizado is null) 
@@ -61,7 +61,7 @@ namespace ServicioHydrate.Data
                 .Where(e => modificacionesPerfil.IdsEntornosDesbloqueados.Contains(e.Id))
                 .ToListAsync();
 
-            perfil.Actualizar(modificacionesPerfil, paisActualizado, entornosActualizados);
+            perfil.Actualizar(modificacionesPerfil, entornosActualizados);
 
             _contexto.Entry(perfil).State = EntityState.Modified;
             await _contexto.SaveChangesAsync();
@@ -96,7 +96,7 @@ namespace ServicioHydrate.Data
 
             if (tokenFCM is null) 
             {
-                 _contexto.TokensParaNotificaciones.Add(tokenActualizado.ComoNuevoModelo());
+                 _contexto.TokensParaNotificaciones.Add(tokenActualizado.ComoNuevoModelo(perfil.Id));
             } else 
             {
                 bool debeBorrarTokenExistente = String.IsNullOrEmpty(tokenActualizado.Token.Trim());

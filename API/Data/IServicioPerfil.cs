@@ -19,7 +19,7 @@ namespace ServicioHydrate.Data
 
         Task<DTOPerfil> RegistrarPerfilExistente(DTOPerfil perfil, DTOUsuario cuentaUsuario);
 
-        Task ActualizarPerfil(DTOPerfil perfil);
+        Task ActualizarPerfil(DTOPerfilModificado cambiosAlPerfil);
 
         Task EliminarPerfil(Guid idCuentaUsuario, int idPerfil);
     }

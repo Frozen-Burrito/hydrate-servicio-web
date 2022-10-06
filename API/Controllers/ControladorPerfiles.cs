@@ -171,7 +171,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ActualizarPerfil(int idPerfil, DTOPerfil modificacionesPerfil)
+        public async Task<IActionResult> ActualizarPerfil(int idPerfil, DTOPerfilModificado cambiosAlPerfil)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -184,10 +184,10 @@ namespace ServicioHydrate.Controladores
                 string idStr = this.User.Claims.FirstOrDefault(i => i.Type == "id")?.Value ?? "";
                 Guid idUsuarioActual = new Guid(idStr);
 
-                modificacionesPerfil.Id = idPerfil;
-                modificacionesPerfil.IdCuentaUsuario = idUsuarioActual;
+                cambiosAlPerfil.Id = idPerfil;
+                cambiosAlPerfil.IdCuentaUsuario = idUsuarioActual;
 
-                await _repoPerfiles.ActualizarPerfil(modificacionesPerfil);
+                await _repoPerfiles.ActualizarPerfil(cambiosAlPerfil);
 
                 return NoContent();
             }

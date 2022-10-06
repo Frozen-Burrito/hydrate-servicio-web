@@ -12,9 +12,12 @@ namespace ServicioHydrate.Modelos.Datos
     {
         public int Id { get; set; }
 
-		[Column("id_perfil")]
+		[Column("IdPerfil")]
         public int IdPerfil { get; set; }
-        public Perfil PerfilDeUsuario { get; set; }
+        public Perfil Perfil { get; set; }
+
+        [NotMapped]
+        private int _diasDeRutina;
 
         public int DiasDeOcurrencia { 
             get 
@@ -28,6 +31,24 @@ namespace ServicioHydrate.Modelos.Datos
 
                 return bitmaskDias;
             }
+            set
+            {
+                // Reiniciar los días de ocurrencia de la rutina.
+                Dias.Clear();
+
+                _diasDeRutina = value;
+
+                if (_diasDeRutina > 0) 
+                {
+                    foreach (var diaDeLaSemana in diasDeLaSemana)
+                    {
+                        if (((int)diaDeLaSemana & _diasDeRutina) == (int)diaDeLaSemana) 
+                        {
+                            Dias.Add(diaDeLaSemana);
+                        }
+                    }
+                }
+            }
         }
 
         [NotMapped]
@@ -35,9 +56,21 @@ namespace ServicioHydrate.Modelos.Datos
 
         public TimeOnly Hora { get; set; }
 
-		[Column("id_actividad")]
+		[Column("IdRegistroActividad")]
         public int IdActividad { get; set; }
-        public ActividadFisica RegistroDeActividad { get; set; }
+        public RegistroDeActividad RegistroDeActividad { get; set; }
+
+        [NotMapped]
+        private static List<DiasDeLaSemana> diasDeLaSemana = new List<DiasDeLaSemana>{
+            DiasDeLaSemana.LUNES,
+            DiasDeLaSemana.MARTES,
+            DiasDeLaSemana.MIERCOLES,
+            DiasDeLaSemana.JUEVES,
+            DiasDeLaSemana.VIERNES,
+            DiasDeLaSemana.SABADO,
+            DiasDeLaSemana.DOMINGO,
+            DiasDeLaSemana.TODOS_LOS_DIAS,
+        };
 
         public DTORutina ComoDTO()
         {

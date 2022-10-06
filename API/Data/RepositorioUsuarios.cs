@@ -251,12 +251,24 @@ namespace ServicioHydrate.Data
             // caso, crear un nuevo perfil asociado a la cuenta.
             if (perfil is null) 
             {
-                Perfil nuevoPerfil = new Perfil
+                Entorno? primerEntornoDesbloqueado = await _contexto.Entornos
+                    .SingleOrDefaultAsync(e => e.Id.Equals(Entorno.PrimerEntornoDesbloqueado.Id));
+
+                Pais? paisNoEspecificado = await _contexto.Paises
+                    .SingleOrDefaultAsync(p => p.Id.Equals(Pais.PaisNoEspecificado.Id));
+
+                if (primerEntornoDesbloqueado is null || paisNoEspecificado is null) 
                 {
-                    IdCuentaUsuario = modeloUsuario.Id,
-                };
+                    throw new ArgumentNullException("No existen el entorno o pais seleccionados");
+                }
+
+                Perfil nuevoPerfil = Perfil.PorDefecto(modeloUsuario.Id);
+
+                nuevoPerfil.PaisDeResidencia = paisNoEspecificado;
+                nuevoPerfil.EntornoSeleccionado = primerEntornoDesbloqueado;
 
                 _contexto.Perfiles.Add(nuevoPerfil);
+                await _contexto.SaveChangesAsync();
 
                 idPerfil = nuevoPerfil.Id;
 
@@ -267,9 +279,7 @@ namespace ServicioHydrate.Data
             }
 
             Configuracion? config = await _contexto.Configuraciones
-                .Include(c => c.Perfil)
-                .AsSplitQuery()
-                .Where(c => c.Perfil.Id.Equals(idPerfil) && c.Perfil.IdCuentaUsuario.Equals(modeloUsuario.Id))
+                .Where(c => c.IdPerfil.Equals(idPerfil))
                 .FirstOrDefaultAsync();
 
             if (config is null) 

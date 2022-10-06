@@ -30,7 +30,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
         public ICollection<DTOEtiqueta> Etiquetas { get; set; }
 
-        public Meta ComoNuevoModelo(ICollection<Etiqueta> etiquetas, Perfil perfil)
+        public MetaHidratacion ComoNuevoModelo(ICollection<Etiqueta> etiquetas, Perfil perfil)
         {
             DateTime fechaDeInicio;
 
@@ -52,7 +52,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 throw new FormatException("Se esperaba un string con formato ISO 8601 para FechaInicio, pero el string recibido no es válido");  
             }
 
-            return new Meta()
+            return new MetaHidratacion()
             {
                 Id = this.Id,
                 IdPerfil = perfil.Id,
