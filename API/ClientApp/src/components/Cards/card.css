@@ -1,0 +1,67 @@
+.card {
+    width: 385px;
+    margin: 0px 25px 40px 25px;
+    background-color: #F8F8F8;
+    border-radius: 10px;
+}
+
+.cardTitle {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px;
+}
+
+.cardInfo {
+    display: flex;
+}
+
+.water {
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+}
+
+.water > .waterContainer {
+    display: flex;
+    padding-left: 10px;
+    margin-bottom: 5px;
+}
+
+.water > .waterContainer > .color {
+    width: 16px;
+    height: 16px;
+    background: #4C98DE;
+}
+
+.water > .waterContainer > .text {
+    font-size: 12px;
+    color: #0F0F0F;
+    margin-left: 5px;
+}
+
+.cantidadAgua {
+    margin-right: 10px;
+}
+
+.cantidadAgua > .cantidad {
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.cantidadAgua > .estado {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.cantidadAgua > .estado > span {
+    color: rgba(15, 15, 15, 0.87);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
-import { Layout, Avatar, DrawerPerfil } from "../../components";
+import { Layout, DrawerPerfil } from "../../components";
+import { Cards } from "../../components/Cards/Cards";
 
 export function PaginaTableroPerfil() {
 
@@ -16,12 +17,9 @@ export function PaginaTableroPerfil() {
       />
 
       <section className='contenedor full-page py-5'>
-        <div className="stack horizontal justify-between gap-2 my-3">
-          <h3>Tablero</h3>
-
-          <div style={{ display: "flex" }}>
-            <Avatar alt="Juan Perez" />
-          </div>
+        <div className="stack horizontal justify-between gap-2 my-3" style={{ display: "flex", flexDirection: "column" }}>
+          <h3>Datos de consumo del usuario</h3>
+          <Cards />
         </div>
       </section>
     </Layout>
