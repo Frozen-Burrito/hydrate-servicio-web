@@ -188,7 +188,7 @@ export default function TarjetaComentario(props) {
 
 			// Obtener todas las respuestas al comentario. Ya vienen ordenados por
 			// fecha desde la API.
-			const resultado = await api.fetchRespuestasAComentario(comentario.id, jwt);
+			const resultado = await api.fetchRespuestasAComentario(comentario.id, 1, jwt);
 
 			console.log(resultado);
 
