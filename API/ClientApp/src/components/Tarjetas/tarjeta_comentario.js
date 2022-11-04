@@ -193,7 +193,7 @@ export default function TarjetaComentario(props) {
 			console.log(resultado);
 
 			if (resultado.ok && resultado.status === StatusHttp.Status200OK) {
-				setRespuestas(resultado.cuerpo);
+				setRespuestas(resultado.datos);
 			} else {
 				setTieneError(true);
 			}
