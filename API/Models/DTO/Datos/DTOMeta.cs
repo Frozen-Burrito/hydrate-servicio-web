@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Linq;
 using ServicioHydrate.Modelos.Datos;
 using ServicioHydrate.Modelos.Enums;
 
+#nullable enable
 namespace ServicioHydrate.Modelos.DTO.Datos
 {
     public class DTOMeta 
@@ -16,8 +18,8 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
         public PlazoTemporal Plazo { get; set; }
 
-        public string FechaInicio { get; set; }
-        public string FechaTermino { get; set; }
+        public string FechaInicio { get; set; } = "";
+        public string FechaTermino { get; set; } = "";
 
         [Range(0, 501)]
         public int RecompensaDeMonedas { get; set; }
@@ -26,11 +28,11 @@ namespace ServicioHydrate.Modelos.DTO.Datos
         public int CantidadEnMl { get; set; }
 
         [MaxLength(300)]
-        public string Notas { get; set; }
+        public string Notas { get; set; } = "";
 
-        public ICollection<DTOEtiqueta> Etiquetas { get; set; }
+        public ICollection<DTOEtiqueta> Etiquetas { get; set; } = new List<DTOEtiqueta>();
 
-        public Meta ComoNuevoModelo(ICollection<Etiqueta> etiquetas)
+        public MetaHidratacion ComoNuevoModelo(Perfil perfil, IEnumerable<Etiqueta> etiquetasDeMeta)
         {
             DateTime fechaDeInicio;
 
@@ -52,17 +54,19 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 throw new FormatException("Se esperaba un string con formato ISO 8601 para FechaInicio, pero el string recibido no es válido");  
             }
 
-            return new Meta()
+            return new MetaHidratacion()
             {
-                IdPerfil = this.IdPerfil,
+                Id = this.Id,
+                IdPerfil = perfil.Id,
                 Plazo = this.Plazo,
                 FechaInicio = fechaDeInicio,
                 FechaTermino = fechaTermino,
                 RecompensaDeMonedas = this.RecompensaDeMonedas,
                 CantidadEnMl = this.CantidadEnMl,
                 Notas = this.Notas,
-                Etiquetas = etiquetas,
+                Etiquetas = etiquetasDeMeta.ToList(),
             };
         }
     }
 }
+#nullable disable

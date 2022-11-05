@@ -49,7 +49,22 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.ToTable("ComentariosUtiles", (string)null);
                 });
 
-            modelBuilder.Entity("EtiquetaMeta", b =>
+            modelBuilder.Entity("EntornoPerfil", b =>
+                {
+                    b.Property<int>("EntornosDesbloqueadosId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PerfilesQueDesbloquearonId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EntornosDesbloqueadosId", "PerfilesQueDesbloquearonId");
+
+                    b.HasIndex("PerfilesQueDesbloquearonId");
+
+                    b.ToTable("EntornosDesbloqueados", (string)null);
+                });
+
+            modelBuilder.Entity("EtiquetaMetaHidratacion", b =>
                 {
                     b.Property<int>("EtiquetasId")
                         .HasColumnType("int");
@@ -67,7 +82,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("MetasId", "MetasIdPerfil");
 
-                    b.ToTable("Etiquetas_De_Meta", (string)null);
+                    b.ToTable("EtiquetasDeMetas", (string)null);
                 });
 
             modelBuilder.Entity("RespuestaUsuario", b =>
@@ -157,7 +172,47 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.ToTable("ComentariosArchivados");
                 });
 
-            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.ActividadFisica", b =>
+            modelBuilder.Entity("ServicioHydrate.Modelos.Configuracion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("AportaDatosAbiertos")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("CodigoLocalizacion")
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<bool>("FormulariosRecurrentesActivados")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("IdDispositivo")
+                        .HasMaxLength(17)
+                        .HasColumnType("varchar(17)");
+
+                    b.Property<int>("IdPerfil")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IntegradoConGoogleFit")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("PreferenciasDeNotificaciones")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TemaDeColor")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdPerfil")
+                        .IsUnique();
+
+                    b.ToTable("Configuracion");
+                });
+
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.DatosMedicos", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -165,7 +220,99 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Property<int>("IdPerfil")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DatosActividadId")
+                    b.Property<float>("AguaExtracelular")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("FechaProxCita")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<float>("GananciaReal")
+                        .HasColumnType("float");
+
+                    b.Property<float>("GananciaRegistrada")
+                        .HasColumnType("float");
+
+                    b.Property<float>("Hipervolemia")
+                        .HasColumnType("float");
+
+                    b.Property<float>("Normovolemia")
+                        .HasColumnType("float");
+
+                    b.Property<float>("PesoPostDialisis")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id", "IdPerfil");
+
+                    b.HasIndex("IdPerfil");
+
+                    b.ToTable("DatosMedicos");
+                });
+
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Etiqueta", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdPerfil")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Valor")
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)");
+
+                    b.HasKey("Id", "IdPerfil");
+
+                    b.HasIndex("IdPerfil");
+
+                    b.ToTable("Etiquetas");
+                });
+
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.MetaHidratacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdPerfil")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CantidadEnMl")
+                        .HasColumnType("int")
+                        .HasColumnName("CantidadMl");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("FechaTermino")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Notas")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<int>("Plazo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecompensaDeMonedas")
+                        .HasColumnType("int")
+                        .HasColumnName("RecomensaMonedas");
+
+                    b.HasKey("Id", "IdPerfil");
+
+                    b.HasIndex("IdPerfil");
+
+                    b.ToTable("Metas");
+                });
+
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeActividad", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdPerfil")
                         .HasColumnType("int");
 
                     b.Property<double>("Distancia")
@@ -183,10 +330,10 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Property<bool>("FueAlAireLibre")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<int>("KcalQuemadas")
+                    b.Property<int>("IdTipoDeActividad")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PerfilDeUsuarioId")
+                    b.Property<int>("KcalQuemadas")
                         .HasColumnType("int");
 
                     b.Property<string>("Titulo")
@@ -196,130 +343,11 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id", "IdPerfil");
 
-                    b.HasIndex("DatosActividadId");
+                    b.HasIndex("IdPerfil");
 
-                    b.HasIndex("PerfilDeUsuarioId");
+                    b.HasIndex("IdTipoDeActividad");
 
                     b.ToTable("RegistrosDeActFisica");
-                });
-
-            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.DatosDeActividad", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<double>("METs")
-                        .HasColumnType("double");
-
-                    b.Property<double>("VelocidadPromedioKMH")
-                        .HasColumnType("double");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DatosDeActividades");
-                });
-
-            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.DatosMedicos", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdPerfil")
-                        .HasColumnType("int");
-
-                    b.Property<float>("AguaExtracelular")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("FechaProxCita")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<float>("GananciaReal")
-                        .HasColumnType("float");
-
-                    b.Property<float>("GananciaRegistrada")
-                        .HasColumnType("float");
-
-                    b.Property<float>("Hipervolemia")
-                        .HasColumnType("float");
-
-                    b.Property<float>("Normovolemia")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("PerfilDeUsuarioId")
-                        .HasColumnType("int");
-
-                    b.Property<float>("PesoPostDialisis")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id", "IdPerfil");
-
-                    b.HasIndex("PerfilDeUsuarioId");
-
-                    b.ToTable("DatosMedicos");
-                });
-
-            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Etiqueta", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdPerfil")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PerfilDeUsuarioId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Valor")
-                        .HasMaxLength(16)
-                        .HasColumnType("varchar(16)");
-
-                    b.HasKey("Id", "IdPerfil");
-
-                    b.HasIndex("PerfilDeUsuarioId");
-
-                    b.ToTable("Etiquetas");
-                });
-
-            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Meta", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdPerfil")
-                        .HasColumnType("int")
-                        .HasColumnName("id_perfil");
-
-                    b.Property<int>("CantidadEnMl")
-                        .HasColumnType("int")
-                        .HasColumnName("cantidad");
-
-                    b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("FechaTermino")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("fecha_fin");
-
-                    b.Property<string>("Notas")
-                        .HasMaxLength(300)
-                        .HasColumnType("varchar(300)");
-
-                    b.Property<int?>("PerfilDeUsuarioId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Plazo")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RecompensaDeMonedas")
-                        .HasColumnType("int")
-                        .HasColumnName("recompensa");
-
-                    b.HasKey("Id", "IdPerfil");
-
-                    b.HasIndex("PerfilDeUsuarioId");
-
-                    b.ToTable("Metas");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeHidratacion", b =>
@@ -329,7 +357,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.Property<int>("IdPerfil")
                         .HasColumnType("int")
-                        .HasColumnName("id_perfil");
+                        .HasColumnName("IdPerfil");
 
                     b.Property<int>("CantidadEnMl")
                         .HasColumnType("int");
@@ -340,9 +368,6 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("PerfilDeUsuarioId")
-                        .HasColumnType("int");
-
                     b.Property<int>("PorcentajeCargaBateria")
                         .HasColumnType("int");
 
@@ -351,7 +376,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id", "IdPerfil");
 
-                    b.HasIndex("PerfilDeUsuarioId");
+                    b.HasIndex("IdPerfil");
 
                     b.ToTable("RegistrosDeHidratacion");
                 });
@@ -376,15 +401,12 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Property<double>("HorasDeSuenio")
                         .HasColumnType("double");
 
-                    b.Property<int?>("PerfilDeUsuarioId")
-                        .HasColumnType("int");
-
                     b.Property<double>("TemperaturaMaxima")
                         .HasColumnType("double");
 
                     b.HasKey("Id", "IdPerfil");
 
-                    b.HasIndex("PerfilDeUsuarioId");
+                    b.HasIndex("IdPerfil");
 
                     b.ToTable("ReporteSemanal");
                 });
@@ -396,9 +418,9 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.Property<int>("IdPerfil")
                         .HasColumnType("int")
-                        .HasColumnName("id_perfil");
+                        .HasColumnName("IdPerfil");
 
-                    b.Property<int>("Dias")
+                    b.Property<int>("DiasDeOcurrencia")
                         .HasColumnType("int");
 
                     b.Property<TimeOnly>("Hora")
@@ -406,14 +428,11 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.Property<int>("IdActividad")
                         .HasColumnType("int")
-                        .HasColumnName("id_actividad");
-
-                    b.Property<int?>("PerfilDeUsuarioId")
-                        .HasColumnType("int");
+                        .HasColumnName("IdRegistroActividad");
 
                     b.HasKey("Id", "IdPerfil");
 
-                    b.HasIndex("PerfilDeUsuarioId");
+                    b.HasIndex("IdPerfil");
 
                     b.HasIndex("IdActividad", "IdPerfil")
                         .IsUnique();
@@ -421,13 +440,95 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.ToTable("RutinasDeActFisica");
                 });
 
-            modelBuilder.Entity("ServicioHydrate.Modelos.Entorno", b =>
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.TipoDeActividad", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("PerfilId")
+                    b.Property<int>("IdActividadGoogleFit")
+                        .HasColumnType("int");
+
+                    b.Property<double>("METs")
+                        .HasColumnType("double");
+
+                    b.Property<double>("VelocidadPromedioKMH")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TiposDeActividad");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IdActividadGoogleFit = 7,
+                            METs = 4.2999999999999998,
+                            VelocidadPromedioKMH = 5.0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IdActividadGoogleFit = 8,
+                            METs = 7.0,
+                            VelocidadPromedioKMH = 8.0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            IdActividadGoogleFit = 1,
+                            METs = 7.5,
+                            VelocidadPromedioKMH = 11.0
+                        },
+                        new
+                        {
+                            Id = 4,
+                            IdActividadGoogleFit = 82,
+                            METs = 9.8000000000000007,
+                            VelocidadPromedioKMH = 0.0
+                        },
+                        new
+                        {
+                            Id = 5,
+                            IdActividadGoogleFit = 29,
+                            METs = 7.0,
+                            VelocidadPromedioKMH = 0.0
+                        },
+                        new
+                        {
+                            Id = 6,
+                            IdActividadGoogleFit = 12,
+                            METs = 6.5,
+                            VelocidadPromedioKMH = 0.0
+                        },
+                        new
+                        {
+                            Id = 7,
+                            IdActividadGoogleFit = 89,
+                            METs = 4.0,
+                            VelocidadPromedioKMH = 0.0
+                        },
+                        new
+                        {
+                            Id = 8,
+                            IdActividadGoogleFit = 24,
+                            METs = 7.7999999999999998,
+                            VelocidadPromedioKMH = 0.0
+                        },
+                        new
+                        {
+                            Id = 9,
+                            IdActividadGoogleFit = 100,
+                            METs = 1.3,
+                            VelocidadPromedioKMH = 0.0
+                        });
+                });
+
+            modelBuilder.Entity("ServicioHydrate.Modelos.Entorno", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<int>("PrecioEnMonedas")
@@ -438,9 +539,21 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PerfilId");
-
                     b.ToTable("Entornos");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            PrecioEnMonedas = 0,
+                            UrlImagen = "1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PrecioEnMonedas = 250,
+                            UrlImagen = "2"
+                        });
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.LlaveDeApi", b =>
@@ -512,6 +625,23 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.HasKey("Id");
 
                     b.ToTable("Paises");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Codigo = "--"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Codigo = "MX"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Codigo = "USA"
+                        });
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Perfil", b =>
@@ -532,13 +662,25 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Property<double>("Estatura")
                         .HasColumnType("double");
 
+                    b.Property<DateTime>("FechaDeCreacion")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("FechaDeModificacion")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("FechaNacimiento")
                         .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("FechaSyncConGoogleFit")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<Guid>("IdCuentaUsuario")
                         .HasColumnType("char(36)");
 
                     b.Property<int>("IdEntornoSeleccionado")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdPaisDeResidencia")
                         .HasColumnType("int");
 
                     b.Property<string>("Nombre")
@@ -548,9 +690,6 @@ namespace ServicioHydrate.Migrations.MySQL
                         .HasColumnType("int");
 
                     b.Property<int>("Ocupacion")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PaisDeResidenciaId")
                         .HasColumnType("int");
 
                     b.Property<double>("Peso")
@@ -564,7 +703,9 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.HasIndex("IdCuentaUsuario")
                         .IsUnique();
 
-                    b.HasIndex("PaisDeResidenciaId");
+                    b.HasIndex("IdEntornoSeleccionado");
+
+                    b.HasIndex("IdPaisDeResidencia");
 
                     b.ToTable("Perfiles");
                 });
@@ -679,6 +820,33 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.ToTable("Respuestas");
                 });
 
+            modelBuilder.Entity("ServicioHydrate.Modelos.TokenFCM", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("IdPerfil")
+                        .HasColumnType("int")
+                        .HasColumnName("IdPerfil");
+
+                    b.Property<DateTime>("TimestampGenerado")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("TimestampPersistido")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdPerfil")
+                        .IsUnique();
+
+                    b.ToTable("TokensFCM");
+                });
+
             modelBuilder.Entity("ServicioHydrate.Modelos.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -736,7 +904,22 @@ namespace ServicioHydrate.Migrations.MySQL
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EtiquetaMeta", b =>
+            modelBuilder.Entity("EntornoPerfil", b =>
+                {
+                    b.HasOne("ServicioHydrate.Modelos.Entorno", null)
+                        .WithMany()
+                        .HasForeignKey("EntornosDesbloqueadosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", null)
+                        .WithMany()
+                        .HasForeignKey("PerfilesQueDesbloquearonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EtiquetaMetaHidratacion", b =>
                 {
                     b.HasOne("ServicioHydrate.Modelos.Datos.Etiqueta", null)
                         .WithMany()
@@ -744,7 +927,7 @@ namespace ServicioHydrate.Migrations.MySQL
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ServicioHydrate.Modelos.Datos.Meta", null)
+                    b.HasOne("ServicioHydrate.Modelos.Datos.MetaHidratacion", null)
                         .WithMany()
                         .HasForeignKey("MetasId", "MetasIdPerfil")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -790,88 +973,108 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Navigation("Autor");
                 });
 
-            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.ActividadFisica", b =>
+            modelBuilder.Entity("ServicioHydrate.Modelos.Configuracion", b =>
                 {
-                    b.HasOne("ServicioHydrate.Modelos.Datos.DatosDeActividad", "DatosActividad")
-                        .WithMany()
-                        .HasForeignKey("DatosActividadId");
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", "Perfil")
+                        .WithOne("Configuracion")
+                        .HasForeignKey("ServicioHydrate.Modelos.Configuracion", "IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ServicioHydrate.Modelos.Perfil", "PerfilDeUsuario")
-                        .WithMany("RegistrosDeActFisica")
-                        .HasForeignKey("PerfilDeUsuarioId");
-
-                    b.Navigation("DatosActividad");
-
-                    b.Navigation("PerfilDeUsuario");
+                    b.Navigation("Perfil");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.DatosMedicos", b =>
                 {
                     b.HasOne("ServicioHydrate.Modelos.Perfil", "PerfilDeUsuario")
                         .WithMany("RegistrosMedicos")
-                        .HasForeignKey("PerfilDeUsuarioId");
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("PerfilDeUsuario");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Etiqueta", b =>
                 {
-                    b.HasOne("ServicioHydrate.Modelos.Perfil", "PerfilDeUsuario")
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", "Perfil")
                         .WithMany("Etiquetas")
-                        .HasForeignKey("PerfilDeUsuarioId");
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("PerfilDeUsuario");
+                    b.Navigation("Perfil");
                 });
 
-            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Meta", b =>
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.MetaHidratacion", b =>
                 {
-                    b.HasOne("ServicioHydrate.Modelos.Perfil", "PerfilDeUsuario")
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", "Perfil")
                         .WithMany("Metas")
-                        .HasForeignKey("PerfilDeUsuarioId");
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("PerfilDeUsuario");
+                    b.Navigation("Perfil");
+                });
+
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeActividad", b =>
+                {
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", "Perfil")
+                        .WithMany("RegistrosDeActFisica")
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ServicioHydrate.Modelos.Datos.TipoDeActividad", "TipoDeActividad")
+                        .WithMany("RegistrosDeActividad")
+                        .HasForeignKey("IdTipoDeActividad")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Perfil");
+
+                    b.Navigation("TipoDeActividad");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeHidratacion", b =>
                 {
-                    b.HasOne("ServicioHydrate.Modelos.Perfil", "PerfilDeUsuario")
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", "Perfil")
                         .WithMany("RegistrosDeHidratacion")
-                        .HasForeignKey("PerfilDeUsuarioId");
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("PerfilDeUsuario");
+                    b.Navigation("Perfil");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.ReporteSemanal", b =>
                 {
-                    b.HasOne("ServicioHydrate.Modelos.Perfil", "PerfilDeUsuario")
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", "Perfil")
                         .WithMany("ReportesSemanales")
-                        .HasForeignKey("PerfilDeUsuarioId");
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("PerfilDeUsuario");
+                    b.Navigation("Perfil");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Rutina", b =>
                 {
-                    b.HasOne("ServicioHydrate.Modelos.Perfil", "PerfilDeUsuario")
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", "Perfil")
                         .WithMany("Rutinas")
-                        .HasForeignKey("PerfilDeUsuarioId");
+                        .HasForeignKey("IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ServicioHydrate.Modelos.Datos.ActividadFisica", "RegistroDeActividad")
+                    b.HasOne("ServicioHydrate.Modelos.Datos.RegistroDeActividad", "RegistroDeActividad")
                         .WithOne("Rutina")
                         .HasForeignKey("ServicioHydrate.Modelos.Datos.Rutina", "IdActividad", "IdPerfil")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PerfilDeUsuario");
+                    b.Navigation("Perfil");
 
                     b.Navigation("RegistroDeActividad");
-                });
-
-            modelBuilder.Entity("ServicioHydrate.Modelos.Entorno", b =>
-                {
-                    b.HasOne("ServicioHydrate.Modelos.Perfil", null)
-                        .WithMany("EntornosDesbloqueados")
-                        .HasForeignKey("PerfilId");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.LlaveDeApi", b =>
@@ -902,11 +1105,21 @@ namespace ServicioHydrate.Migrations.MySQL
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ServicioHydrate.Modelos.Entorno", "EntornoSeleccionado")
+                        .WithMany("PerfilesQueSeleccionaron")
+                        .HasForeignKey("IdEntornoSeleccionado")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ServicioHydrate.Modelos.Pais", "PaisDeResidencia")
-                        .WithMany("Perfiles")
-                        .HasForeignKey("PaisDeResidenciaId");
+                        .WithMany("PerfilesQueResidenEnPais")
+                        .HasForeignKey("IdPaisDeResidencia")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Cuenta");
+
+                    b.Navigation("EntornoSeleccionado");
 
                     b.Navigation("PaisDeResidencia");
                 });
@@ -947,14 +1160,35 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Navigation("Comentario");
                 });
 
+            modelBuilder.Entity("ServicioHydrate.Modelos.TokenFCM", b =>
+                {
+                    b.HasOne("ServicioHydrate.Modelos.Perfil", "Perfil")
+                        .WithOne("TokenFCM")
+                        .HasForeignKey("ServicioHydrate.Modelos.TokenFCM", "IdPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Perfil");
+                });
+
             modelBuilder.Entity("ServicioHydrate.Modelos.Comentario", b =>
                 {
                     b.Navigation("Respuestas");
                 });
 
-            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.ActividadFisica", b =>
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeActividad", b =>
                 {
                     b.Navigation("Rutina");
+                });
+
+            modelBuilder.Entity("ServicioHydrate.Modelos.Datos.TipoDeActividad", b =>
+                {
+                    b.Navigation("RegistrosDeActividad");
+                });
+
+            modelBuilder.Entity("ServicioHydrate.Modelos.Entorno", b =>
+                {
+                    b.Navigation("PerfilesQueSeleccionaron");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Orden", b =>
@@ -964,12 +1198,12 @@ namespace ServicioHydrate.Migrations.MySQL
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Pais", b =>
                 {
-                    b.Navigation("Perfiles");
+                    b.Navigation("PerfilesQueResidenEnPais");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Perfil", b =>
                 {
-                    b.Navigation("EntornosDesbloqueados");
+                    b.Navigation("Configuracion");
 
                     b.Navigation("Etiquetas");
 
@@ -984,6 +1218,8 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.Navigation("ReportesSemanales");
 
                     b.Navigation("Rutinas");
+
+                    b.Navigation("TokenFCM");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Producto", b =>
