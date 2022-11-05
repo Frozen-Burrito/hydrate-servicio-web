@@ -20,6 +20,16 @@ namespace ServicioHydrate
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.ConfigureAppConfiguration(config => 
+                    {
+                        // Obtener el string de conexión a Azure App Configuration.
+                        IConfiguration settings = config.Build();
+                        string connectionString = settings.GetConnectionString("AppConfig");
+
+                        // Cargar la configuracion desde Azure App Configuration.
+                        config.AddAzureAppConfiguration(connectionString);
+                    });
+
                     webBuilder.UseStartup<Startup>();
                 });
     }
