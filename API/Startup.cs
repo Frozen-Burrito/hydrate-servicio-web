@@ -62,8 +62,8 @@ namespace ServicioHydrate
             // Configura Cross-Origin Resource Sharing.
             services.AddCors();
 
-            // Obtiene la configuración del secreto para JWT.
-            services.Configure<AppConfig>(Configuration.GetSection("AppConfig"));
+            // Obtiene la configuración de la app.
+            services.Configure<AppConfig>(Configuration.GetSection("HydrateWebService:AppConfig"));
 
             // Incluye el servicio de generación de JWT.
             services.AddScoped<GeneradorDeToken>();
@@ -100,7 +100,7 @@ namespace ServicioHydrate
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(Configuration.GetSection("AppConfig:SecretoJWT").Value)
+                        Encoding.UTF8.GetBytes(Configuration.GetSection("HydrateWebService:AppConfig:SecretoJWT").Value)
                     ),
                     ValidateIssuer = false,
                     ValidateAudience = false,
@@ -160,7 +160,7 @@ namespace ServicioHydrate
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // Configurar llave de API de Stripe
-            StripeConfiguration.ApiKey = Configuration.GetSection("AppConfig:StripeApiKey").Value;
+            StripeConfiguration.ApiKey = Configuration.GetSection("HydrateWebService:AppConfig:StripeSKApiKey").Value;
             
             if (env.IsDevelopment())
             {
@@ -176,7 +176,7 @@ namespace ServicioHydrate
                 // con el JSON del key.
                 FirebaseApp.Create(new AppOptions() 
                 {
-                    Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("GOOGLE_SERVICE_ACCOUNT_KEY")),
+                    Credential = GoogleCredential.FromJson(Configuration.GetSection("HydrateWebService:AppConfig:GoogleServiceAccountKey").Value),
                 });
             }
             
