@@ -145,7 +145,7 @@ namespace ServicioHydrate.Data
             String? fcmMessageId = null;
 
             bool notificacionesDeDescansoActivadas = perfil.Configuracion
-                .PuedeRecibirNotificacionesDeFuente(TiposDeNotificacion.ALERTAS_BATERIA_DISPOSITIVO);
+                .PuedeRecibirNotificacionesDeFuente(TiposDeNotificacion.RECORDATORIOS_DESCANSO);
 
             // Intentar enviar una notificación de alerta de batería, si están activadas
             // y los registros de hidratación más recientes incluyen un nivel de batería bajo.
@@ -162,7 +162,7 @@ namespace ServicioHydrate.Data
                     .Where(ra => ra.EsActividadIntensa)
                     .Count();
 
-                if (actividadDeUltimosTresDias is not null && numeroDeActividadesIntensasRecientes >= 1) 
+                if (actividadDeUltimosTresDias is not null && numeroDeActividadesIntensasRecientes >= 3) 
                 {
                     // Existen más de 3 registros de actividad intensa en los últimos 
                     // 3 días. Notificar al usuario.
