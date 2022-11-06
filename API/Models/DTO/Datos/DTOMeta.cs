@@ -47,11 +47,11 @@ namespace ServicioHydrate.Modelos.DTO.Datos
             DateTime fechaTermino;
 
             esStrISO8601Valido = DateTime
-                .TryParse(this.FechaInicio, CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaTermino);
+                .TryParse(this.FechaTermino, CultureInfo.InvariantCulture, DateTimeStyles.None, out fechaTermino);
 
             if (!esStrISO8601Valido)
             {
-                throw new FormatException("Se esperaba un string con formato ISO 8601 para FechaInicio, pero el string recibido no es válido");  
+                throw new FormatException("Se esperaba un string con formato ISO 8601 para FechaTermino, pero el string recibido no es válido");  
             }
 
             return new MetaHidratacion()
