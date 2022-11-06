@@ -443,9 +443,9 @@ namespace ServicioHydrate.Data
 
             if (existenMarcadores)
             {
-                Usuario usuarioEnMarcasComoUtil = comentario.UtilParaUsuarios
+                Usuario? usuarioEnMarcasComoUtil = comentario.UtilParaUsuarios
                     .Where(u => u.Id == usuario.Id)
-                    .First();
+                    .FirstOrDefault();
 
                 yaFueMarcadoComoUtil = usuarioEnMarcasComoUtil is not null;
             }
@@ -513,7 +513,7 @@ namespace ServicioHydrate.Data
             {
                 Usuario? usuarioEnMarcasComoUtil = respuesta.UtilParaUsuarios
                     .Where(u => u.Id == usuario.Id)
-                    .First();
+                    .FirstOrDefault();
 
                 yaFueMarcadaComoUtil = usuarioEnMarcasComoUtil is not null;
             }
@@ -645,7 +645,7 @@ namespace ServicioHydrate.Data
                 // Obtener la entidad del usuario actual desde la lista de reportes del respuesta.
                 Usuario? usuarioEnReportes = respuesta.ReportesDeUsuarios
                     .Where(u => u.Id == usuario.Id)
-                    .First();
+                    .FirstOrDefault();
 
                 yaFueReportada = usuarioEnReportes is not null;
             }
