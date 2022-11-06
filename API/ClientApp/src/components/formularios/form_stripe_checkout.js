@@ -105,14 +105,7 @@ export default function FormStripeCheckout(props) {
     };
 
     // Si el usuario lo desea, enviarle un correo de confirmacion.
-    if (debeEnviarEmail) {
-      
-      if (emailUsuario === null || emailUsuario === undefined) {
-        await getEmailDeUsuario();
-      }
-
-      confirmParams.receipt_email = emailUsuario;
-    }
+    if (debeEnviarEmail) confirmParams.receipt_email = emailUsuario;
 
     console.log(confirmParams);
 
