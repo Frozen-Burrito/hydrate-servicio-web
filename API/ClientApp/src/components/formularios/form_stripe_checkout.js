@@ -80,8 +80,6 @@ export default function FormStripeCheckout(props) {
 
     getIntentDePago();
 
-    getEmailDeUsuario();
-
     if (jwt != null) {
       const id = getIdUsuarioDesdeJwt(jwt);
 
@@ -109,7 +107,7 @@ export default function FormStripeCheckout(props) {
     // Si el usuario lo desea, enviarle un correo de confirmacion.
     if (debeEnviarEmail) {
       
-      if (emailUsuario == null || emailUsuario == undefined) {
+      if (emailUsuario === null || emailUsuario === undefined) {
         await getEmailDeUsuario();
       }
 
