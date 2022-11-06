@@ -32,7 +32,7 @@ namespace ServicioHydrate.Autenticacion
                 new Claim(ClaimTypes.Role, usuario.RolDeUsuario.ToString()),
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appConfig.JwtSecret));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appConfig.SecretoJWT));
 
             var credenciales = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 

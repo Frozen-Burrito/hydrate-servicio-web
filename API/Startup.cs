@@ -100,7 +100,7 @@ namespace ServicioHydrate
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(Configuration.GetSection("HydrateWebService:AppConfig:SecretoJWT").Value)
+                        Encoding.UTF8.GetBytes(Configuration.GetValue<string>("HydrateWebService:AppConfig:SecretoJWT"))
                     ),
                     ValidateIssuer = false,
                     ValidateAudience = false,
@@ -160,7 +160,7 @@ namespace ServicioHydrate
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // Configurar llave de API de Stripe
-            StripeConfiguration.ApiKey = Configuration.GetSection("HydrateWebService:AppConfig:StripeSKApiKey").Value;
+            StripeConfiguration.ApiKey = Configuration.GetValue<string>("HydrateWebService:AppConfig:StripeSecretApiKey");
             
             if (env.IsDevelopment())
             {
@@ -176,7 +176,7 @@ namespace ServicioHydrate
                 // con el JSON del key.
                 FirebaseApp.Create(new AppOptions() 
                 {
-                    Credential = GoogleCredential.FromJson(Configuration.GetSection("HydrateWebService:AppConfig:GoogleServiceAccountKey").Value),
+                    Credential = GoogleCredential.FromJson(Configuration.GetValue<string>("HydrateWebService:AppConfig:GoogleServiceAccountKey")),
                 });
             }
             
