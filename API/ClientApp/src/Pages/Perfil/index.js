@@ -2,11 +2,7 @@ import './perfil.css';
 
 import React, { useState } from "react";
 
-import useCookie from "../../utils/useCookie";
-import { getIdUsuarioDesdeJwt } from "../../utils/parseJwt";
-
 import { Layout, Avatar, DrawerPerfil } from "../../components";
-import { Link } from 'react-router-dom';
 
 export function PaginaPerfil() {
 

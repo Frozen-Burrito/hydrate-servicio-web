@@ -23,6 +23,7 @@ export function PaginaLlavesUsuario() {
 					<Link 
 						to={ "/llaves/nueva" } 
 						className={`btn btn-primario`}
+            style={{ textDecoration: "none" }}
 					>
 						Nuevo Token
 					</Link>

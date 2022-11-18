@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { Layout, DrawerPerfil } from "../../components";
+import { BarChart } from "../../components/BarChart/BarChart";
 import { Cards } from "../../components/Cards/Cards";
 
 export function PaginaTableroPerfil() {
@@ -19,6 +20,7 @@ export function PaginaTableroPerfil() {
       <section className='contenedor full-page py-5'>
         <div className="stack horizontal justify-between gap-2 my-3" style={{ display: "flex", flexDirection: "column" }}>
           <h3>Datos de consumo del usuario</h3>
+          <BarChart />
           <Cards />
         </div>
       </section>

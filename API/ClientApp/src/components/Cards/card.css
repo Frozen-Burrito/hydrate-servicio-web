@@ -1,8 +1,7 @@
 .card {
-    width: 385px;
+    width: 350px;
     margin: 0px 25px 40px 25px;
     background-color: #F8F8F8;
-    border-radius: 10px;
 }
 
 .cardTitle {
@@ -11,10 +10,6 @@
     justify-content: flex-start;
     align-items: center;
     padding: 10px;
-}
-
-.cardInfo {
-    display: flex;
 }
 
 .water {
@@ -41,25 +36,21 @@
     margin-left: 5px;
 }
 
-.cantidadAgua {
-    margin-right: 10px;
-}
-
-.cantidadAgua > .cantidad {
+.cantidad {
     font-size: 20px;
     letter-spacing: -0.015em;
     font-weight: 500;
     margin-bottom: 10px;
 }
 
-.cantidadAgua > .estado {
+.estado {
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: flex-end;
 }
 
-.cantidadAgua > .estado > span {
+.estado > span {
     color: rgba(15, 15, 15, 0.87);
     font-weight: 400;
     font-size: 16px;
