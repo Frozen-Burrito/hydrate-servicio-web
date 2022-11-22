@@ -33,14 +33,15 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 throw new FormatException("Se esperaba un string con formato ISO 8601, pero el string recibido no es válido");  
             }
 
+			int idPerfilAsociado = esParteDeDatosAbiertos ? Perfil.perfilServicio.Id : perfilDeUsuario.Id;
+
 			return new RegistroDeHidratacion 
 			{
-				Id = this.Id,
+				IdPerfil = idPerfilAsociado,
 				CantidadEnMl = this.CantidadEnMl,
                 PorcentajeCargaBateria = this.PorcentajeCargaBateria,
                 TemperaturaAproximada = this.TemperaturaAproximada,
                 Fecha = fecha,
-                Perfil = perfilDeUsuario,
 				EsInformacionAbierta = esParteDeDatosAbiertos,
 			};
 		}

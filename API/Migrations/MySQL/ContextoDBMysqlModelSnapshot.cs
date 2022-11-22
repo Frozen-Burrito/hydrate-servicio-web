@@ -148,7 +148,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("AutorId");
 
-                    b.ToTable("Comentarios");
+                    b.ToTable("Comentarios", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.ComentarioArchivado", b =>
@@ -169,7 +169,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id");
 
-                    b.ToTable("ComentariosArchivados");
+                    b.ToTable("ComentariosArchivados", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Configuracion", b =>
@@ -209,7 +209,7 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.HasIndex("IdPerfil")
                         .IsUnique();
 
-                    b.ToTable("Configuracion");
+                    b.ToTable("Configuracion", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.DatosMedicos", b =>
@@ -248,7 +248,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdPerfil");
 
-                    b.ToTable("DatosMedicos");
+                    b.ToTable("DatosMedicos", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Etiqueta", b =>
@@ -267,7 +267,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdPerfil");
 
-                    b.ToTable("Etiquetas");
+                    b.ToTable("Etiquetas", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.MetaHidratacion", b =>
@@ -304,7 +304,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdPerfil");
 
-                    b.ToTable("Metas");
+                    b.ToTable("Metas", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeActividad", b =>
@@ -347,7 +347,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdTipoDeActividad");
 
-                    b.ToTable("RegistrosDeActFisica");
+                    b.ToTable("RegistrosDeActFisica", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeHidratacion", b =>
@@ -378,7 +378,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdPerfil");
 
-                    b.ToTable("RegistrosDeHidratacion");
+                    b.ToTable("RegistrosDeHidratacion", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.ReporteSemanal", b =>
@@ -408,7 +408,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdPerfil");
 
-                    b.ToTable("ReporteSemanal");
+                    b.ToTable("ReporteSemanal", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Rutina", b =>
@@ -437,7 +437,7 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.HasIndex("IdActividad", "IdPerfil")
                         .IsUnique();
 
-                    b.ToTable("RutinasDeActFisica");
+                    b.ToTable("RutinasDeActFisica", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.TipoDeActividad", b =>
@@ -457,7 +457,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id");
 
-                    b.ToTable("TiposDeActividad");
+                    b.ToTable("TiposDeActividad", (string)null);
 
                     b.HasData(
                         new
@@ -539,7 +539,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id");
 
-                    b.ToTable("Entornos");
+                    b.ToTable("Entornos", (string)null);
 
                     b.HasData(
                         new
@@ -587,7 +587,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdUsuario");
 
-                    b.ToTable("LlavesDeAPI");
+                    b.ToTable("LlavesDeAPI", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Orden", b =>
@@ -610,7 +610,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("ClienteId");
 
-                    b.ToTable("Ordenes");
+                    b.ToTable("Ordenes", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Pais", b =>
@@ -624,7 +624,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id");
 
-                    b.ToTable("Paises");
+                    b.ToTable("Paises", (string)null);
 
                     b.HasData(
                         new
@@ -707,7 +707,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdPaisDeResidencia");
 
-                    b.ToTable("Perfiles");
+                    b.ToTable("Perfiles", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Producto", b =>
@@ -737,7 +737,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id");
 
-                    b.ToTable("Productos");
+                    b.ToTable("Productos", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.ProductosOrdenados", b =>
@@ -755,7 +755,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdProducto");
 
-                    b.ToTable("ProductosOrdenados");
+                    b.ToTable("ProductosOrdenados", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.RecursoInformativo", b =>
@@ -784,7 +784,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id");
 
-                    b.ToTable("Recursos");
+                    b.ToTable("Recursos", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Respuesta", b =>
@@ -817,7 +817,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasIndex("IdComentario");
 
-                    b.ToTable("Respuestas");
+                    b.ToTable("Respuestas", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.TokenFCM", b =>
@@ -844,7 +844,7 @@ namespace ServicioHydrate.Migrations.MySQL
                     b.HasIndex("IdPerfil")
                         .IsUnique();
 
-                    b.ToTable("TokensFCM");
+                    b.ToTable("TokensFCM", (string)null);
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Usuario", b =>
@@ -871,7 +871,7 @@ namespace ServicioHydrate.Migrations.MySQL
 
                     b.HasKey("Id");
 
-                    b.ToTable("Usuarios");
+                    b.ToTable("Usuarios", (string)null);
                 });
 
             modelBuilder.Entity("ComentarioUsuario", b =>

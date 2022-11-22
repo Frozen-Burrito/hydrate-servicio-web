@@ -68,6 +68,31 @@ namespace ServicioHydrate.Modelos
 		public virtual ICollection<RegistroDeHidratacion> RegistrosDeHidratacion { get; set; }
 		public virtual ICollection<Rutina> Rutinas { get; set; }
 
+		[NotMapped]
+		private static Perfil _perfilCuentaServicio = new Perfil
+		{
+			Id = 5,
+			IdCuentaUsuario = new Guid("08dabc24-80c4-4416-8ff9-07c23b71fcf6"),
+			Nombre = "Cuenta",
+			Apellido = "Servicio",
+			FechaNacimiento = DateTime.Now.ToString("o"),
+			SexoUsuario = SexoUsuario.NO_ESPECIFICADO,
+			Estatura = 0.0,
+			Peso = 0.0,
+			Ocupacion = Ocupacion.NO_ESPECIFICADO,
+			IdPaisDeResidencia = Pais.PaisNoEspecificado.Id,
+			CondicionMedica = CondicionMedica.NO_ESPECIFICADO,
+			CantidadMonedas = 0,
+			NumModificaciones = 0,
+			IdEntornoSeleccionado = Entorno.PrimerEntornoDesbloqueado.Id,
+			EntornosDesbloqueados = new List<Entorno>(),
+			FechaSyncConGoogleFit = null,
+			FechaDeCreacion = DateTime.Now,
+			FechaDeModificacion = null,
+		};
+
+		public static Perfil perfilServicio { get => _perfilCuentaServicio; }
+
         public static Perfil PorDefecto(Guid? idCuentaUsuario) 
         {
             return new Perfil
