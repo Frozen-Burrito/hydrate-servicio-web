@@ -154,7 +154,11 @@ namespace ServicioHydrate.Data
             // entidades asociadas con un Perfil. 
             // (Esto es para identificar los registros de distintos usuarios.)
             modelBuilder.Entity<RegistroDeActividad>()
-                .HasKey(af => new { af.Id, af.IdPerfil });
+                .Property(ar => ar.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<RegistroDeActividad>()
+                .HasKey(ar => new { ar.Id, ar.IdPerfil });
                 
             modelBuilder.Entity<DatosMedicos>()
                 .HasKey(dm => new { dm.Id, dm.IdPerfil });
@@ -167,6 +171,10 @@ namespace ServicioHydrate.Data
 
             modelBuilder.Entity<MetaHidratacion>()
                 .HasKey(m => new { m.Id, m.IdPerfil });
+
+            modelBuilder.Entity<RegistroDeHidratacion>()
+                .Property(rh => rh.Id)
+                .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<RegistroDeHidratacion>()
                 .HasKey(rh => new { rh.Id, idPerfil = rh.IdPerfil });
