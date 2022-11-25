@@ -65,6 +65,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 CantidadEnMl = this.CantidadEnMl,
                 Notas = this.Notas,
                 Etiquetas = etiquetasDeMeta.ToList(),
+                FechaCreacion = DateTime.Now,
             };
         }
     }
