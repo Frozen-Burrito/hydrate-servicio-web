@@ -12,6 +12,8 @@ namespace ServicioHydrate.Modelos
 
         public ICollection<Perfil> PerfilesQueResidenEnPais { get; set; }
 
+        public virtual ICollection<Ubicacion> UbicacionesEnPais { get; set; }
+
         [NotMapped]
         private static Pais _paisNoEspecificado = new Pais
         {

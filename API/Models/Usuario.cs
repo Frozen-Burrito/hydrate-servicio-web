@@ -27,6 +27,8 @@ namespace ServicioHydrate.Modelos
 
         public Perfil PerfilDeUsuario { get; set; }
 
+        public Ubicacion Ubicacion { get; set; }
+
         public virtual ICollection<Orden> Ordenes { get; set; }
 
         public virtual ICollection<LlaveDeApi> LlavesDeAPI { get; set; }

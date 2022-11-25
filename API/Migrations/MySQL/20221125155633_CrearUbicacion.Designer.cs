@@ -2,28 +2,32 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServicioHydrate.Data;
 
 #nullable disable
 
-namespace ServicioHydrate.Migrations.SQLite
+namespace ServicioHydrate.Migrations.MySQL
 {
-    [DbContext(typeof(ContextoDBSqlite))]
-    partial class ContextoDBSqliteModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ContextoDBMysql))]
+    [Migration("20221125155633_CrearUbicacion")]
+    partial class CrearUbicacion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.3");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "6.0.3")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("ComentarioUsuario", b =>
                 {
                     b.Property<int>("ComentariosReportadosId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<Guid>("ReportesDeUsuariosId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("ComentariosReportadosId", "ReportesDeUsuariosId");
 
@@ -35,10 +39,10 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ComentarioUsuario1", b =>
                 {
                     b.Property<int>("ComentariosUtilesId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<Guid>("UtilParaUsuariosId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("ComentariosUtilesId", "UtilParaUsuariosId");
 
@@ -50,10 +54,10 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("EntornoPerfil", b =>
                 {
                     b.Property<int>("EntornosDesbloqueadosId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("PerfilesQueDesbloquearonId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("EntornosDesbloqueadosId", "PerfilesQueDesbloquearonId");
 
@@ -65,16 +69,16 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("EtiquetaMetaHidratacion", b =>
                 {
                     b.Property<int>("EtiquetasId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("EtiquetasIdPerfil")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("MetasId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("MetasIdPerfil")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("EtiquetasId", "EtiquetasIdPerfil", "MetasId", "MetasIdPerfil");
 
@@ -86,10 +90,10 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("RespuestaUsuario", b =>
                 {
                     b.Property<int>("RespuestasUtilesId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<Guid>("UtilParaUsuariosId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.HasKey("RespuestasUtilesId", "UtilParaUsuariosId");
 
@@ -101,10 +105,10 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("RespuestaUsuario1", b =>
                 {
                     b.Property<Guid>("ReportesDeUsuariosId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("RespuestasReportadasId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("ReportesDeUsuariosId", "RespuestasReportadasId");
 
@@ -117,30 +121,30 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Asunto")
                         .IsRequired()
                         .HasMaxLength(60)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(60)");
 
                     b.Property<Guid?>("AutorId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Contenido")
                         .IsRequired()
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(300)");
 
                     b.Property<string>("Fecha")
                         .HasMaxLength(33)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(33)");
 
                     b.Property<bool>("NecesitaModificaciones")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("Publicado")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -153,17 +157,17 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Fecha")
                         .HasMaxLength(33)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(33)");
 
                     b.Property<int>("IdComentario")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Motivo")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -174,33 +178,33 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<bool>("AportaDatosAbiertos")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("CodigoLocalizacion")
                         .HasMaxLength(10)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<bool>("FormulariosRecurrentesActivados")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("IdDispositivo")
                         .HasMaxLength(17)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(17)");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<bool>("IntegradoConGoogleFit")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("PreferenciasDeNotificaciones")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("TemaDeColor")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -213,34 +217,34 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.DatosMedicos", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<float>("AguaExtracelular")
-                        .HasColumnType("REAL");
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("FechaProxCita")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<float>("GananciaReal")
-                        .HasColumnType("REAL");
+                        .HasColumnType("float");
 
                     b.Property<float>("GananciaRegistrada")
-                        .HasColumnType("REAL");
+                        .HasColumnType("float");
 
                     b.Property<float>("Hipervolemia")
-                        .HasColumnType("REAL");
+                        .HasColumnType("float");
 
                     b.Property<float>("Normovolemia")
-                        .HasColumnType("REAL");
+                        .HasColumnType("float");
 
                     b.Property<float>("PesoPostDialisis")
-                        .HasColumnType("REAL");
+                        .HasColumnType("float");
 
                     b.HasKey("Id", "IdPerfil");
 
@@ -252,14 +256,14 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Etiqueta", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Valor")
                         .HasMaxLength(16)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(16)");
 
                     b.HasKey("Id", "IdPerfil");
 
@@ -271,34 +275,34 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.MetaHidratacion", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("CantidadEnMl")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("int")
                         .HasColumnName("CantidadMl");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("FechaTermino")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Notas")
                         .IsRequired()
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(300)");
 
                     b.Property<int>("Plazo")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("RecompensaDeMonedas")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("int")
                         .HasColumnName("RecomensaMonedas");
 
                     b.HasKey("Id", "IdPerfil");
@@ -311,36 +315,37 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeActividad", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<double>("Distancia")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<int>("Duracion")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<bool>("EsInformacionAbierta")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("Fecha")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("FueAlAireLibre")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("IdTipoDeActividad")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("KcalQuemadas")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasMaxLength(40)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(40)");
 
                     b.HasKey("Id", "IdPerfil");
 
@@ -354,26 +359,27 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.RegistroDeHidratacion", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("int")
                         .HasColumnName("IdPerfil");
 
                     b.Property<int>("CantidadEnMl")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<bool>("EsInformacionAbierta")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("Fecha")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("PorcentajeCargaBateria")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<double>("TemperaturaAproximada")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.HasKey("Id", "IdPerfil");
 
@@ -385,25 +391,25 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.ReporteSemanal", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Fecha")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<double>("HorasDeActividadFisica")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<double>("HorasDeOcupacion")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<double>("HorasDeSuenio")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<double>("TemperaturaMaxima")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.HasKey("Id", "IdPerfil");
 
@@ -415,23 +421,23 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Datos.Rutina", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("int")
                         .HasColumnName("IdPerfil");
 
                     b.Property<int>("DiasDeOcurrencia")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<TimeOnly>("Hora")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("time(6)");
 
                     b.Property<int>("IdActividad")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("int")
                         .HasColumnName("IdRegistroActividad");
 
                     b.HasKey("Id", "IdPerfil");
@@ -448,16 +454,16 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("IdActividadGoogleFit")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<double>("METs")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<double>("VelocidadPromedioKMH")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.HasKey("Id");
 
@@ -533,13 +539,13 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("PrecioEnMonedas")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("UrlImagen")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -564,28 +570,28 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("ErroresEnMes")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("FechaDeCreacion")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<Guid>("IdUsuario")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Llave")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("NombreDelCliente")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("PeticionesEnMes")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("RolDeAcceso")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -598,17 +604,16 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<Guid?>("ClienteId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Estado")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
-                    b.Property<string>("Fecha")
-                        .HasMaxLength(33)
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -621,10 +626,10 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Codigo")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -652,55 +657,55 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Apellido")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("CantidadMonedas")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("CondicionMedica")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<double>("Estatura")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<DateTime>("FechaDeCreacion")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("FechaDeModificacion")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("FechaNacimiento")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("FechaSyncConGoogleFit")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<Guid>("IdCuentaUsuario")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("IdEntornoSeleccionado")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("IdPaisDeResidencia")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Nombre")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("NumModificaciones")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("Ocupacion")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<double>("Peso")
-                        .HasColumnType("REAL");
+                        .HasColumnType("double");
 
                     b.Property<int>("SexoUsuario")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -718,25 +723,26 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(300)");
 
                     b.Property<int>("Disponibles")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Nombre")
                         .HasMaxLength(32)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(32)");
 
                     b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("TEXT");
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
 
                     b.Property<string>("UrlImagen")
                         .HasMaxLength(128)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(128)");
 
                     b.HasKey("Id");
 
@@ -746,13 +752,13 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.ProductosOrdenados", b =>
                 {
                     b.Property<Guid>("IdOrden")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("IdProducto")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("Cantidad")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("IdOrden", "IdProducto");
 
@@ -765,25 +771,25 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(300)");
 
                     b.Property<string>("FechaPublicacion")
                         .HasMaxLength(33)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(33)");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(64)");
 
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(64)");
 
                     b.HasKey("Id");
 
@@ -794,25 +800,25 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("AutorId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Contenido")
                         .IsRequired()
                         .HasMaxLength(300)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(300)");
 
                     b.Property<string>("Fecha")
                         .HasMaxLength(33)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(33)");
 
                     b.Property<int>("IdComentario")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<bool>("Publicado")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -827,20 +833,20 @@ namespace ServicioHydrate.Migrations.SQLite
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("IdPerfil")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("int")
                         .HasColumnName("IdPerfil");
 
                     b.Property<DateTime>("TimestampGenerado")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("TimestampPersistido")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Token")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -850,27 +856,73 @@ namespace ServicioHydrate.Migrations.SQLite
                     b.ToTable("TokensFCM");
                 });
 
+            modelBuilder.Entity("ServicioHydrate.Modelos.Ubicacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Calle")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Ciudad")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("CodigoPostal")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Colonia")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Estado")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("IdPais")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("IdUsuario")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("NumeroExterior")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NumeroInterior")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdPais");
+
+                    b.HasIndex("IdUsuario")
+                        .IsUnique();
+
+                    b.ToTable("Ubicaciones");
+                });
+
             modelBuilder.Entity("ServicioHydrate.Modelos.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("NombreUsuario")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(80)");
 
                     b.Property<int>("RolDeUsuario")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1174,6 +1226,25 @@ namespace ServicioHydrate.Migrations.SQLite
                     b.Navigation("Perfil");
                 });
 
+            modelBuilder.Entity("ServicioHydrate.Modelos.Ubicacion", b =>
+                {
+                    b.HasOne("ServicioHydrate.Modelos.Pais", "Pais")
+                        .WithMany("UbicacionesEnPais")
+                        .HasForeignKey("IdPais")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ServicioHydrate.Modelos.Usuario", "Usuario")
+                        .WithOne("Ubicacion")
+                        .HasForeignKey("ServicioHydrate.Modelos.Ubicacion", "IdUsuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pais");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("ServicioHydrate.Modelos.Comentario", b =>
                 {
                     b.Navigation("Respuestas");
@@ -1202,6 +1273,8 @@ namespace ServicioHydrate.Migrations.SQLite
             modelBuilder.Entity("ServicioHydrate.Modelos.Pais", b =>
                 {
                     b.Navigation("PerfilesQueResidenEnPais");
+
+                    b.Navigation("UbicacionesEnPais");
                 });
 
             modelBuilder.Entity("ServicioHydrate.Modelos.Perfil", b =>
@@ -1241,6 +1314,8 @@ namespace ServicioHydrate.Migrations.SQLite
                     b.Navigation("PerfilDeUsuario");
 
                     b.Navigation("Respuestas");
+
+                    b.Navigation("Ubicacion");
                 });
 #pragma warning restore 612, 618
         }

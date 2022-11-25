@@ -57,7 +57,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetMetasDelPerfil([FromQuery] DTOParamsPagina? paramsPagina)
+        public async Task<IActionResult> GetMetasDelPerfil([FromQuery] DTOParamsPagina? paramsPagina, [FromQuery] DTORangoFechas? rangoFechas)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
@@ -75,7 +75,7 @@ namespace ServicioHydrate.Controladores
                 string idPerfilStr = this.User.Claims.FirstOrDefault(i => i.Type == GeneradorDeToken.TipoClaimIdPerfil)?.Value ?? "";
                 int idPerfil = int.Parse(idPerfilStr);
 
-                ICollection<DTOMeta> metas = await _repoDatos.GetMetasPorPerfil(idPerfil, paramsPagina);
+                ICollection<DTOMeta> metas = await _repoDatos.GetMetasPorPerfil(idPerfil, paramsPagina, rangoFechas);
 
                 int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
 
@@ -242,7 +242,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetRegistrosDeHidratacion([FromQuery] DTOParamsPagina? paramsPagina)
+        public async Task<IActionResult> GetRegistrosDeHidratacion([FromQuery] DTOParamsPagina? paramsPagina, [FromQuery] DTORangoFechas? rangoFechas)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
@@ -263,7 +263,7 @@ namespace ServicioHydrate.Controladores
                 int idPerfil = int.Parse(idPerfilStr);
 
                 ICollection<DTORegistroDeHidratacion> registrosHidratacion = await _repoDatos
-                    .GetHidratacionPorPerfil(idPerfil, paramsPagina);
+                    .GetHidratacionPorPerfil(idPerfil, paramsPagina, rangoFechas);
 
                 int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
 
@@ -387,7 +387,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetRegistrosDeActividad([FromQuery] DTOParamsPagina? paramsPagina)
+        public async Task<IActionResult> GetRegistrosDeActividad([FromQuery] DTOParamsPagina? paramsPagina, [FromQuery] DTORangoFechas? rangoFechas)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
@@ -407,7 +407,7 @@ namespace ServicioHydrate.Controladores
                     .FirstOrDefault(i => i.Type == GeneradorDeToken.TipoClaimIdPerfil)?.Value ?? "";
                 int idPerfil = int.Parse(idPerfilStr);
 
-                ICollection<DTORegistroActividad> registrosDeActividad = await _repoDatos.GetActividadesPorPerfil(idPerfil, paramsPagina);
+                ICollection<DTORegistroActividad> registrosDeActividad = await _repoDatos.GetActividadesPorPerfil(idPerfil, paramsPagina, rangoFechas);
 
                 int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
 
@@ -530,7 +530,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetRutinasDeActividadFisica([FromQuery] DTOParamsPagina? paramsPagina)
+        public async Task<IActionResult> GetRutinasDeActividadFisica([FromQuery] DTOParamsPagina? paramsPagina, [FromQuery] DTORangoFechas? rangoFechas)
         {
             // Registrar un log de la peticion.
             string strFecha = DateTime.Now.ToString("G");
@@ -548,7 +548,7 @@ namespace ServicioHydrate.Controladores
                 string idPerfilStr = this.User.Claims.FirstOrDefault(i => i.Type == GeneradorDeToken.TipoClaimIdPerfil)?.Value ?? "";
                 int idPerfil = int.Parse(idPerfilStr);
 
-                ICollection<DTORutina> rutinas = await _repoDatos.GetRutinasPorPerfil(idPerfil, paramsPagina);
+                ICollection<DTORutina> rutinas = await _repoDatos.GetRutinasPorPerfil(idPerfil, paramsPagina, rangoFechas);
 
                 int? numPagina = paramsPagina is not null ? paramsPagina.Pagina : 1;
 

@@ -506,7 +506,7 @@ namespace ServicioHydrate.Data
             await _contexto.SaveChangesAsync();
         }
 
-        public async Task<ICollection<DTORegistroActividad>> GetActividadesPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina)
+        public async Task<ICollection<DTORegistroActividad>> GetActividadesPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina, DTORangoFechas? rangoFechas)
         {
             int numActividades = await _contexto.RegistrosDeActFisica.CountAsync();
 
@@ -525,21 +525,38 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            IQueryable<DTORegistroActividad>? actividades = _contexto.RegistrosDeActFisica
+            IQueryable<RegistroDeActividad>? actividades = _contexto.RegistrosDeActFisica
                 .Where(ra => ra.IdPerfil == perfil.Id)
                 .Include(ra => ra.TipoDeActividad)
                 .Include(ra => ra.Rutina)
                 .AsSplitQuery()
-                .OrderBy(ra => ra.Fecha)
+                .OrderBy(ra => ra.Fecha);
+
+            if (rangoFechas is not null) 
+            {
+                if (rangoFechas.Desde is not null) 
+                {
+                    actividades = actividades
+                        .Where(ra => ra.Fecha >= rangoFechas.desdeDate);
+                }
+
+                if (rangoFechas.Hasta is not null) 
+                {
+                    actividades = actividades
+                        .Where(ra => ra.Fecha <= rangoFechas.hastaDate);
+                }
+            }
+
+            IQueryable<DTORegistroActividad> dtoRegistrosActividad = actividades
                 .Select(ra => ra.ComoDTO());
 
             ListaPaginada<DTORegistroActividad> registrosActFisicaPaginados = await ListaPaginada<DTORegistroActividad>
-                .CrearAsync(actividades, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+                .CrearAsync(dtoRegistrosActividad, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return registrosActFisicaPaginados;
         }
 
-        public async Task<ICollection<DTORegistroDeHidratacion>> GetHidratacionPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina)
+        public async Task<ICollection<DTORegistroDeHidratacion>> GetHidratacionPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina, DTORangoFechas? rangoFechas)
         {
             int numRegistrosHidratacion = await _contexto.RegistrosDeHidratacion.CountAsync();
 
@@ -558,20 +575,37 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            IQueryable<DTORegistroDeHidratacion>? regHidratacion = _contexto.RegistrosDeHidratacion
+            IQueryable<RegistroDeHidratacion>? registrosDeHidratacion = _contexto.RegistrosDeHidratacion
                 .Include(rh => rh.Perfil)
                 .AsSplitQuery()
                 .Where(rh => rh.Perfil.Id == perfil.Id)
-                .OrderBy(rh => rh.Fecha)
+                .OrderBy(rh => rh.Fecha);
+
+            if (rangoFechas is not null) 
+            {
+                if (rangoFechas.Desde is not null) 
+                {
+                    registrosDeHidratacion = registrosDeHidratacion
+                        .Where(rh => rh.Fecha >= rangoFechas.desdeDate);
+                }
+
+                if (rangoFechas.Hasta is not null) 
+                {
+                    registrosDeHidratacion = registrosDeHidratacion
+                        .Where(rh => rh.Fecha <= rangoFechas.hastaDate);
+                }
+            }
+
+            IQueryable<DTORegistroDeHidratacion> dtosRegistros = registrosDeHidratacion
                 .Select(rh => rh.ComoDTO());
 
             ListaPaginada<DTORegistroDeHidratacion> registrosHidratacionPaginados = await ListaPaginada<DTORegistroDeHidratacion>
-                .CrearAsync(regHidratacion, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+                .CrearAsync(dtosRegistros, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return registrosHidratacionPaginados;
         }
 
-        public async Task<ICollection<DTOMeta>> GetMetasPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina)
+        public async Task<ICollection<DTOMeta>> GetMetasPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina, DTORangoFechas? rangoFechas)
         {
             int numMetasExistentes = await _contexto.Metas.CountAsync();
 
@@ -590,20 +624,37 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            IQueryable<DTOMeta>? metasDelPerfil = _contexto.Metas
+            IQueryable<MetaHidratacion>? metasDeHidratacion = _contexto.Metas
                 .Where(m => m.IdPerfil == perfil.Id)
                 .Include(m => m.Etiquetas)
                 .AsSplitQuery()
-                .OrderBy(m => m.FechaInicio)
+                .OrderBy(m => m.FechaInicio);
+
+            if (rangoFechas is not null) 
+            {
+                if (rangoFechas.Desde is not null) 
+                {
+                    metasDeHidratacion = metasDeHidratacion
+                        .Where(m => m.FechaCreacion >= rangoFechas.desdeDate);
+                }
+
+                if (rangoFechas.Hasta is not null) 
+                {
+                    metasDeHidratacion = metasDeHidratacion
+                        .Where(m => m.FechaCreacion <= rangoFechas.hastaDate);
+                }
+            }
+
+            IQueryable<DTOMeta> dtosMetas = metasDeHidratacion
                 .Select(m => m.ComoDTO());
 
             ListaPaginada<DTOMeta> metasPaginadas = await ListaPaginada<DTOMeta>
-                .CrearAsync(metasDelPerfil, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+                .CrearAsync(dtosMetas, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return metasPaginadas;
         }
 
-        public async Task<ICollection<DTORutina>> GetRutinasPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina)
+        public async Task<ICollection<DTORutina>> GetRutinasPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina, DTORangoFechas? rangoFechas)
         {
             int numRutinasExistentes = await _contexto.RutinasDeActFisica.CountAsync();
 
@@ -622,13 +673,30 @@ namespace ServicioHydrate.Data
                 throw new ArgumentException("No existe un perfil con el ID especificado.");
             }
 
-            IQueryable<DTORutina>? rutinas = _contexto.RutinasDeActFisica
+            IQueryable<Rutina>? rutinas = _contexto.RutinasDeActFisica
                 .Where(ru => ru.IdPerfil == perfil.Id)
-                .OrderBy(ru => ru.Id)
+                .OrderBy(ru => ru.Id);
+
+            if (rangoFechas is not null) 
+            {
+                if (rangoFechas.Desde is not null) 
+                {
+                    rutinas = rutinas
+                        .Where(ru => ru.FechaCreacion >= rangoFechas.desdeDate);
+                }
+
+                if (rangoFechas.Hasta is not null) 
+                {
+                    rutinas = rutinas
+                        .Where(ru => ru.FechaCreacion <= rangoFechas.hastaDate);
+                }
+            }    
+
+            IQueryable<DTORutina> dtosRutinas = rutinas
                 .Select(ru => ru.ComoDTO());
 
             ListaPaginada<DTORutina> registrosHidratacionPaginados = await ListaPaginada<DTORutina>
-                .CrearAsync(rutinas, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+                .CrearAsync(dtosRutinas, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
 
             return registrosHidratacionPaginados;
         }
