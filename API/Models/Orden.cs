@@ -13,9 +13,7 @@ namespace ServicioHydrate.Modelos
         [Key]
         public Guid Id { get; set; }
 
-        [MaxLength(33)]
-        [DataType("char")]
-        public string Fecha { get; set; }
+        public DateTime Fecha { get; set; }
 
         // El estado actual de la orden.
         public EstadoOrden Estado { get; set; }

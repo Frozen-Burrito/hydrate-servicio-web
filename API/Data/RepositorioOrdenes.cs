@@ -63,16 +63,15 @@ namespace ServicioHydrate.Data
                 ordenes = ordenes.Where(o => o.Id.Equals(paramsOrden.IdOrden));
             }
 
-            //TODO: encontrar una manera de comparar las fechas usando lambdas simples de un queryable.
-            // if (paramsOrden.Desde is not null)
-            // {
-            //     ordenes = ordenes.Where(o => DateTime.Parse(o.Fecha) >= paramsOrden.Desde);
-            // }
+            if (paramsOrden.Desde is not null)
+            {
+                ordenes = ordenes.Where(o => o.Fecha >= paramsOrden.Desde);
+            }
 
-            // if (paramsOrden.Hasta is not null)
-            // {
-            //     ordenes = ordenes.Where(o => DateTime.Parse(o.Fecha) <= paramsOrden.Hasta);
-            // }
+            if (paramsOrden.Hasta is not null)
+            {
+                ordenes = ordenes.Where(o => o.Fecha <= paramsOrden.Hasta);
+            }
 
             ordenes = ordenes                
                 .Include(o => o.Cliente)
