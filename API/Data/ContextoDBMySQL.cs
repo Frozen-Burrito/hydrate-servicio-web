@@ -63,6 +63,8 @@ namespace ServicioHydrate.Data
 
         public DbSet<TokenFCM> TokensParaNotificaciones { get; set; }
 
+        public DbSet<Ubicacion> Ubicaciones { get; set; }
+
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
@@ -144,6 +146,16 @@ namespace ServicioHydrate.Data
                 .HasMany(pa => pa.PerfilesQueResidenEnPais)
                 .WithOne(pe => pe.PaisDeResidencia)
                 .HasForeignKey(pe => pe.IdPaisDeResidencia);
+
+            modelBuilder.Entity<Pais>()
+                .HasMany(pa => pa.UbicacionesEnPais)
+                .WithOne(u => u.Pais)
+                .HasForeignKey(u => u.IdPais);
+
+            modelBuilder.Entity<Usuario>()
+                .HasOne(us => us.Ubicacion)
+                .WithOne(ub => ub.Usuario)
+                .HasForeignKey<Ubicacion>(ub => ub.IdUsuario);
 
             modelBuilder.Entity<Perfil>()
                 .HasOne(p => p.Cuenta)
