@@ -5,6 +5,7 @@ export { default as DrawerPerfil } from "./DrawerConfigurados/drawer_perfil";
 export { default as DrawerAdmin } from "./DrawerConfigurados/drawer_admin";
 export { default as DrawerCompra } from "./DrawerConfigurados/drawer_compra";
 export { default as DrawerGuias } from "./DrawerConfigurados/drawer_guias";
+export { default as DrawerDatosAbiertos } from "./DrawerConfigurados/drawer_datos_abiertos";
 export { default as Dropdown } from "./Dropdown/dropdown";
 export { default as Footer } from "./Footer/Footer";
 export { default as ListaComentarios } from "./Listas/lista_comentarios";

@@ -10,18 +10,12 @@ nav.navbar {
 }
 
 .container {
-  max-width: 90vw;
+  max-width: 90%;
   padding: 0 2rem;
   margin: 0 auto;
   display: flex;
   align-items: center;
   height: 100%;
-}
-
-@media screen and (min-width: 1920px) {
-  .container {
-    max-width: 80vw;
-  }
 }
 
 nav.navbar > .container {
@@ -92,18 +86,6 @@ button.btn-menu-mobile > span.material-icons {
   font-size: 2rem;
 }
 
-@media screen and (min-width: 1526px) {
-  ul.nav-links { 
-    display: flex;
-    justify-content: space-between;
-    gap: 0.8rem;
-  }
-
-  button.btn-menu-mobile {
-    display: none;
-  }
-}
-
 ul.nav-links > li {
   display: inline-block;
   max-width: 14vw;
@@ -122,4 +104,22 @@ ul.nav-links > li > .nav-link {
 
 ul.nav-links > li > a.nav-link:hover {
   transform: scale(1.1);
+}
+
+@media screen and (min-width: 1300px) {
+  ul.nav-links { 
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+
+  button.btn-menu-mobile {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 740px) {
+  .btns-container > .btn {
+    display: none;
+  }
 }

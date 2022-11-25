@@ -30,14 +30,12 @@ export function Home() {
       <div className='banner'>
         <div className='color-contrast'>
           <div className='container-text'>
-            <div className='text-flex'>
-                <h1 className='text'>Toma Agua.</h1>
+            <h1 className='text'>Toma Agua.</h1>
                 <div className='together'>
                   <h1 className='text edition'>Cambiará tu</h1>
                   <h1 className='text'> {escribirAuto()} </h1>
                 </div>
                 <h3 className='description'>Crea un hábito positivo con nuestra botella.</h3>
-            </div>
             <div className='btn-container'>
                 <BotoneCompra />
             </div>

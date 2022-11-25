@@ -1,0 +1,106 @@
+@import url("../../styles.css");
+
+.avatar {
+    min-width: 150px;
+    min-height: 150px;
+}
+
+.avatar > p {
+    font-size: 60px;
+}
+
+.titulo-perfil {
+    margin-left: 20px;
+}
+
+.contenedor-perfil {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.contenedor-perfil > .izquierda-perfil,
+.contenedor-perfil > .derecha-perfil {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 100%;
+    height: calc(100vh - 45vh);
+}
+
+.contenedor-perfil > .izquierda-perfil {
+    margin-right: 40px;
+}
+
+.contenedor-perfil > .derecha-perfil {
+    margin-left: 40px;
+}
+
+.contenedor-perfil > .izquierda-perfil > .campo-icono,
+.contenedor-perfil > .derecha-perfil > .campo-icono {
+    position: relative;
+    width: 100%;
+    height: 20%;
+    display: flex;
+    align-items: center;
+}
+
+.contenedor-perfil > .izquierda-perfil > .campo-icono > span.material-icons,
+.contenedor-perfil > .derecha-perfil > .campo-icono > span.material-icons {
+    position: absolute;
+    left: 16px;
+    top: 38%;
+    min-width: 32px;
+    color: var(--contraste-superficie-claro);
+}
+
+.contenedor-perfil > .izquierda-perfil > .campo-icono > input.input,
+.contenedor-perfil > .derecha-perfil > .campo-icono > input.input {
+    padding: 1.4rem 3.2rem;
+    width: 100%;
+
+    border-radius: 10px;
+    border: 2px solid var(--primario-claro);
+    background-color: var(--superficie-claro);
+
+    resize: none;
+
+    color: var(--contraste-superficie-claro);
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+    font-weight: 500;
+}
+
+@media screen and (max-width: 800px) {
+
+    .contenedor-titulo {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .titulo-perfil,
+    .btn-editar {
+        justify-content: center;
+        margin-left: 0px;
+    }
+
+    .contenedor-perfil {
+        flex-direction: column;
+    }
+
+    .contenedor-perfil > .izquierda-perfil,
+    .contenedor-perfil > .derecha-perfil {
+        margin-left: 0;
+        margin-right: 20px;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .contenedor{
+        text-align: center;
+    }
+
+    .contenedor > div > h3 {
+        padding-top: 20px;
+    }
+}

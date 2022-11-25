@@ -4,7 +4,7 @@
   position: relative;
   width: 100%;
   height: 37vh;
-  background: url("jong-marshes-79mNMAvSORg-unsplash.jpg");
+  background: url("jong-marshes-79mNMAvSORg-unsplash.jpg") no-repeat center center/cover;
   background-size: cover;
   background-attachment: fixed;
 }
@@ -17,6 +17,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 .title-banner {
@@ -67,4 +68,22 @@
   width: 100%;
   height: 1vh;
   margin-bottom: 3rem;
+}
+
+@media screen and (max-width: 500px) {
+  .about-banner {
+    top: 30px;
+  }
+
+  .title-banner {
+    font-size: 3rem;
+  }
+
+  .title-about {
+    font-size: 2.25rem;
+  }
+
+  .text-container-about {
+    width: 80vw;
+  }
 }
