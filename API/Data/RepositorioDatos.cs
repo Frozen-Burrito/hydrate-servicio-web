@@ -281,7 +281,7 @@ namespace ServicioHydrate.Data
                 IQueryable<RegistroDeHidratacion>? registrosRecientes = _contexto.RegistrosDeHidratacion
                     .Include(rh => rh.Perfil)
                     .AsSplitQuery()
-                    .Where(rh => (rh.Perfil.Id.Equals(idPerfil)))
+                    .Where(rh => (rh.IdPerfil.Equals(idPerfil)))
                     .OrderBy(rh => rh.Fecha)
                     .Take(1);
 
@@ -578,7 +578,7 @@ namespace ServicioHydrate.Data
             IQueryable<RegistroDeHidratacion>? registrosDeHidratacion = _contexto.RegistrosDeHidratacion
                 .Include(rh => rh.Perfil)
                 .AsSplitQuery()
-                .Where(rh => rh.Perfil.Id == perfil.Id)
+                .Where(rh => rh.IdPerfil == perfil.Id)
                 .OrderBy(rh => rh.Fecha);
 
             if (rangoFechas is not null) 
