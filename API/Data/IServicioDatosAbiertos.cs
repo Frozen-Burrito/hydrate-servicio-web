@@ -41,7 +41,7 @@ namespace ServicioHydrate.Data
         /// </remarks>
         /// <param name="filtros">Los parámetros que determinan los datos del resultado.</param>
         /// <returns>Datos de actividad física.</returns>
-        Task<ICollection<DTOActividad>> GetDatosDeActividad(
+        Task<ICollection<DTORegistroActividad>> GetDatosDeActividad(
             FiltrosPorPerfil filtros,
             DTOParamsPagina? paramsPagina
         );

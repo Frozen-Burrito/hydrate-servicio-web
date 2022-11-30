@@ -51,7 +51,7 @@ namespace ServicioHydrate.Controladores
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOResultadoPaginado<DTOProducto>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetProductos([FromQuery] DTOParamsPagina? paramsPagina, bool soloDisponibles = false)
+        public async Task<IActionResult> GetProductos([FromQuery] DTOParamsPagina? paramsPagina, [FromQuery] bool soloDisponibles = false)
         {
             string strFecha = DateTime.Now.ToString("G");
             string metodo = Request.Method.ToString();
@@ -88,6 +88,7 @@ namespace ServicioHydrate.Controladores
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOProducto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetProductoPorId(int idProducto)
         {

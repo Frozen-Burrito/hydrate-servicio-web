@@ -11,9 +11,9 @@ namespace ServicioHydrate.Modelos.DTO.Datos
 
         public double VelocidadPromedioKMH { get; set; }
 
-        public DatosDeActividad ComoNuevoModelo()
+        public TipoDeActividad ComoNuevoModelo()
         {
-            return new DatosDeActividad 
+            return new TipoDeActividad 
             {
                 METs = this.METs,
                 VelocidadPromedioKMH = this.VelocidadPromedioKMH,
