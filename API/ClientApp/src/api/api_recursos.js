@@ -4,7 +4,7 @@ export const fetchRecursos = async (numPagina = 1, jwt = "") => {
 
   const endpoint = "recursos";
 
-  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, null, jwt);
   
   return resultados;
 }

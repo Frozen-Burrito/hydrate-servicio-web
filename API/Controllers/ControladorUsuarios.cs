@@ -262,7 +262,7 @@ namespace ServicioHydrate.Controladores
         /// </summary>
         /// <returns>El nombre de usuario y correo del usuario actual.</returns>
         [HttpGet("datos")]
-        [Authorize]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOUsuario))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

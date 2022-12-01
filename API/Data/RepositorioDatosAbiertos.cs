@@ -21,19 +21,20 @@ namespace ServicioHydrate.Data
 
         public async Task AportarDatosDeActividad(Perfil perfil, IEnumerable<DTONuevaActividad> datos)
         {
-            var mapaTiposDeAct = new Dictionary<int, TipoDeActividad>();
+            var tiposDeActividadPorId = new Dictionary<int, TipoDeActividad>();
 
-            List<TipoDeActividad> datosDeActividades = await _contexto.DatosDeActividades
+            List<TipoDeActividad> tiposDeActividades = await _contexto.DatosDeActividades
                 .ToListAsync();
 
-            datosDeActividades.ForEach((datosDeAct) => mapaTiposDeAct.Add(datosDeAct.Id, datosDeAct));
+            tiposDeActividades.ForEach((datosDeAct) => tiposDeActividadPorId.Add(datosDeAct.Id, datosDeAct));
 
-            IEnumerable<RegistroDeActividad> registros = datos
+            List<RegistroDeActividad> registros = datos
                 .Select(ra => ra.ComoNuevoModelo(
-                    datosDeActividades[ra.IdTipoDeActividad],
+                    tiposDeActividadPorId[ra.IdTipoDeActividad],
                     null, 
                     esParteDeDatosAbiertos: true
-                ));
+                ))
+                .ToList();
 
             _contexto.AddRange(registros);
             await _contexto.SaveChangesAsync();
@@ -41,8 +42,9 @@ namespace ServicioHydrate.Data
 
         public async Task AportarDatosDeHidratacion(Perfil perfil, IEnumerable<DTORegistroDeHidratacion> datos)
         {
-            IEnumerable<RegistroDeHidratacion> registros = datos
-                .Select(rh => rh.ComoNuevoModelo(perfil, esParteDeDatosAbiertos: true));
+            List<RegistroDeHidratacion> registros = datos
+                .Select(rh => rh.ComoNuevoModelo(perfil, esParteDeDatosAbiertos: true))
+                .ToList();
 
             _contexto.AddRange(registros);
             await _contexto.SaveChangesAsync();
@@ -90,13 +92,15 @@ namespace ServicioHydrate.Data
                 return (ICollection<DTORegistroActividad>) new List<DTORegistroActividad>();
             }
 
-            ICollection<DTORegistroActividad> registrosActividad = await _contexto.RegistrosDeActFisica
+            IQueryable<DTORegistroActividad> registrosActividad = _contexto.RegistrosDeActFisica
                 .Where(ra => ra.EsInformacionAbierta)
                 .OrderByDescending(ra => ra.Id)
-                .Select(ra => ra.ComoDTO())
-                .ToListAsync();
+                .Select(ra => ra.ComoDTO());
 
-            return registrosActividad;
+            ListaPaginada<DTORegistroActividad> actividadEstadisticaPaginada = await ListaPaginada<DTORegistroActividad>
+                .CrearAsync(registrosActividad, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return actividadEstadisticaPaginada;
         }
 
         public async Task<ICollection<DTORegistroDeHidratacion>> GetDatosDeHidratacion(FiltrosPorPerfil filtros, DTOParamsPagina paramsPagina)
@@ -106,13 +110,17 @@ namespace ServicioHydrate.Data
                 return (ICollection<DTORegistroDeHidratacion>) new List<DTORegistroDeHidratacion>();
             }
 
-            ICollection<DTORegistroDeHidratacion> datos = await _contexto.RegistrosDeHidratacion
+            IQueryable<DTORegistroDeHidratacion> datos = _contexto.RegistrosDeHidratacion
                 .Where(rh => rh.EsInformacionAbierta)
                 .OrderByDescending(rh => rh.Id)
-                .Select(rh => rh.ComoDTO())
-                .ToListAsync();
+                .Include(rh => rh.Perfil)
+                .AsSplitQuery()
+                .Select(rh => rh.ComoDTO());
 
-            return datos;
+            ListaPaginada<DTORegistroDeHidratacion> hidratacionEstadisticaPaginada = await ListaPaginada<DTORegistroDeHidratacion>
+                .CrearAsync(datos, paramsPagina?.Pagina ?? 1, paramsPagina?.SizePagina);
+
+            return hidratacionEstadisticaPaginada;
         }
     }
 }

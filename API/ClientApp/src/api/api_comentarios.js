@@ -5,7 +5,7 @@ export const fetchComentariosPublicados = async (numPagina = 1, jwt = "") => {
 
   const endpoint = "comentarios";
 
-  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, null, jwt, false);
   
   return resultados;
 }
@@ -99,7 +99,7 @@ export const fetchComentariosDeAutor = async (idAutor, numPagina = 1, jwt = "") 
 
   console.log(numPagina);
 
-  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, null, jwt, false);
   
   return resultados;
 }
@@ -108,7 +108,7 @@ export const fetchComentariosPendientes = async (numPagina = 1, jwt = "") => {
 
   const endpoint = "comentarios/pendientes";
 
-  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, null, jwt, false);
   
   return resultados;
 }
@@ -223,7 +223,7 @@ export const fetchRespuestasAComentario = async (idComentario, numPagina = 1, jw
 
   const endpoint = `comentarios/${idComentario}/respuestas`;
 
-  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, jwt);
+  const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, null, jwt, false);
   
   return resultados;
 }

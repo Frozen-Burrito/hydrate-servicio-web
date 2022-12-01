@@ -34,6 +34,8 @@ namespace ServicioHydrate.Modelos.Datos
         [MaxLength(300)]
         public string Notas { get; set; } = "";
 
+        public DateTime FechaCreacion { get; set; }
+
         public virtual ICollection<Etiqueta> Etiquetas { get; set; } = new List<Etiqueta>();
 
         public DTOMeta ComoDTO() 

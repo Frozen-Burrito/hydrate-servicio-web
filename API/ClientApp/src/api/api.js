@@ -57,7 +57,9 @@ export const hacerPeticion = async (peticion) => {
  * @param {string} endpoint El endpoint que realiza la acción.
  * @param {number} numPagina El número de la página.
  * @param {number} elemsPorPagina El número de elementos por página.
+ * @param {object} paramsExtra Un mapa con parámetros de query adicionales.
  * @param {string} jwt El token de autenticación del usuario.
+ * @param {boolean} incluirIdUsuario Si la petición debería incluir el ID del usuario actual en parámetros de query.
  * @returns Una respuesta con los resultados paginados, o un error.
  */
 export async function fetchPaginado(endpoint, numPagina = 1, elemsPorPagina = 25, paramsExtra = null, jwt = "", incluirIdUsuario = false) {

@@ -60,6 +60,7 @@ namespace ServicioHydrate.Modelos.DTO.Datos
                 Dias = dias,
                 Hora = hora,
                 IdActividad = this.IdActividad,
+                FechaCreacion = DateTime.Now,
             };
         }
     }
