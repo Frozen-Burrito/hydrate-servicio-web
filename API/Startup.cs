@@ -166,10 +166,10 @@ namespace ServicioHydrate
             {
                 // Usar inicialización por defecto para el AdminSDK (por medio
                 // del path del archivo JSON con el key de la cuenta de servicio)
-                FirebaseApp.Create(new AppOptions() 
-                {
-                    Credential = GoogleCredential.GetApplicationDefault(),
-                });
+                // FirebaseApp.Create(new AppOptions() 
+                // {
+                //     Credential = GoogleCredential.GetApplicationDefault(),
+                // });
             } else 
             {
                 // Inicializar el Admin SDK de Firebase para FCM, usando una variable de entorno 

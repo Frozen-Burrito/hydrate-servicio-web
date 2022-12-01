@@ -16,7 +16,8 @@ export const obtenerClaims = (tokenDecodificado) => {
   return {
     idUsuario: tokenDecodificado.id,
     rol: tokenDecodificado['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
-    expiracionMillis: tokenDecodificado.exp
+    expiracionMillis: tokenDecodificado.exp,
+    idPerfil: tokenDecodificado.idPerfil,
   }
 }
 
@@ -64,3 +65,17 @@ export const getIdUsuarioDesdeJwt = (jwt) => {
 
   return (idYRol != null ? idYRol.idUsuario : null);
 }
+
+
+export const getIdPerfilDesdeJwt = (jwt) => {
+  
+  if (jwt == null || jwt.length === 0) {
+    return -1;
+  }
+
+  const datosToken = parseJwt(jwt);
+
+  const { idPerfil } = obtenerClaims(datosToken);
+
+  return idPerfil;
+} 
