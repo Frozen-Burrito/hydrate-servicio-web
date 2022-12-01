@@ -2,30 +2,30 @@ import './perfil.css';
 import React, { useEffect, useState } from "react";
 import useCookie from '../../utils/useCookie';
 import { Layout, Avatar, DrawerPerfil } from "../../components";
-import { getPerfil, updatePerfil, getInformacionPerfil } from '../../api/api_perfil';
+import { getPerfil, updatePerfil } from '../../api/api_perfil';
 
 export function PaginaPerfil() {
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const {valor: jwt} = useCookie('jwt');
 
-  const [idCuentaUsuario, setIdCuentaUsuario] = useState("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+  const [idCuentaUsuario] = useState("3fa85f64-5717-4562-b3fc-2c963f66afa6");
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [fechaNacimiento, setFechaNacimiento] = useState("");
-  const [sexoUsuario, setSexoUsuario] = useState(0);
-  const [estatura, setEstatura] = useState(0);
-  const [peso, setPeso] = useState(0);
-  const [ocupacion, setOcupacion] = useState(0);
-  const [condicionMedica, setCondicionMedica] = useState(0)
+  const [sexoUsuario] = useState(0);
+  const [estatura] = useState(0);
+  const [peso] = useState(0);
+  const [ocupacion] = useState(0);
+  const [condicionMedica] = useState(0)
   const [idPaisDeResidencia, setIdPaisDeResidencia] = useState(1);
-  const [cantidadMonedas, setCantidadMonedas] = useState(0);
-  const [numModificaciones, setNumModificaciones] = useState(0);
-  const [fechaSyncConGoogleFit, setFechaSyncConGoogleFit] = useState(null);
-  const [fechaCreacion, setFechaCreacion] = useState(null);
-  const [fechaModificacion, setFechaModificacion] = useState(null);
-  const [idEntornoSeleccionado, setIdEntornoSeleccionado] = useState(1);
-  const [idsEntornosDesbloqueados, setIdsEntornosDesbloqueados] = useState([1]);
+  const [cantidadMonedas] = useState(0);
+  const [numModificaciones] = useState(0);
+  const [fechaSyncConGoogleFit] = useState(null);
+  const [fechaCreacion] = useState(null);
+  const [fechaModificacion] = useState(null);
+  const [idEntornoSeleccionado] = useState(1);
+  const [idsEntornosDesbloqueados] = useState([1]);
 
   useEffect(() => {
 
