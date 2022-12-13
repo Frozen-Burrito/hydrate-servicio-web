@@ -379,19 +379,19 @@ namespace ServicioHydrate.Data
 
         public async Task<ICollection<DTORespuesta>> GetRespuestasDeComentario(int idComentario, Guid? idUsuarioActual, DTOParamsPagina? paramsPagina)
         {
+            Comentario? comentario = await _contexto.Comentarios.FindAsync(idComentario);
+
+            if (comentario is null)
+            {
+                throw new ArgumentException("No existe un comentario con el ID especificado.");
+            }
+
             int numRespuestas = await _contexto.Respuestas.CountAsync();
 
             if (numRespuestas <= 0)
             {
                 // Si no existe ninguna respuesta, retornar una lista vacia desde el principio.
                 return new List<DTORespuesta>();
-            }
-
-            Comentario? comentario = await _contexto.Comentarios.FindAsync(idComentario);
-
-            if (comentario is null)
-            {
-                throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
             var respuestas = _contexto.Respuestas
@@ -421,17 +421,17 @@ namespace ServicioHydrate.Data
             comentario = await _contexto.Comentarios
                 .Where(c => c.Id == idComentario)
                 .Include(c => c.UtilParaUsuarios)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
 
             if (comentario is null)
             {
                 throw new ArgumentException("No existe un comentario con el ID especificado.");
             }
 
-            Usuario usuario = await _contexto.Usuarios
+            Usuario? usuario = await _contexto.Usuarios
                 .Where(u => u.Id == idUsuarioActual)
                 .Include(u => u.ComentariosUtiles)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
             
             if (usuario is null)
             {
@@ -443,9 +443,9 @@ namespace ServicioHydrate.Data
 
             if (existenMarcadores)
             {
-                Usuario usuarioEnMarcasComoUtil = comentario.UtilParaUsuarios
+                Usuario? usuarioEnMarcasComoUtil = comentario.UtilParaUsuarios
                     .Where(u => u.Id == usuario.Id)
-                    .First();
+                    .FirstOrDefault();
 
                 yaFueMarcadoComoUtil = usuarioEnMarcasComoUtil is not null;
             }
@@ -489,12 +489,17 @@ namespace ServicioHydrate.Data
             respuesta = await _contexto.Respuestas
                 .Where(r => r.Id == idRespuesta)
                 .Include(r => r.UtilParaUsuarios)
-                .FirstAsync();            
+                .FirstOrDefaultAsync();     
+
+            if (respuesta is null)
+            {
+                throw new ArgumentException("No existe una respuesta con el ID especificado.");
+            }       
 
             var usuario = await _contexto.Usuarios
                 .Where(u => u.Id == idUsuarioActual)
                 .Include(u => u.RespuestasUtiles)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
             
             if (usuario is null)
             {
@@ -508,7 +513,7 @@ namespace ServicioHydrate.Data
             {
                 Usuario? usuarioEnMarcasComoUtil = respuesta.UtilParaUsuarios
                     .Where(u => u.Id == usuario.Id)
-                    .First();
+                    .FirstOrDefault();
 
                 yaFueMarcadaComoUtil = usuarioEnMarcasComoUtil is not null;
             }
@@ -545,12 +550,17 @@ namespace ServicioHydrate.Data
             comentario = await _contexto.Comentarios
                 .Where(c => c.Id == idComentario)
                 .Include(c => c.ReportesDeUsuarios)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
+
+            if (comentario is null)
+            {
+                throw new ArgumentException("No existe un comentario con el ID especificado.");
+            }
 
             Usuario? usuario = await _contexto.Usuarios
                 .Where(u => u.Id == idUsuarioActual)
                 .Include(u => u.ComentariosReportados)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
             
             if (usuario is null)
             {
@@ -610,12 +620,17 @@ namespace ServicioHydrate.Data
             respuesta = await _contexto.Respuestas
                 .Where(r => r.Id == idRespuesta)
                 .Include(r => r.ReportesDeUsuarios)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
+
+            if (respuesta is null)
+            {
+                throw new ArgumentException("No existe una respuesta con el ID especificado.");
+            }
 
             var usuario = await _contexto.Usuarios
                 .Where(u => u.Id == idUsuarioActual)
                 .Include(u => u.RespuestasReportadas)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
             
             if (usuario is null)
             {
@@ -630,7 +645,7 @@ namespace ServicioHydrate.Data
                 // Obtener la entidad del usuario actual desde la lista de reportes del respuesta.
                 Usuario? usuarioEnReportes = respuesta.ReportesDeUsuarios
                     .Where(u => u.Id == usuario.Id)
-                    .First();
+                    .FirstOrDefault();
 
                 yaFueReportada = usuarioEnReportes is not null;
             }

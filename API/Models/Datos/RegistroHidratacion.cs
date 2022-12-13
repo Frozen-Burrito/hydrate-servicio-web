@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 using ServicioHydrate.Modelos.DTO.Datos; 
 
+#nullable enable
 namespace ServicioHydrate.Modelos.Datos
 {
 	public class RegistroDeHidratacion 
@@ -14,7 +15,7 @@ namespace ServicioHydrate.Modelos.Datos
 		[Column("IdPerfil")]
 		[ForeignKey("RegistrosDeHidratacion")]
         public int IdPerfil { get; set; }
-        public Perfil Perfil { get; set; }
+        public Perfil? Perfil { get; set; }
 
 		[Range(0, 5000)]
 		public int CantidadEnMl { get; set; }
@@ -41,7 +42,7 @@ namespace ServicioHydrate.Modelos.Datos
                 PorcentajeCargaBateria = this.PorcentajeCargaBateria,
                 TemperaturaAproximada = this.TemperaturaAproximada,
                 Fecha = this.Fecha.ToString("o"),
-                IdPerfilUsuario = this.Perfil.Id,
+                IdPerfilUsuario = this.Perfil?.Id ?? -1,
 			};
 		}
 
@@ -64,3 +65,4 @@ namespace ServicioHydrate.Modelos.Datos
 		}
 	}
 }
+#nullable disable

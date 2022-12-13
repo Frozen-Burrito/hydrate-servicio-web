@@ -60,6 +60,8 @@ namespace ServicioHydrate.Modelos.Datos
         public int IdActividad { get; set; }
         public RegistroDeActividad RegistroDeActividad { get; set; }
 
+        public DateTime FechaCreacion { get; set; }
+
         [NotMapped]
         private static List<DiasDeLaSemana> diasDeLaSemana = new List<DiasDeLaSemana>{
             DiasDeLaSemana.LUNES,

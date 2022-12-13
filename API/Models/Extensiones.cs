@@ -157,7 +157,6 @@ namespace ServicioHydrate.Modelos
 
         public static Comentario ComoNuevoModelo(this DTONuevoComentario nuevoComentario, Usuario autor)
         {
-            //TODO: Verificar el contenido del comentario
             // Si el comentario no es apto, crear el comentario y marcar "Publicado" como false.
             // Si el contenido es apto, crear el comentario y marcar "Publicado" como true.
             bool contenidoAdecuado = true;
@@ -335,7 +334,7 @@ namespace ServicioHydrate.Modelos
             {
                 Id = orden.Id,
                 Estado = orden.Estado,
-                Fecha = VerificarStrISO8601(orden.Fecha),
+                Fecha = orden.Fecha.ToString("o"),
                 MontoTotal = montoTotal,
                 IdCliente = orden.Cliente.Id,
                 NombreCliente = nombre,
@@ -349,7 +348,7 @@ namespace ServicioHydrate.Modelos
             return new Orden
             {
                 Estado = EstadoOrden.PENDIENTE,
-                Fecha = DateTime.Now.ToString("o"),
+                Fecha = DateTime.Now,
                 Cliente = cliente,
                 Productos = new List<ProductosOrdenados>(),
             };

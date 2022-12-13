@@ -9,13 +9,13 @@ namespace ServicioHydrate.Data
 {
     public interface IServicioDatos 
     {
-        Task<ICollection<DTOMeta>> GetMetasPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina);
+        Task<ICollection<DTOMeta>> GetMetasPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina, DTORangoFechas? rangoFechas);
 
-        Task<ICollection<DTORegistroDeHidratacion>> GetHidratacionPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina);
+        Task<ICollection<DTORegistroDeHidratacion>> GetHidratacionPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina, DTORangoFechas? rangoFechas);
 
-        Task<ICollection<DTORutina>> GetRutinasPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina);
+        Task<ICollection<DTORutina>> GetRutinasPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina, DTORangoFechas? rangoFechas);
 
-        Task<ICollection<DTORegistroActividad>> GetActividadesPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina);
+        Task<ICollection<DTORegistroActividad>> GetActividadesPorPerfil(int idPerfil, DTOParamsPagina? paramsPagina, DTORangoFechas? rangoFechas);
 
         Task AgregarMetas(int idPerfil, ICollection<DTOMeta> metas);
 

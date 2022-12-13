@@ -27,6 +27,19 @@ export default function FormStripeCheckout(props) {
 
   const { valor: jwt } = useCookie("jwt");
 
+  async function getEmailDeUsuario() {
+
+    try {
+      const { email } = await getUsernameYCorreo(jwt);
+
+      console.log("Email del usuario: ", email);
+
+      setEmailUsuario(email);
+    } catch (e) {
+      setMensaje("No fue posible obtener tu correo.");
+    }
+  }
+
   useEffect(() => {
 
     if (!stripe) {
@@ -65,32 +78,13 @@ export default function FormStripeCheckout(props) {
       }
     }
 
-    async function getEmailDeUsuario() {
-
-      try {
-        const { email } = await getUsernameYCorreo(jwt);
-
-        console.log("Email del usuario: ", email);
-
-        setEmailUsuario(email);
-      } catch (e) {
-        setMensaje("No fue posible obtener tu correo.");
-      }
-    }
-
     getIntentDePago();
-
-    getEmailDeUsuario();
 
     if (jwt != null) {
       const id = getIdUsuarioDesdeJwt(jwt);
 
       setIdUsuario(id);
     }
-
-    setIdUsuario(
-      getIdUsuarioDesdeJwt(jwt)
-    )
 
   }, [stripe, jwt]);
   
@@ -112,6 +106,8 @@ export default function FormStripeCheckout(props) {
 
     // Si el usuario lo desea, enviarle un correo de confirmacion.
     if (debeEnviarEmail) confirmParams.receipt_email = emailUsuario;
+
+    console.log(confirmParams);
 
     const { error } = await stripe.confirmPayment({
       elements: elementos,
@@ -140,7 +136,13 @@ export default function FormStripeCheckout(props) {
           <input 
             type="checkbox" 
             checked={debeEnviarEmail} 
-            onChange={() => setDebeEnviarEmail(!debeEnviarEmail)} 
+            onChange={() => {
+              setDebeEnviarEmail(!debeEnviarEmail);
+
+              if (!debeEnviarEmail) {
+                getEmailDeUsuario();
+              }
+            }} 
           />
 
           <p>Enviar un correo con el comprobante de pago.</p>

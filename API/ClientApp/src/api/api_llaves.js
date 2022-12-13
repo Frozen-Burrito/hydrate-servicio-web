@@ -5,7 +5,7 @@ export const fetchLlavesDeApiComoAdmin = async (numPagina = 1, jwt = "") => {
 
 	const endpoint = "llaves";
 
-	const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, null, jwt);
+	const resultados = await api.fetchPaginado(endpoint, numPagina, api.SIZE_PAGINA_DEFAULT, null, jwt, false);
 	
 	return resultados;
 }

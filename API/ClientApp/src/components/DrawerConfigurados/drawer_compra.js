@@ -15,7 +15,7 @@ DrawerCompra.defaultProps = {
   lado: "izquierda",
 };
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_TEST_PK);
+const stripePromise = loadStripe("pk_test_51LA20NFEPmet0k2h8UvsOGQZ044WEJD09stXPkeif6YGtk6JrSIOMYW7DghkqjIdYlV9m8x0EyOCFcpF3RSKzIDv00ZR1AzH3s");
 
 export default function DrawerCompra(props) {
 

@@ -14,6 +14,7 @@ using ServicioHydrate.Data;
 using ServicioHydrate.Modelos;
 using ServicioHydrate.Modelos.DTO;
 using ServicioHydrate.Utilidades;
+using ServicioHydrate.Autenticacion;
 
 namespace ServicioHydrate.Controladores
 {
@@ -606,7 +607,7 @@ namespace ServicioHydrate.Controladores
 
             try
             {
-                string idStr = this.User.Claims.FirstOrDefault(i => i.Type.Equals(ClaimTypes.Actor))?.Value ?? String.Empty;
+                string idStr = this.User.Claims.FirstOrDefault(i => i.Type == GeneradorDeToken.TipoClaimIdUsuario)?.Value ?? String.Empty;
                 bool idEsValido = Guid.TryParse(idStr, out Guid idUsuario);
 
                 if (idEsValido)

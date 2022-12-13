@@ -63,6 +63,8 @@ namespace ServicioHydrate.Data
 
         public DbSet<TokenFCM> TokensParaNotificaciones { get; set; }
 
+        public DbSet<Ubicacion> Ubicaciones { get; set; }
+
         /// Configura la creación de cada entidad en la base de datos. (No la inserción)
         protected override void OnModelCreating(ModelBuilder modelBuilder) 
         {
@@ -145,6 +147,16 @@ namespace ServicioHydrate.Data
                 .WithOne(pe => pe.PaisDeResidencia)
                 .HasForeignKey(pe => pe.IdPaisDeResidencia);
 
+            modelBuilder.Entity<Pais>()
+                .HasMany(pa => pa.UbicacionesEnPais)
+                .WithOne(u => u.Pais)
+                .HasForeignKey(u => u.IdPais);
+
+            modelBuilder.Entity<Usuario>()
+                .HasOne(us => us.Ubicacion)
+                .WithOne(ub => ub.Usuario)
+                .HasForeignKey<Ubicacion>(ub => ub.IdUsuario);
+
             modelBuilder.Entity<Perfil>()
                 .HasOne(p => p.Cuenta)
                 .WithOne(u => u.PerfilDeUsuario)
@@ -154,7 +166,11 @@ namespace ServicioHydrate.Data
             // entidades asociadas con un Perfil. 
             // (Esto es para identificar los registros de distintos usuarios.)
             modelBuilder.Entity<RegistroDeActividad>()
-                .HasKey(af => new { af.Id, af.IdPerfil });
+                .Property(ar => ar.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<RegistroDeActividad>()
+                .HasKey(ar => new { ar.Id, ar.IdPerfil });
                 
             modelBuilder.Entity<DatosMedicos>()
                 .HasKey(dm => new { dm.Id, dm.IdPerfil });
@@ -167,6 +183,10 @@ namespace ServicioHydrate.Data
 
             modelBuilder.Entity<MetaHidratacion>()
                 .HasKey(m => new { m.Id, m.IdPerfil });
+
+            modelBuilder.Entity<RegistroDeHidratacion>()
+                .Property(rh => rh.Id)
+                .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<RegistroDeHidratacion>()
                 .HasKey(rh => new { rh.Id, idPerfil = rh.IdPerfil });
