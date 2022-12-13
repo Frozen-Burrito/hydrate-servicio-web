@@ -29,15 +29,15 @@ main.form-page.center {
 }
 
 .img-signup {
-  background-image: url(../../images/placeholder.png);
+  background-image: url(../../images/login_bg.jpg);
 }
 
 .img-signin {
-  background-image: url(../../images/placeholder.png);
+  background-image: url(../../images/login_bg.jpg);
 }
 
 .img-enviar-comentario {
-  background-image: url(../../images/placeholder.png);
+  background-image: url(../../images/publish_comment_bg.jpg);
 }
 
 /* Formularios y campos */
