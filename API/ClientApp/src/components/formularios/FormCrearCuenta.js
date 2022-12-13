@@ -230,6 +230,7 @@ function FormCrearCuenta() {
                   className='input' 
                   placeholder='Nombre de usuario' value={nombreUsuario}
                   onChange={e => handleUsernameChange(e)}/>
+                  <div>Formato valido, minusculas sin espacio, puede contener numeros</div>
               </div>
 
               <p className='error mt-1' >

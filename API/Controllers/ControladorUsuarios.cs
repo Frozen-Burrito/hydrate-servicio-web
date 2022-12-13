@@ -24,7 +24,7 @@ namespace ServicioHydrate.Controladores
     [Consumes("application/json")]
     public class ControladorUsuarios : ControllerBase
     {
-        /// El repositorio de acceso a los Usuarios.
+        /// El repositorio da acceso a los Usuarios.
         private readonly IServicioUsuarios _repoUsuarios;
 
         // Permite generar Logs desde las acciones del controlador.

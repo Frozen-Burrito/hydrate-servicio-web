@@ -29,7 +29,7 @@ export default function FormAgregarRecurso({ recursoActual, onRecursoModificado 
   const [errDescripcion, setErrDescripcion] = useState('');
 
   const [errGeneral, setErrGeneral] = useState('');
-  const [txtBotonSubmit, setTxtBotonSubmit] = useState('Agregr Recurso');
+  const [txtBotonSubmit, setTxtBotonSubmit] = useState('Agregar Recurso');
 
   // Describe si el formulario esta haciendo una peticion a la API.
   const [estaCargando, setEstaCargando] = useState(false);
@@ -40,7 +40,7 @@ export default function FormAgregarRecurso({ recursoActual, onRecursoModificado 
     setUrl(recursoExistente ? recursoActual.url : '');
     setDescripcion(recursoExistente ? recursoActual.descripcion : '');
 
-    setTxtBotonSubmit(recursoExistente ? 'Confirmar Cambios' : 'Agregr Recurso');
+    setTxtBotonSubmit(recursoExistente ? 'Confirmar Cambios' : 'Agregar Recurso');
     
   }, [recursoActual, recursoExistente])
   
