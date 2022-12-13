@@ -9,7 +9,7 @@ export function PaginaPerfil() {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const {valor: jwt} = useCookie('jwt');
 
-  const [idCuentaUsuario, setIdCuentaUsuario] = useState("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+  const [idCuentaUsuario] = useState("3fa85f64-5717-4562-b3fc-2c963f66afa6");
 
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
