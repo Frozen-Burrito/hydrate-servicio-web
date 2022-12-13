@@ -24,7 +24,7 @@ namespace ServicioHydrate.Controladores
     [Consumes("application/json")]
     public class ControladorUsuarios : ControllerBase
     {
-        /// El repositorio de acceso a los Usuarios.
+        /// El repositorio da acceso a los Usuarios.
         private readonly IServicioUsuarios _repoUsuarios;
 
         // Permite generar Logs desde las acciones del controlador.
@@ -262,7 +262,7 @@ namespace ServicioHydrate.Controladores
         /// </summary>
         /// <returns>El nombre de usuario y correo del usuario actual.</returns>
         [HttpGet("datos")]
-        [Authorize]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DTOUsuario))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

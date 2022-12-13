@@ -11,15 +11,19 @@ export function PaginaPerfil() {
   const {valor: jwt} = useCookie('jwt');
 
   const [idCuentaUsuario, setIdCuentaUsuario] = useState("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [fechaNacimiento, setFechaNacimiento] = useState("");
-  const [sexoUsuario, setSexoUsuario] = useState(0);
+  const [nombreUsuario, setNombreUsuario] = useState("");
+  const [email, setEmail] = useState("");
   const [estatura, setEstatura] = useState(0);
   const [peso, setPeso] = useState(0);
-  const [ocupacion, setOcupacion] = useState(0);
-  const [condicionMedica, setCondicionMedica] = useState(0)
+  const [sexoUsuario, setSexoUsuario] = useState(0);
+  const [condicionMedica, setCondicionMedica] = useState(0);
   const [idPaisDeResidencia, setIdPaisDeResidencia] = useState(1);
+
+  const [ocupacion, setOcupacion] = useState(0);
   const [cantidadMonedas, setCantidadMonedas] = useState(0);
   const [numModificaciones, setNumModificaciones] = useState(0);
   const [fechaSyncConGoogleFit, setFechaSyncConGoogleFit] = useState(null);
@@ -33,13 +37,21 @@ export function PaginaPerfil() {
     const obtenerPerfil = async() => {
 
       const res = await getPerfil(jwt);
+      const res1 = await getInformacionPerfil(jwt);
       console.log(res);
+      console.log(res1);
 
       if(res.cuerpo !== undefined && res.ok) {
 
         setNombre(res.cuerpo.nombre);
         setApellido(res.cuerpo.apellido);
         setFechaNacimiento(res.cuerpo.fechaNacimiento);
+        setNombreUsuario(res1.cuerpo.nombreUsuario);
+        setEmail(res1.cuerpo.email);
+        setPeso(res.cuerpo.peso);
+        setEstatura(res.cuerpo.estatura);
+        setSexoUsuario(res.cuerpo.sexoUsuario);
+        setCondicionMedica(res.cuerpo.condicionMedica);
       }
     }
     obtenerPerfil();
@@ -66,7 +78,9 @@ export function PaginaPerfil() {
       fechaCreacion,
       fechaModificacion,
       idEntornoSeleccionado,
-      idsEntornosDesbloqueados
+      idsEntornosDesbloqueados,
+      nombreUsuario,
+      email
     }
 
     updatePerfil(cambiosPerfil, jwt);
@@ -122,7 +136,9 @@ export function PaginaPerfil() {
               type="text" 
               name="nombreUsuario" 
               className="input" 
-              placeholder='Nombre del usuario' 
+              placeholder='Nombre del usuario'
+              value={nombreUsuario}
+              onChange={(e) => setNombreUsuario(e.target.value)}
               />
             </div>
             <div className='campo-icono'>
@@ -136,6 +152,32 @@ export function PaginaPerfil() {
                 placeholder='País'
                 value={ idPaisDeResidencia }
                 onChange={(e) => setIdPaisDeResidencia(e.target.value)}
+                />
+            </div>
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                height
+              </span>
+                <input 
+                type="number" 
+                name="estatura" 
+                className="input" 
+                placeholder='Estatura'
+                value={ estatura }
+                onChange={(e) => setEstatura(e.target.value)}
+                />
+            </div>
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                person
+              </span>
+                <input 
+                type="number" 
+                name="peso" 
+                className="input" 
+                placeholder='Peso'
+                value={ peso }
+                onChange={(e) => setPeso(e.target.value)}
                 />
             </div>
           </div>
@@ -161,7 +203,9 @@ export function PaginaPerfil() {
               type="text" 
               name="correo" 
               className="input" 
-              placeholder='Correo Electrónico' 
+              placeholder='Correo Electrónico'
+              value={ email }
+              onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className='campo-icono'>
@@ -175,6 +219,32 @@ export function PaginaPerfil() {
                 placeholder='Fecha de Nacimiento'
                 value={ fechaNacimiento }
                 onChange={(e) => setFechaNacimiento(e.target.value)}
+                />
+            </div>
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                person
+              </span>
+                <input 
+                type="number" 
+                name="sexoUsuario" 
+                className="input" 
+                placeholder='Sexo'
+                value={ sexoUsuario }
+                onChange={(e) => setSexoUsuario(e.target.value)}
+                />
+            </div>
+            <div className='campo-icono'>
+              <span className='material-icons'>
+                person
+              </span>
+                <input 
+                type="number" 
+                name="condicionMedica" 
+                className="input" 
+                placeholder='Condicion Medica'
+                value={ condicionMedica }
+                onChange={(e) => setCondicionMedica(e.target.value)}
                 />
             </div>
           </div>
