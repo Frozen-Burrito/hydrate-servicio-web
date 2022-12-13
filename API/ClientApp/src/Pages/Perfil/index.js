@@ -2,7 +2,7 @@ import './perfil.css';
 import React, { useEffect, useState } from "react";
 import useCookie from '../../utils/useCookie';
 import { Layout, Avatar, DrawerPerfil } from "../../components";
-import { getPerfil, updatePerfil } from '../../api/api_perfil';
+import { getPerfil, updatePerfil, getInformacionPerfil } from '../../api/api_perfil';
 
 export function PaginaPerfil() {
 
@@ -41,9 +41,7 @@ export function PaginaPerfil() {
       console.log(res1);
 
       if(res.cuerpo !== undefined && res.ok) {
-
-        
-        (res.cuerpo.nombre);
+        setNombre(res.cuerpo.nombre);
         setApellido(res.cuerpo.apellido);
         setFechaNacimiento(res.cuerpo.fechaNacimiento);
         setNombreUsuario(res1.cuerpo.nombreUsuario);
