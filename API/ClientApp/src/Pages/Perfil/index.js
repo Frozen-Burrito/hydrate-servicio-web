@@ -2,7 +2,7 @@ import './perfil.css';
 import React, { useEffect, useState } from "react";
 import useCookie from '../../utils/useCookie';
 import { Layout, Avatar, DrawerPerfil } from "../../components";
-import { getPerfil, updatePerfil, getInformacionPerfil } from '../../api/api_perfil';
+import { getPerfil, updatePerfil } from '../../api/api_perfil';
 
 export function PaginaPerfil() {
 
@@ -22,15 +22,15 @@ export function PaginaPerfil() {
   const [condicionMedica, setCondicionMedica] = useState(0);
   const [idPaisDeResidencia, setIdPaisDeResidencia] = useState(1);
 
-  const [ocupacion, setOcupacion] = useState(0);
-  const [cantidadMonedas, setCantidadMonedas] = useState(0);
-  const [numModificaciones, setNumModificaciones] = useState(0);
-  const [fechaSyncConGoogleFit, setFechaSyncConGoogleFit] = useState(null);
-  const [fechaCreacion, setFechaCreacion] = useState(null);
-  const [fechaModificacion, setFechaModificacion] = useState(null);
-  const [idEntornoSeleccionado, setIdEntornoSeleccionado] = useState(1);
-  const [idsEntornosDesbloqueados, setIdsEntornosDesbloqueados] = useState([1]);
-
+  const [ocupacion] = useState(0);
+  const [cantidadMonedas] = useState(0);
+  const [numModificaciones] = useState(0);
+  const [fechaSyncConGoogleFit] = useState(null);
+  const [fechaCreacion] = useState(null);
+  const [fechaModificacion] = useState(null);
+  const [idEntornoSeleccionado] = useState(1);
+  const [idsEntornosDesbloqueados] = useState([1]);
+  
   useEffect(() => {
 
     const obtenerPerfil = async() => {
@@ -42,7 +42,8 @@ export function PaginaPerfil() {
 
       if(res.cuerpo !== undefined && res.ok) {
 
-        setNombre(res.cuerpo.nombre);
+        
+        (res.cuerpo.nombre);
         setApellido(res.cuerpo.apellido);
         setFechaNacimiento(res.cuerpo.fechaNacimiento);
         setNombreUsuario(res1.cuerpo.nombreUsuario);

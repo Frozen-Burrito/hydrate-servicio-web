@@ -3,6 +3,8 @@ import './Footer.css';
 import { Link } from 'react-router-dom';
 import BotonesGenerales from '../../components/Botones/BotonesGenerales';
 
+import logo from "../../images/icono_sin_bg.png";
+
 const texto = 'Iniciar Sesión';
 
 const Footer = () => {
@@ -11,11 +13,11 @@ const Footer = () => {
         <div className='footer-box'>
           <div className='footer-navbar'>
             <div className='footer-title-container'>
-              <h3 className='footer-title'>Hydrate</h3>
+              <img className="footer-logo" src={logo} alt="Logo de Hydrate" />
             </div>
             <div className='footer-links-container'>
               <div className='product-links'>
-                <h4 className='links-footer-title'>Botella</h4>
+                <h4 className='links-footer-title'>Dispositivos</h4>
                 <Link className='footer-link' to='/' style={{ textDecoration: 'none' }}>Características</Link>
                 <Link className='footer-link' to='/productos' style={{ textDecoration: 'none' }}>Comprar</Link>
                 <Link className='footer-link' to='https://play.google.com/store/games' style={{ textDecoration: 'none' }}>Descargar la App</Link>
@@ -33,7 +35,7 @@ const Footer = () => {
               </div>
             </div>
             <div className='footer-btn-container'>
-              <BotonesGenerales texto={texto} />
+              <BotonesGenerales texto={texto} url="/inicio-sesion"/>
             </div>
           </div>
           <hr />

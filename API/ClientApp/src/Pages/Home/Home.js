@@ -1,9 +1,12 @@
 import React from 'react'
+import { Link } from "react-router-dom";
 import './Home.css';
 import Typewriter  from 'typewriter-effect';
 
 import { Tarjeta, Layout, Footer } from "../../components";
 import BotoneCompra from '../../components/Botones/BotonesCompra';
+
+import googlePlayButton from "./appstores_google_play.png";
 
 const escribirAuto = () => {
    return <Typewriter
@@ -35,7 +38,7 @@ export function Home() {
                   <h1 className='text edition'>Cambiará tu</h1>
                   <h1 className='text'> {escribirAuto()} </h1>
                 </div>
-                <h3 className='description'>Crea un hábito positivo con nuestra botella.</h3>
+                <h3 className='description'>Forma un hábito saludable con la extensión inteligente Hydrate</h3>
             <div className='btn-container'>
                 <BotoneCompra />
             </div>
@@ -43,8 +46,12 @@ export function Home() {
         </div>
       </div>
       <section className='info-container'>
-        <div className='box-info'>
-          <p className='info'>¿Ya tienes la botella? Descarga la aplicación para dispositivos móviles.</p>
+        <div className='stack horizontal justify-between align-center' style={{ maxWidth: "80vw"}}>
+          <p className='info'>¿Ya tienes la extensión inteligente? Descarga la app Hydrate para dispositivos móviles.</p>
+
+          <Link to="/">
+            <img src={googlePlayButton} alt="Download from Google Play" />
+          </Link>
         </div>
       </section>
       <section className='home-second-part'>
@@ -52,16 +59,15 @@ export function Home() {
         </div>
         <div className='bottle-definition-box'>
           <div className='bottle-definition-container-up'>
-            <h2 className='tittle-definion-up'>Una botella para acompañarte</h2>
+            <h2 className='tittle-definion-up'>Un Dispositivo Para Acompañarte</h2>
             <div className='text-description-container-up'>
               <span className="material-icons">
                 view_in_ar
               </span>
               <p className='text-description-up'>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-              Morbi ultrices tortor sed felis suscipit, id volutpat est 
-              cursus. Morbi eleifend diam efficitur, vehicula dolor nec, 
-              lobortis sem. Cras semper blandit augue sit amet sodales.
+                La extensión inteligente Hydrate facilita medir tu consumo
+                de agua durante tus actividades diarias, como trabajar o hacer
+                actividad física. 
               </p>
             </div>
             <div className='text-description-container-up'>
@@ -69,10 +75,10 @@ export function Home() {
                 phonelink_ring
               </span>
               <p className='text-description-up'>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-              Morbi ultrices tortor sed felis suscipit, id volutpat est 
-              cursus. Morbi eleifend diam efficitur, vehicula dolor nec, 
-              lobortis sem. Cras semper blandit augue sit amet sodales.
+              Para obtener el máximo provecho de la extensión inteligente, 
+              puedes instalar gratuitamente la app Hydrate. La app ayuda  a formar 
+              un hábito saludable de consumo de agua, que se adecúe a tus necesidades
+              y estilo de vida.
               </p>
             </div>
           </div>
@@ -80,13 +86,13 @@ export function Home() {
             <div className='bottle-definition-container'>
               <div className="mr-3">
                 <Tarjeta> 
-                  <p>Maecenas non purus tincidunt, sollicitudin erat ac, feugiat mi.</p>
+                  <p>La app Hydrate tiene soporte dedicado para atletas y personas con condiciones médicas.</p>
                 </Tarjeta>
               </div>
 
               <div className="mr-3">
                 <Tarjeta>
-                  <p>Maecenas non purus tincidunt, sollicitudin erat ac, feugiat mi.</p>
+                  <p>Usando una cuenta Hydrate, puedes sincronizar tu progreso de hidratación en todos tus dispositivos.</p>
                 </Tarjeta>
               </div>
 

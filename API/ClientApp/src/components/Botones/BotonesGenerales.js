@@ -1,9 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 
-const BotonesGenerales = ( {texto} ) => {
+const BotonesGenerales = ( {texto, url} ) => {
   return (
-    <Link className='btn btn-primario' to='/' style={{ textDecoration: 'none', fontSize: '20px', textAlign: 'center' }}>{ texto }</Link>
+    <Link className='btn btn-primario' to={url} style={{ textDecoration: 'none', fontSize: '20px', textAlign: 'center' }}>{ texto }</Link>
   );
 }
 
